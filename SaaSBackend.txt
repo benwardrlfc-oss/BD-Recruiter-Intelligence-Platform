@@ -1,0 +1,937 @@
+Build the backend for this platform as a real BD intelligence engine, not a mock demo and not a CRM.
+
+The frontend and visual direction are already in place. What now needs building is the full backend architecture, logic, storage, ingestion, intelligence processing, and API layer so the product actually works end to end.
+
+What the backend needs to do
+
+The system is an intelligence and action platform for recruiters.
+
+Its job is to:
+
+ingest market news, company updates, funding events, venture activity, and live roles
+
+structure that raw information into clean intelligence
+
+link all entities together properly
+
+score and explain hiring signals
+
+personalise outputs to each user’s market scope
+
+power the dashboard, watchlist, venture pages, company pages, live roles, BD scripts, daily briefing, and content studio
+
+support fast search, filtering, and navigation across all linked entities
+
+This is not a candidate database, ATS, or CRM.
+It is a market intelligence, hiring signal, and BD action engine.
+
+1. Core backend architecture
+
+Build the backend in clear layers:
+
+A. Application / API layer
+
+This should handle:
+
+authentication
+
+user accounts
+
+onboarding
+
+user settings
+
+market scope
+
+watchlist
+
+dashboard data
+
+search
+
+content generation requests
+
+BD script generation
+
+CV analysis requests
+
+role and company retrieval
+
+venture intelligence retrieval
+
+B. Database layer
+
+This should store structured data for:
+
+users
+
+onboarding info
+
+market scopes
+
+companies
+
+venture firms
+
+portfolio company links
+
+hiring signals
+
+live roles
+
+company timelines
+
+watchlists
+
+CV uploads and analysis results
+
+daily briefings
+
+generated BD scripts
+
+generated LinkedIn content
+
+user interaction data for personalisation
+
+C. Ingestion layer
+
+This should collect and process raw data from:
+
+news / press release sources
+
+company websites
+
+venture firm websites
+
+portfolio pages
+
+job sources / live role sources
+
+uploaded CVs
+
+user inputs
+
+D. Intelligence processing layer
+
+This should:
+
+extract structured entities from raw content
+
+identify companies, VCs, roles, locations, funding rounds, leadership changes, pipeline events, and hiring triggers
+
+classify the type of signal
+
+determine whether a signal is relevant to the user’s market scope
+
+calculate signal strength
+
+explain signal strength
+
+build company timelines
+
+link companies to investors, roles, and signals
+
+E. Background jobs / workers
+
+Use background workers for:
+
+scanning sources
+
+parsing and enrichment
+
+daily briefing generation
+
+notification generation
+
+signal recalculation
+
+LinkedIn content generation
+
+BD script generation
+
+watchlist updates
+
+The system should not rely on the frontend for any serious logic.
+Most of the intelligence work should happen in the backend.
+
+2. Core product behaviour the backend must support
+
+The backend must support the following end-to-end flow:
+
+Raw information comes in
+→ the system extracts structured intelligence
+→ links the right entities together
+→ scores the signal
+→ checks relevance to the user’s market scope
+→ stores it cleanly
+→ pushes it to the right modules
+→ enables the user to action it
+
+For example:
+
+A company announces a Series B round
+→ backend identifies company, funding type, amount, date, sector, geography
+→ links this to the company record
+→ checks if it fits the user’s market scope
+→ creates a hiring signal
+→ calculates signal strength
+→ writes confidence explanation
+→ updates company timeline
+→ surfaces it on dashboard / watchlist / live signals
+→ allows BD script generation from that signal
+
+That type of logic should exist across the platform.
+
+3. Required core data models
+
+Build a proper relational data model so everything links together.
+
+At minimum, include the following core entities:
+
+Users
+
+Store:
+
+name
+
+title
+
+company
+
+email / auth identity
+
+preferences
+
+onboarding completion
+
+email settings
+
+Market Scopes
+
+Store:
+
+user link
+
+sector
+
+subsector / therapeutic area
+
+geography
+
+stage focus
+
+function focus
+
+A user’s market scope should influence what intelligence they see.
+
+Companies
+
+Store:
+
+name
+
+website
+
+description
+
+sector
+
+subsector
+
+geography
+
+HQ / location
+
+company stage
+
+status
+
+any enrichment fields needed for intelligence logic
+
+Venture Firms
+
+Store:
+
+name
+
+website
+
+AUM if available
+
+sector focus
+
+stage focus
+
+geography focus
+
+Portfolio Links
+
+Store:
+
+venture firm to company relationships
+
+Roles / Live Roles
+
+Store:
+
+company
+
+title
+
+location
+
+function
+
+status
+
+source URL
+
+posted date
+
+role summary
+
+role detail data
+
+Signals
+
+Store:
+
+company link
+
+optional venture firm link
+
+signal type
+
+signal title
+
+signal summary
+
+signal source
+
+source URL
+
+signal strength
+
+confidence breakdown
+
+detected date
+
+market relevance fields
+
+Company Timeline Events
+
+Store:
+
+company
+
+event type
+
+title
+
+summary
+
+event date
+
+source URL
+
+Watchlists
+
+Store:
+
+user
+
+company
+
+Daily Briefings
+
+Store:
+
+user
+
+date
+
+summary
+
+top signals
+
+recommended BD action
+
+CV Uploads / CV Analysis
+
+Store:
+
+user
+
+file reference
+
+extracted text
+
+parsed summary
+
+market fit output
+
+BD Scripts
+
+Store:
+
+user
+
+related signal
+
+script type
+
+generated content
+
+LinkedIn Content
+
+Store:
+
+user
+
+post type
+
+content
+
+created date
+
+optional history / status
+
+User Interaction / Personalisation Data
+
+Store:
+
+clicked signals
+
+watched companies
+
+generated scripts
+
+content interactions
+
+This is needed for the personalisation engine.
+
+4. Interconnected entity logic
+
+This is critical.
+
+Every major entity must link to related entities so the platform behaves like a connected intelligence system.
+
+Examples:
+
+Venture firm pages must link to portfolio companies
+
+Portfolio companies must link to company pages
+
+Company pages must link to signals, timeline events, roles, and related investors
+
+Signals must link back to their company
+
+Watchlist companies must open their full company profile
+
+Live roles must link to the company and related signals
+
+Company and venture firm profiles must include clickable website links
+
+This logic must be enforced in the backend data model and API responses, not just the UI.
+
+5. Onboarding support
+
+Build backend support for the onboarding wizard.
+
+The onboarding flow should collect and store:
+
+Step 1
+
+User name, title, company
+
+Step 2
+
+Primary market scope:
+
+sector
+
+geography
+
+stage
+
+other filters needed
+
+Step 3
+
+3–5 target companies already being tracked
+These should populate the watchlist
+
+Step 4
+
+Upload example CV
+This should calibrate candidate analysis / talent-market fit logic
+
+Step 5
+
+Email preferences:
+
+daily briefing
+
+weekly summary
+
+signal alerts
+
+The onboarding flow should create a fully personalised starting state for the user.
+
+6. Daily Briefing engine
+
+Build backend logic for a daily briefing that appears every time the user logs in.
+
+The backend should generate and store a daily briefing containing:
+
+personalised greeting
+
+summary of what happened in the user’s market in the last 24 hours
+
+top 3 hiring signals
+
+new funding events
+
+one recommended BD action
+
+This must be generated from actual structured intelligence, not static text.
+
+The daily briefing should respect:
+
+user market scope
+
+watchlist activity
+
+user interaction history where relevant
+
+7. Watchlist engine
+
+Build a watchlist system that lets users pin companies.
+
+The backend must support:
+
+adding / removing companies from a watchlist
+
+retrieving watched companies
+
+showing a signal timeline for each watched company
+
+triggering updates when a watched company receives a new signal
+
+Each watched company should surface:
+
+funding events
+
+job postings
+
+leadership changes
+
+pipeline updates
+
+related hiring signals
+
+8. Signal detection and scoring
+
+Build a structured signal engine.
+
+The system must be able to detect signal types such as:
+
+funding round
+
+leadership hire / departure
+
+company launch
+
+portfolio expansion
+
+pipeline progression
+
+new job postings
+
+geographic expansion
+
+partnership / collaboration
+
+other relevant BD triggers
+
+For each signal:
+
+classify the type
+
+create structured records
+
+calculate signal strength
+
+store a human-readable confidence explanation
+
+Example confidence explanation:
+
+Series B funding detected = 40 points
+
+leadership gap identified = 30 points
+
+pipeline expansion announced = 24 points
+
+total = 94
+
+This should be deterministic where possible, with AI used for explanation and enrichment where useful.
+
+9. Company and venture intelligence pages
+
+Build backend support for detailed entity pages.
+
+Company page data should support:
+
+company details
+
+website
+
+sector / geography / stage
+
+investors
+
+live roles
+
+hiring signals
+
+timeline events
+
+recent news / intelligence summary
+
+Venture page data should support:
+
+venture firm details
+
+website
+
+AUM if available
+
+investment focus
+
+geography focus
+
+portfolio companies
+
+signals across portfolio
+
+recent activity where possible
+
+The API should return these as structured, linked objects so the frontend can render them cleanly.
+
+10. Live roles engine
+
+Build support for the Live Roles view.
+
+The backend should:
+
+ingest live role data
+
+store role metadata
+
+link roles to companies
+
+make roles filterable by location, function, sector, stage, and keyword
+
+allow users to click from a role into the company profile
+
+include enough company context so the role is useful as BD intelligence, not just a job listing
+
+Where relevant, roles should also be linked to related hiring signals.
+
+11. Candidate analysis / CV parsing
+
+This is not a candidate database.
+
+Build it as an analysis tool only.
+
+The backend should:
+
+accept CV uploads
+
+extract text
+
+parse key experience
+
+summarise core skills, background, leadership level, therapeutic / sector alignment, location relevance, and USP
+
+generate a market-fit style output showing which types of companies are most relevant
+
+This should be used as an intelligence tool to support recruiter action, not candidate storage or pipeline management.
+
+12. BD script generator
+
+Build backend logic so a user can generate outreach scripts from a specific hiring signal.
+
+The system should take:
+
+company
+
+signal type
+
+likely hire
+
+market context
+
+And generate:
+
+cold email
+
+LinkedIn message
+
+phone opener
+
+These outputs should reference the actual trigger, company, and likely need so they feel specific and commercially useful.
+
+Store generated scripts for history / reuse.
+
+13. LinkedIn content studio
+
+Build backend support for daily content generation based on market activity.
+
+Generate three post types:
+
+short news overview
+
+thought leadership post
+
+conversation starter
+
+All content should be based on the user’s market scope and current signal activity.
+
+Also build post history storage so previous generated content can be shown.
+
+14. Personalisation engine
+
+Build a system that tracks user behaviour and improves relevance over time.
+
+Track things like:
+
+signals clicked
+
+companies watched
+
+scripts generated
+
+content used
+
+sections engaged with
+
+Use this data to support a “Your Market Pulse” style feed that becomes more tailored to the user.
+
+This does not need to be overly complex at first, but it should be built into the architecture so relevance can improve over time.
+
+15. Search and filtering
+
+The backend must support fast search and filtering for:
+
+companies
+
+venture firms
+
+roles
+
+signals
+
+The search system should make the platform feel responsive and usable.
+
+Support structured filtering by:
+
+location
+
+sector
+
+stage
+
+function
+
+keyword
+
+user market scope
+
+16. API design
+
+Build a clean API layer to support the frontend.
+
+At minimum, the backend should expose endpoints or equivalent service functions for:
+
+authentication / current user
+
+onboarding
+
+user preferences
+
+market scope
+
+dashboard data
+
+daily briefing
+
+signals list and signal detail
+
+companies list and company detail
+
+venture firms list and venture detail
+
+live roles list and role detail
+
+watchlist add / remove / list
+
+CV upload and analysis
+
+BD script generation
+
+LinkedIn content generation
+
+search
+
+notifications / alerts
+
+scan / refresh intelligence
+
+The dashboard endpoint should return a fully assembled payload with:
+
+daily briefing
+
+top 10 signals
+
+watchlist activity
+
+top target companies
+
+quick actions metadata
+
+17. Background jobs and scheduling
+
+Use proper background processing.
+
+Do not make the user wait for long-running scans or enrichment steps in the request cycle.
+
+Background jobs should handle:
+
+source scanning
+
+data ingestion
+
+enrichment
+
+signal generation
+
+score recalculation
+
+briefing generation
+
+notifications
+
+content generation where appropriate
+
+The system should also support scheduled runs such as:
+
+daily market scan
+
+daily briefing generation
+
+periodic watchlist refresh
+
+regular role refresh
+
+venture / portfolio updates
+
+18. AI usage principles
+
+Use AI where it adds value, but do not make the whole backend depend on vague LLM behaviour.
+
+Use normal backend logic for:
+
+storing structured data
+
+linking entities
+
+deterministic scoring rules
+
+filters and search
+
+permissions
+
+timelines
+
+watchlists
+
+Use AI for:
+
+summarisation
+
+reasoning layer / explanation layer
+
+CV summary
+
+BD script generation
+
+LinkedIn content generation
+
+daily briefing wording
+
+The backend should combine:
+
+structured logic
+
+rules
+
+enrichment
+
+AI-generated readable outputs
+
+Not “just send everything to a model.”
+
+19. Production quality requirement
+
+Build this as a real, production-oriented backend foundation.
+
+That means:
+
+clean architecture
+
+modular services
+
+clear data model
+
+robust linking between entities
+
+background jobs
+
+proper validation
+
+scalable API structure
+
+maintainable code
+
+Avoid hacky demo logic or hardcoded fake connections.
+
+The system should be built so that new sources, new signal types, and new intelligence modules can be added later without rewriting the whole backend.
+
+20. Final goal
+
+The backend should make the product function as a real BD intelligence and action engine.
+
+A user should be able to:
+
+log in
+
+define their market
+
+receive relevant intelligence
+
+see linked companies, VCs, roles, and signals
+
+monitor a watchlist
+
+understand why signals matter
+
+generate BD outreach from those signals
+
+generate LinkedIn content from current market activity
+
+use the system daily as an actual intelligence assistant
+
+Build the backend so the frontend becomes a working product, not just a good-looking interface.
+
+Review the overall architecture and if anything here is missing that needs building then build it

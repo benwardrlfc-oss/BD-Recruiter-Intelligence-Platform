@@ -1,0 +1,416 @@
+Implement the following enhancements to improve usability, personalisation, navigation, and intelligence quality.
+
+The goal is to make the platform feel like a personal BD intelligence assistant for executive search, where every signal, company, and investor is interconnected and actionable.
+
+The system must remain a market intelligence and BD action engine, not a CRM or candidate database.
+
+1. Universal Linking Between Entities (Critical System Behaviour)
+
+The platform currently shows companies, venture firms, signals, and roles as separate items. This needs to change.
+
+Every entity should be clickable and interconnected, creating a navigable intelligence graph.
+
+Required linking behaviour
+
+Users should be able to navigate seamlessly between:
+
+Venture firms
+
+Portfolio companies
+
+Companies
+
+Hiring signals
+
+Live roles
+
+Watch list items
+
+Example flow
+
+User clicks:
+
+Venture Intel → Venture Firm → Portfolio Company → Company Profile → Hiring Signals → BD Script
+
+Implementation rules
+
+Every card representing:
+
+venture firm
+
+company
+
+portfolio company
+
+hiring signal
+
+role
+
+watchlist company
+
+must be clickable and open the relevant detail view.
+
+Example:
+
+Venture Intel page
+
+ARCH Venture Partners → click → opens VC profile
+
+Portfolio companies list:
+
+BioNova Therapeutics → click → opens company profile
+
+Company profile includes:
+
+website link
+
+hiring signals
+
+timeline
+
+related investors
+
+Add Website Links
+
+Every company and venture firm should include a clickable website link.
+
+Examples:
+
+Company profile
+
+Website: www.bionovatherapeutics.com
+
+Investor: ARCH Venture Partners
+Sector: Oncology Biotech
+
+Clicking the website should open it in a new browser tab.
+
+2. First-Time Onboarding Flow
+
+Add a guided onboarding wizard that runs when a new user logs into the platform for the first time.
+
+This should personalise the system immediately.
+
+Step 1 – User Details
+
+Collect:
+
+Name
+Title
+Company
+
+Example
+
+Ben Ward
+Head of Life Sciences
+CSG Talent
+
+Store this information and use the user’s name throughout the interface.
+
+Step 2 – Define Market Scope
+
+Allow the user to define the market they want the intelligence engine to analyse.
+
+Fields:
+
+Sector
+Subsector / therapeutic area
+Geography
+Company stage
+
+Example:
+
+Sector: Biotech
+Subsector: Oncology
+Geography: USA
+Stage: Seed – Series B
+
+This should drive the entire platform.
+
+Step 3 – Target Companies
+
+Ask the user to add 3–5 companies they are already tracking.
+
+Example:
+
+Tempus
+Natera
+Guardant Health
+
+These automatically populate the Watch List.
+
+Step 4 – Upload Example CV
+
+Allow the user to upload a sample CV.
+
+Purpose:
+
+Calibrate the Candidate Matcher so the system understands the type of leadership profile the recruiter typically works with.
+
+This CV is only used for analysis and calibration, not stored as a database record.
+
+Step 5 – Weekly Email Preferences
+
+Allow users to choose:
+
+Daily briefing email
+Weekly market summary
+Signal alerts
+
+This completes onboarding.
+
+3. Daily Briefing Panel
+
+Add a Daily Briefing section at the top of the dashboard.
+
+This should appear every time the user logs in.
+
+The tone should feel like a personal intelligence report written specifically for the user.
+
+Content of Daily Briefing
+
+Personal greeting
+
+Example
+
+Good morning Ben.
+
+AI market summary
+
+One paragraph explaining what happened in the user’s market in the last 24 hours.
+
+Example
+
+Three oncology biotech companies announced funding rounds in Boston, signalling likely leadership expansion across discovery and clinical teams.
+
+Top 3 hiring signals today
+
+Example
+
+BioNova Therapeutics – Series B – likely CSO hire
+Radiant Bio – Platform expansion – Head of Biology
+NeuroAxis – Clinical trial start – VP Clinical
+
+New funding events
+
+Example
+
+Atlas Oncology – Series A – $42M
+
+Recommended BD action
+
+Example
+
+Reach out to BioNova Therapeutics leadership regarding upcoming CSO search.
+
+4. Company Watch List
+
+Add a Watch List feature.
+
+Users can pin companies they are actively monitoring.
+
+Watch List behaviour
+
+Users can add companies from:
+
+Company pages
+Hiring signals
+Venture portfolio lists
+
+Each watched company should have its own signal timeline.
+
+Timeline includes:
+
+Funding events
+Job postings
+Leadership changes
+Pipeline updates
+
+Example timeline
+
+January – Series A funding
+February – VP Biology hire
+March – Platform expansion
+
+Users should receive a notification when a watched company triggers a new signal.
+
+The Watch List should be accessible from:
+
+Sidebar navigation
+Company cards across the platform
+
+5. Signal Confidence Explanation
+
+Each Signal Strength score must include an explanation of how the score was calculated.
+
+Add either:
+
+Tooltip
+Expandable section
+
+Example
+
+Signal Strength: 94
+
+Confidence Breakdown
+
+Series B funding detected – 40 points
+Leadership gap identified – 30 points
+Pipeline expansion announced – 24 points
+
+Total score: 94
+
+This builds trust in the AI intelligence.
+
+6. BD Scripts Generator Enhancement
+
+Improve the BD Scripts section.
+
+When a user selects a hiring signal the system should generate a personalised outreach script referencing that specific signal.
+
+Script inputs
+
+Company name
+Signal type
+Likely hire
+Market context
+
+Script outputs
+
+Cold Email
+
+LinkedIn Message
+
+Phone Call Opener
+
+Example
+
+Cold Email
+
+Subject: Quick thought on your Series B expansion
+
+Hi [Name],
+
+I saw BioNova Therapeutics recently closed its Series B round. At this stage many oncology companies begin strengthening their discovery leadership, particularly around CSO level.
+
+I’ve supported similar teams through leadership builds following funding rounds and would be happy to share insight on the market.
+
+Would it make sense to connect briefly?
+
+Best
+[Name]
+
+Scripts must feel specific and researched, not generic templates.
+
+7. LinkedIn Content Studio Enhancement
+
+Each day the system should generate three content options based on market activity.
+
+Option 1 – Market news overview
+
+Short summary of the day’s key signals and funding events.
+
+Option 2 – Thought leadership
+
+Insight about a trend detected in the user’s market.
+
+Option 3 – Conversation starter
+
+Question or discussion prompt based on current activity.
+
+All posts should be ready to copy and paste to LinkedIn.
+
+Add a Post History section so users can see previously generated posts.
+
+8. Personalisation Engine
+
+The platform should learn from user behaviour.
+
+Track:
+
+Signals clicked
+Companies watched
+Scripts generated
+Content created
+
+Use this data to prioritise relevant signals.
+
+Add a dashboard section:
+
+Your Market Pulse
+
+This dynamically surfaces the signals and companies most relevant to the user.
+
+9. Mobile Responsiveness
+
+The entire platform must be fully responsive.
+
+Recruiters should be able to check intelligence on mobile.
+
+Ensure:
+
+Dashboard works on mobile
+Signal cards adapt to smaller screens
+Venture intelligence pages remain readable
+Watch list works on mobile
+
+Add a simplified mobile Daily Briefing view showing:
+
+Greeting
+Top signals
+Recommended BD action
+
+10. Floating Quick Actions Bar
+
+Add a floating Quick Actions bar visible from every page.
+
+Actions should include:
+
+Scan Market Signals
+Upload CV
+Add Company to Watch List
+Create LinkedIn Content
+View BD Pipeline
+
+This allows recruiters to take action without navigating back to the dashboard.
+
+11. Overall Platform Experience
+
+The platform should feel like a personal intelligence assistant built specifically for the recruiter using it.
+
+Key design principles:
+
+Personalised experience using the user’s name
+
+Example
+
+Good morning Ben.
+
+Clean dark theme
+
+Clear visual hierarchy
+
+Signals and actions should always be the most prominent elements.
+
+Every piece of intelligence should relate to the user’s defined Market Scope.
+
+The user should always know:
+
+What is happening in their market
+Which companies are likely hiring
+What BD action they should take next
+
+Final Objective
+
+The platform should function as a BD Intelligence Terminal for Executive Search.
+
+Core system loop:
+
+Scan market activity
+Detect hiring signals
+Explain the trigger
+Predict leadership hiring
+Recommend BD actions
+Enable outreach
+
+Every entity in the system must be interconnected, clickable, and navigable, allowing the user to move fluidly from venture firms to companies to signals to BD actions.

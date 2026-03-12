@@ -1,0 +1,398 @@
+I want you to perform a full product and codebase audit of everything built so far before any backend work begins.
+
+Your job is to review the entire site, all current code, components, pages, navigation, user flows, clickable elements, data handling, UI consistency, and product logic so the platform works as one coherent system rather than a collection of disconnected screens.
+
+Objective
+
+Audit the entire product and identify:
+
+broken flows
+
+missing links
+
+dead buttons
+
+inconsistent interactions
+
+weak UX
+
+confusing hierarchy
+
+duplicated sections
+
+mismatched naming
+
+missing states
+
+pages that do not connect properly
+
+components that do not reflect the intended product logic
+
+anything that would cause the site to feel unfinished, disjointed, or low quality
+
+This needs to be approached like a product designer, UX reviewer, frontend architect, and QA reviewer combined.
+
+What I want you to review
+1. Full site structure
+
+Review every page, section, modal, component, navigation item, card, tab, button, dropdown, filter, table, and CTA currently in the codebase.
+
+Map:
+
+what exists
+
+what each element is supposed to do
+
+where it should lead
+
+whether it currently works
+
+whether it makes sense in the wider product flow
+
+2. Navigation and product flow
+
+Check that the whole site flows together logically.
+
+Review:
+
+primary nav
+
+secondary nav
+
+breadcrumbs if any
+
+tab logic
+
+internal page linking
+
+card click behaviour
+
+button destinations
+
+banner click behaviour
+
+filters and sort flows
+
+transitions between overview pages and detail pages
+
+Make sure:
+
+anything clickable goes somewhere meaningful
+
+anything that looks clickable behaves correctly
+
+links go to the correct destination
+
+there are no dead ends
+
+users can always understand where they are and what to do next
+
+3. UX and usability review
+
+Audit the product as if you are a real user using it for the first time.
+
+Review:
+
+clarity
+
+ease of use
+
+information hierarchy
+
+cognitive load
+
+consistency
+
+whether the dashboard is actionable
+
+whether pages feel premium, modern, and well structured
+
+whether too much is happening in one place
+
+whether any area feels cluttered, confusing, repetitive, or underdeveloped
+
+Flag areas where:
+
+the user has to think too hard
+
+important actions are buried
+
+there is duplication
+
+the flow breaks down
+
+the platform does not feel intuitive
+
+4. UI consistency audit
+
+Review the visual and interaction consistency across the product.
+
+Check for:
+
+inconsistent spacing
+
+inconsistent card styles
+
+inconsistent typography
+
+inconsistent button styles
+
+inconsistent hover states
+
+inconsistent icon usage
+
+inconsistent naming of features
+
+inconsistent empty states
+
+inconsistent light mode styling
+
+poor contrast or readability issues
+
+sections that feel visually disconnected from the rest of the product
+
+The platform should feel like one premium system throughout.
+
+5. Functional review of every interactive element
+
+I want you to audit all interactivity.
+
+Check:
+
+buttons
+
+cards
+
+tabs
+
+search
+
+filters
+
+toggles
+
+dropdowns
+
+sort controls
+
+hover states
+
+drawers
+
+modals
+
+links
+
+homepage banners
+
+signals
+
+companies
+
+hotspot interactions
+
+content studio actions
+
+BD script actions
+
+settings save/update behaviour
+
+Identify:
+
+what works
+
+what does not work
+
+what is stubbed
+
+what is misleading
+
+what should be connected differently
+
+6. Naming and logic consistency
+
+Check that product naming is consistent throughout.
+
+For example:
+
+if “Targets” should now be “Companies”, make sure that change is reflected consistently
+
+market scope should align with settings logic
+
+any feature names should match their true function
+
+sector / subsector / function naming should make sense
+
+user-facing language should be clear and professional
+
+Flag any naming, taxonomy, or structural mismatches.
+
+7. Feature-to-feature cohesion
+
+Review whether all major product areas actually support each other properly.
+
+Check that:
+
+dashboard links into companies, signals, and intelligence correctly
+
+company pages connect to news and hiring signals
+
+venture intelligence connects to relevant filters and detail views
+
+market intelligence links out properly
+
+content studio can logically pull from real signals/news
+
+BD scripts are clearly driven by opportunity or signal selection
+
+settings actually control what the user sees elsewhere in the product
+
+Identify anywhere the product currently feels disconnected.
+
+8. State handling and edge cases
+
+Review the frontend for missing states and poor handling.
+
+Check for:
+
+empty states
+
+no results states
+
+loading states
+
+error states
+
+partially filled states
+
+missing data handling
+
+long text overflow
+
+mobile/responsive issues if relevant
+
+inconsistent placeholder behaviour
+
+9. Code quality and architecture review
+
+Review the codebase structure as well, not just the UI.
+
+Check for:
+
+duplicated components
+
+messy page logic
+
+poor separation of concerns
+
+inconsistent naming conventions
+
+hardcoded data that should not be hardcoded
+
+components with unclear purpose
+
+routing issues
+
+missing reusable patterns
+
+fragile or messy state flow
+
+anything that will make backend integration harder later
+
+Do not just say “refactor this.” Be specific.
+
+10. Output format I want
+
+I do not want a vague summary.
+
+I want the output in this structure:
+
+A. Executive summary
+
+A concise overview of how strong or weak the product currently is overall.
+
+B. What is working well
+
+The areas that are clean, strong, well connected, and should remain.
+
+C. Issues found
+
+Break these into categories:
+
+navigation and flow issues
+
+UX issues
+
+UI consistency issues
+
+clickable/linking issues
+
+naming/taxonomy issues
+
+code architecture issues
+
+missing states / edge cases
+
+product logic gaps
+
+D. Priority fixes
+
+Separate these into:
+
+Critical fixes
+
+Important fixes
+
+Nice-to-have improvements
+
+E. Exact recommendations
+
+For each issue, explain:
+
+what is wrong
+
+why it is a problem
+
+what should be changed
+
+where in the codebase it lives
+
+what the intended correct behaviour should be
+
+F. Implementation plan
+
+Give me the best order to fix everything so the site becomes fully coherent before backend development starts.
+
+Important instructions
+
+Do not assume the current behaviour is correct just because it exists.
+
+Audit the product against the goal of creating a premium, clean, modern, highly actionable intelligence platform.
+
+Be critical and precise.
+
+Think like a top-tier product lead doing a pre-backend readiness audit.
+
+Trace all major user flows end to end.
+
+Review both UX and code structure together.
+
+Check whether every clickable element leads to the correct place.
+
+Identify anything that will break backend integration later.
+
+Flag any hardcoded/demo behaviour that should be removed before backend development.
+
+Where useful, propose structural improvements, not just cosmetic tweaks.
+
+Final requirement
+
+At the end, give me a Backend Readiness Verdict:
+
+Ready
+
+Almost ready
+
+Not ready
+
+Then explain exactly why.

@@ -1,0 +1,399 @@
+Build a production-ready SaaS web application called “BD Intelligence OS for Recruiters”.
+
+This is a pure business development intelligence platform for recruiters and executive search consultants. It is NOT a CRM, ATS, or candidate management system. Its only purpose is to help recruiters identify who to target, why they matter now, what angle to use, and what content to publish so they generate more BD conversations, more relevance in outreach, more inbound leads, and ultimately more vacancies.
+
+CORE PRODUCT PURPOSE
+
+The platform must ingest market intelligence daily, analyse it with AI, and turn it into actionable BD opportunities for recruiters working in specific niches such as:
+- Early Stage Biotech USA
+- Venture Capital Biotech Europe
+- Diagnostics US
+- MedTech Europe
+- CRO/CDMO Global
+- Oncology Clinical Biotech USA
+- ADC Biotech Europe
+- Synthetic Biology USA
+
+The platform must be highly personalised. Every user configures their own market focus so the system becomes a tailored BD intelligence environment for that user.
+
+The platform must answer these questions every day:
+1. What happened in my market?
+2. Which companies or investors should I target?
+3. Why are they relevant now?
+4. What hiring implication or growth signal does this create?
+5. What is the best stakeholder type to approach?
+6. What should I say in outreach?
+7. What content can I publish from these signals?
+8. Which companies are relevant for a candidate I want to monetise?
+
+SYSTEM ARCHITECTURE
+
+Build the platform using:
+- Frontend web app with modern SaaS UI
+- Backend APIs and database
+- AI agent layer
+- Daily automated market intelligence ingestion layer
+- Scoring and rules engine
+- Personalised user configuration layer
+
+The platform must use AI agents, not just simple prompts.
+
+AI AGENT REQUIREMENTS
+
+Build multiple specialised AI agents that work together:
+
+1. Market Intelligence Agent
+Purpose:
+Scour the web daily for relevant news, market updates, funding announcements, leadership changes, hiring signals, partnerships, M&A, IPOs, clinical milestones and investor activity.
+It must gather relevant information for each user’s configured market focus.
+
+2. Signal Classification Agent
+Purpose:
+Take raw articles and classify them into structured signal types such as:
+- Funding
+- Partnership
+- Leadership Change
+- Hiring Signal
+- Clinical Milestone
+- Acquisition / M&A
+- IPO / Financing
+- VC Portfolio Activity
+It must tag geography, sector, stage, modality, and functions impacted.
+
+3. Opportunity Intelligence Agent
+Purpose:
+Translate each signal into BD implications.
+For each signal it must generate:
+- why this matters
+- likely hiring implication
+- likely business development relevance
+- recommended stakeholder role to target
+- best outreach angle
+
+4. Opportunity Scoring Agent
+Purpose:
+Score every company and investor by BD value.
+Scoring must consider:
+- signal strength
+- signal recency
+- company lifecycle stage
+- hiring intensity
+- signal density
+- momentum
+- investor backing
+
+5. Candidate Monetisation Agent
+Purpose:
+When a recruiter uploads a CV or candidate summary, analyse the candidate and return:
+- best-fit target companies
+- why they fit commercially
+- which stakeholder to target
+- outreach angle
+- prebuilt e-shot / outreach draft
+
+6. BD Script Generator Agent
+Purpose:
+Generate outreach messaging from any opportunity.
+It must generate:
+- email opener
+- LinkedIn opener
+- cold call opener
+- short BD angle summary
+
+7. Content Agent
+Purpose:
+Generate LinkedIn posts, newsletter ideas, and market commentary from recent signals, trend clusters, or venture activity.
+
+All agents must work from structured data and user-specific market filters.
+
+MARKET PERSONALISATION
+
+Each user must configure a personalised market profile.
+
+Required setup fields:
+- Geography
+- Sector
+- Sub-sector / indication area
+- Company stage
+- Function focus (R&D, Clinical, Commercial, CMC, Regulatory, Operations, Manufacturing, Medical Affairs etc.)
+- Optional modality / technology focus
+- Optional investor focus
+
+Examples:
+- Early Stage Biotech, USA, R&D + Clinical
+- Venture Capital Biotech, Europe
+- Diagnostics, US, Commercial
+- CRO/CDMO, Global, Manufacturing
+- Oncology Biotech, Europe, Clinical
+
+Users must be able to save multiple market profiles and switch between them.
+All intelligence, dashboards, scores, trends, signals, target accounts, live roles and content must recalculate based on the active user market profile.
+
+DAILY INTELLIGENCE INGESTION
+
+The system must scour the web daily and automatically ingest relevant information.
+
+Requirements:
+- Run daily intelligence collection jobs
+- Search relevant market sources
+- Parse relevant pages/articles
+- Deduplicate signals
+- Score article/source relevance
+- Store source URL and source name
+- Link each signal to relevant company/investor entities
+- Ignore irrelevant generic news
+
+The system must support a broad source architecture so the intelligence layer can check:
+- industry news sites
+- biotech / medtech / diagnostics media
+- company news pages
+- press releases
+- VC websites / portfolio updates
+- public job boards / company hiring pages
+- regulatory / clinical milestone sources where relevant
+
+DATA ENTITIES
+
+Create these core data models:
+
+User
+- name
+- email
+- company
+- account type
+- saved market profiles
+
+Market Profile
+- geography
+- sector
+- subsector
+- company stage
+- function focus
+- modality focus
+- investor focus
+
+Company
+- name
+- sector
+- subsector
+- stage
+- geography
+- website
+- modality
+- investors
+- lifecycle stage
+- summary
+
+Investor / VC
+- name
+- geography
+- stage focus
+- sector focus
+- website
+- portfolio companies
+- activity summary
+
+Market Signal
+- signal type
+- title / headline
+- company
+- investor
+- source name
+- source URL
+- date
+- summary
+- why it matters
+- impacted functions
+- relevant market tags
+
+Opportunity
+- linked company
+- linked signal(s)
+- opportunity score
+- momentum score
+- BD timing window
+- recommended stakeholder
+- likely hiring need
+- outreach angle
+- lifecycle context
+
+Candidate Upload
+- uploaded file or pasted summary
+- parsed candidate profile
+- role / function
+- seniority
+- expertise
+- market relevance
+
+Candidate Match
+- candidate
+- matched company
+- match score
+- reason for fit
+- stakeholder to target
+- outreach draft
+
+Content Item
+- content type
+- linked signals
+- draft text
+- status
+- market profile
+
+KEY PRODUCT FEATURES
+
+1. Market Focus Setup
+Onboarding and settings where users define their market profile(s).
+
+2. BD Command Centre Dashboard
+The main daily homepage.
+Must show:
+- top opportunities
+- latest relevant signals
+- funding and investor activity
+- live hiring signals
+- high momentum companies
+- trend snapshots
+- content opportunities
+
+3. Market Radar
+A searchable, filterable intelligence feed.
+Each item must show:
+- source
+- summary
+- why it matters
+- BD angle
+- company/investor
+- signal type
+- impacted function
+- relevant market tags
+
+4. Opportunity Scoring Engine
+Rank all companies/investors using a visible score.
+
+5. Momentum Detection
+Detect signal clusters and high-activity companies/sectors.
+
+6. BD Timing Window
+Recommend when to contact:
+- Contact Now
+- 1–2 Weeks
+- 30 Days
+based on timing and signal context.
+
+7. Target Accounts View
+Ranked table of BD targets with:
+- company / investor
+- score
+- momentum
+- timing window
+- likely hiring need
+- recommended stakeholder
+- outreach angle
+
+8. Opportunity Timeline
+For each company show chronological signals and key events.
+
+9. Similar Company & Competitor Discovery
+From any company, surface similar and competitor companies using market similarity logic.
+
+10. Venture Intelligence & Portfolio Expansion
+Show VC activity and allow expansion into relevant portfolio companies.
+
+11. Candidate Matcher
+User uploads candidate CV or summary and receives ranked target companies, reasons, stakeholder types, and e-shot draft.
+
+12. Live Hiring Signals
+Aggregate hiring activity and classify by function such as R&D, Clinical, Commercial, CMC, Regulatory etc.
+
+13. BD Script Generator
+Generate outreach copy for email, LinkedIn and calls using signal context.
+
+14. Content Studio
+Generate:
+- LinkedIn posts
+- newsletter ideas
+- market trend commentary
+tailored to user’s market focus.
+
+15. Market Trend & Momentum Insights
+Aggregate signals into macro insights:
+- hottest subsectors
+- most active funding stages
+- fastest-growing hiring functions
+- most active investors
+
+USER EXPERIENCE / UI REQUIREMENTS
+
+The platform must be visually clean, modern, premium, and highly usable.
+
+UI requirements:
+- modern B2B SaaS interface
+- left sidebar navigation
+- fast-scanning dashboard cards
+- clear tables for ranked targets
+- strong filtering system
+- searchable global search
+- visually prominent scores and timing badges
+- timeline view on company pages
+- source links visible everywhere
+- mobile responsive but desktop-first
+- designed for daily repeated use by recruiters
+
+Every key record view must contain an Action Panel showing:
+- Why this matters
+- Recommended next action
+- Recommended stakeholder to approach
+- Outreach angle
+- Opportunity score
+- Timing window
+
+FUNCTION-SPECIFIC PERSONALISATION
+
+The platform must tailor outputs based on the user’s selected function focus.
+
+Examples:
+If user focuses on Clinical:
+- prioritise companies with clinical milestones, clinical hiring, CMO / VP Clinical relevance
+
+If user focuses on R&D:
+- prioritise platform companies, CSO hires, discovery/preclinical signals, scientific leadership relevance
+
+If user focuses on Commercial:
+- prioritise product launches, market expansion, commercial hiring, VP Sales / GM / Commercial Director relevance
+
+If user focuses on CMC / Manufacturing:
+- prioritise manufacturing partnerships, scale-up signals, plant expansion, CMC leadership roles
+
+This functional tailoring must affect:
+- signals shown
+- opportunity score
+- hiring need inference
+- stakeholder recommendations
+- script generation
+- content ideas
+
+IMPORTANT PRODUCT CONSTRAINTS
+
+Do NOT build this as:
+- a CRM
+- a candidate pipeline
+- an ATS
+- a contact database
+- a generic news reader
+
+Keep the product focused on BD intelligence, opportunity prioritisation, and actionable outreach preparation.
+
+FINAL STANDARD
+
+The product should feel like a recruiter’s daily BD operating system.
+
+A user should be able to log in and immediately understand:
+- what changed in their market
+- who is worth targeting
+- why those accounts matter now
+- what the likely hiring need is
+- what they should say in outreach
+- what content they can publish today
+
+Make sensible engineering decisions and continue building unless something is critically ambiguous.

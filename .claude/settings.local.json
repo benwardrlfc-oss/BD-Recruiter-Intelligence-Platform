@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes 2>&1)",
+      "Read(//c/Users/Temp/projects/**)",
+      "Bash(npx create-next-app@latest my-saas-new --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(cp -r /c/Users/Temp/projects/my-saas-new/. /c/Users/Temp/projects/my-saas/ 2>&1 && ls /c/Users/Temp/projects/my-saas/)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(ls /c/Users/Temp/projects/my-saas/*.config* 2>/dev/null && cat /c/Users/Temp/projects/my-saas/postcss.config.mjs)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(node -e \"const {PrismaClient} = require\\('@prisma/client'\\); const p = new PrismaClient\\(\\); console.log\\('ok'\\)\" 2>&1 | head -20)",
+      "Bash(node -e \"const {PrismaClient} = require\\('@prisma/client'\\); const p = new PrismaClient\\({adapter: null}\\); console.log\\('ok'\\)\" 2>&1 | head -5)",
+      "Bash(ls /c/Users/Temp/projects/my-saas/*.config* 2>/dev/null)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker --version && docker compose version)",
+      "Read(//c/Program Files/**)"
+    ]
+  }
+}

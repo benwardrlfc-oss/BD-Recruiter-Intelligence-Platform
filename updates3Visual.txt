@@ -1,0 +1,474 @@
+Core Product Philosophy
+
+This platform is not a data warehouse and not a cluttered financial terminal.
+
+The system should feel like a high-end intelligence assistant for recruiters, designed to deliver:
+
+• market news
+• intelligence analysis
+• hiring signals
+• actionable BD opportunities
+
+The user should receive intelligence → understand it quickly → take action immediately.
+
+The interface must therefore prioritise:
+
+clarity
+minimalism
+professional authority
+ease of action
+
+The experience should feel premium, calm, and intelligent, not overwhelming.
+
+Users should feel like they are using a high-end professional product, similar to the experience of using well-designed modern software like:
+
+Linear
+Notion
+Arc Browser
+Apple Pro apps
+
+The system should never feel like:
+
+a spreadsheet
+a CRM
+a data terminal
+a cluttered dashboard
+
+Design Principles
+1. Radical Clarity
+
+Every screen should answer three questions immediately:
+
+What happened
+Why it matters
+What action should I take
+
+If the interface does not clearly answer these questions, it is too complex.
+
+Information should be layered so that important insights are visible instantly while deeper analysis is available when needed.
+
+2. Minimal Cognitive Load
+
+The platform should avoid:
+
+large dense tables
+excessive charts
+multiple colours competing for attention
+heavy borders
+
+Instead the interface should rely on:
+
+clear cards
+clean spacing
+structured layout
+short summaries
+
+The goal is to allow the recruiter to understand their market in seconds.
+
+3. Calm Professional Aesthetic
+
+The interface should feel:
+
+calm
+deliberate
+precise
+
+Not:
+
+flashy
+busy
+noisy
+
+This ensures users trust the platform as a serious intelligence product.
+
+Visual Style
+Colour Theme
+
+Use a dark modern theme with restrained accent colours.
+
+Dark interfaces communicate:
+
+authority
+focus
+depth
+
+Primary Background
+
+Deep navy
+
+Example colour
+
+#0F172A
+
+This creates a calm and professional base.
+
+Panel Background
+
+Cards and modules should sit on slightly lighter surfaces.
+
+Example
+
+#1E293B
+
+This creates subtle layering.
+
+Sidebar Background
+
+Slightly darker than the main interface.
+
+Example
+
+#020617
+
+This anchors the navigation visually.
+
+Primary Accent Colour
+
+Soft indigo
+
+Example
+
+#6366F1
+
+Use for:
+
+buttons
+active tabs
+selected items
+
+This communicates intelligence and modernity.
+
+Secondary Accent Colour
+
+Soft teal
+
+Example
+
+#14B8A6
+
+Use for:
+
+signal indicators
+insight highlights
+
+This represents “intelligence”.
+
+Alert Colour
+
+Muted red
+
+Example
+
+#EF4444
+
+Use sparingly for:
+
+urgent hiring signals.
+
+Typography
+
+Use a modern professional font.
+
+Primary font:
+
+Inter
+
+Example
+
+font-family: Inter, sans-serif
+
+Font sizes should follow clear hierarchy:
+
+Page title
+28px bold
+
+Section titles
+20px semi-bold
+
+Body text
+15px regular
+
+Small metadata text
+13px
+
+Numbers and signal scores
+20px bold
+
+Typography should feel clean and highly readable.
+
+Layout Structure
+
+The platform should follow a simple three-zone layout.
+
+Top Header – Intelligence Context
+
+This establishes context.
+
+Content:
+
+User greeting
+Market scope
+Signal summary
+Primary action button
+
+Example
+
+Good morning Ben
+
+Biotech | Oncology | USA | Seed–Series B
+
+Signals Today: 12
+High Probability Searches: 5
+
+[ Scan Market Signals ]
+
+The header should remain visible while scrolling.
+
+Sidebar Navigation
+
+The sidebar should be minimal and stable.
+
+Width
+
+260px
+
+Navigation items
+
+Dashboard
+Hiring Signals
+Venture Intelligence
+Watchlist
+Companies
+BD Scripts
+Content Studio
+Trends
+Settings
+
+Icons should be minimal line icons.
+
+Active tab behaviour
+
+Left border glow using the accent colour.
+
+Main Dashboard
+
+The dashboard should be clean and action-oriented.
+
+This is the most important screen in the product.
+
+The recruiter should immediately see:
+
+Daily briefing
+Top signals
+Watchlist activity
+Top target companies
+Quick actions
+
+Dashboard Modules
+Daily Briefing
+
+This module should sit at the top.
+
+Content:
+
+One paragraph summarising key events in the user's market in the last 24 hours.
+
+Example
+
+“Three oncology biotech companies announced funding rounds in Boston, signalling upcoming leadership hiring across discovery and clinical development.”
+
+Top Hiring Signals
+
+Display the 10 most important signals detected.
+
+Each signal card should show:
+
+Company name
+Location
+Signal trigger
+Likely hires
+Signal strength
+
+Example
+
+BioNova Therapeutics
+Boston
+
+Series B funding
+
+Likely hires
+CSO
+VP Biology
+
+Signal strength: 94
+
+Cards should be scannable.
+
+Watchlist Activity
+
+Show updates from companies the user is tracking.
+
+Example
+
+Tempus – new clinical partnership
+Guardant – new leadership hire
+Natera – posted VP Clinical role
+
+Top Target Companies
+
+Show companies that match the user's market scope and show strong hiring indicators.
+
+This helps recruiters identify BD targets.
+
+Quick Actions
+
+This section should contain simple actions such as:
+
+Upload CV
+Generate BD Scriptcheck
+Create LinkedIn Post
+Scan Market Signals
+Add Company to Watchlist
+
+These should be visible immediately.
+
+Card Design
+
+Cards should be minimal and spacious.
+
+Style
+
+Rounded corners
+Soft shadow
+No heavy borders
+
+Example
+
+border-radius: 12px
+box-shadow: 0 6px 25px rgba(0,0,0,0.35)
+padding: 24px
+
+Cards should feel light and refined.
+
+Interactions
+Hover Behaviour
+
+When hovering over cards:
+
+Card lifts slightly.
+
+Example
+
+transform: translateY(-3px)
+
+Shadow deepens slightly.
+
+This gives the interface a responsive feel.
+
+Tab Behaviour
+
+When selecting a tab:
+
+Background subtly changes
+Accent border appears
+
+Transitions should be smooth.
+
+Example
+
+transition: all 200ms ease
+Animations
+
+Animations should be subtle and refined.
+
+Examples
+
+Card hover
+Panel expand
+Signal update
+
+Avoid flashy motion.
+
+Company Pages
+
+Each company page should act as an intelligence hub.
+
+Content should include:
+
+Company name
+Website link
+Sector
+Location
+Investors
+
+Signal timeline
+
+Hiring signals
+
+Recent news
+
+Venture Intelligence
+
+Venture firm pages should show:
+
+Firm overview
+AUM
+Investment focus
+
+Portfolio companies
+
+Each portfolio company should be clickable.
+
+Signal Timeline
+
+Companies should display a timeline of signals.
+
+Example
+
+Jan – Series A funding
+Feb – VP Biology hire
+Mar – pipeline expansion
+
+This helps recruiters understand hiring timing.
+
+Personalisation
+
+The interface should subtly personalise the experience.
+
+Examples
+
+Good morning Ben
+
+Your Market Pulse
+
+Your Watchlist
+
+This reinforces the feeling of a personal intelligence assistant.
+
+Mobile Design
+
+The platform must work well on mobile.
+
+Cards should stack vertically.
+
+Navigation should collapse into a menu.
+
+Daily briefing and top signals should remain visible.
+
+Final Design Goal
+
+The product should feel like:
+
+A premium intelligence assistant built for high-level recruiters.
+
+When users log in they should feel:
+
+calm
+informed
+in control
+
+They should instantly see:
+
+What happened in their market
+Which companies matter
+What BD action they should take next

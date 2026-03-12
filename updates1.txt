@@ -1,0 +1,450 @@
+Implement the following updates to improve the platform’s usability, intelligence output, and alignment with its purpose as a BD intelligence and action engine for executive search and market intelligence.
+
+The goal is to ensure the system focuses on:
+
+market intelligence
+
+hiring signals
+
+venture activity
+
+strategic BD opportunities
+
+actionable insights
+
+The platform must not function as a candidate database or CRM. It should instead act as a market intelligence terminal that surfaces signals and enables strategic BD actions.
+
+1. Introduce a Market Scope / Market Focus System
+
+The platform currently lacks a clear definition of the market it is analysing. This must be added as a core feature.
+
+Add a Market Scope panel at the top of the BD Command Centre that defines the context the system is analysing.
+
+Example structure:
+
+Market Scope
+
+Sector: Biotech
+Subsector / Therapeutic Area: Oncology
+Geography: USA → Massachusetts → Boston
+Company Stage: Seed – Series B
+Function Focus: R&D Leadership / C-Suite
+
+Include an Edit Market Scope button allowing the user to modify these parameters.
+
+The Market Scope should influence and filter the entire platform:
+
+hiring signals
+
+venture intelligence
+
+trends
+
+company insights
+
+live roles
+
+signal detection
+
+candidate matching analysis
+
+This ensures all intelligence is contextual and market-specific rather than generic.
+
+2. Rename “Opportunities” to “Hiring Signals”
+
+The term “Opportunities” should be removed.
+
+Replace it with:
+
+Hiring Signals
+
+This better reflects the platform’s role as a signal detection system rather than a job board.
+
+Each hiring signal card should include:
+
+Company Name
+Location
+Company Stage (Seed / Series A / Series B etc)
+Sector / focus area
+
+Signal detected
+Example:
+
+Series B funding
+
+New company launch
+
+Portfolio expansion
+
+Board appointment
+
+Product entering clinic
+
+Pipeline expansion
+
+Likely hires
+
+Example:
+
+Chief Scientific Officer
+
+VP Clinical Development
+
+Head of Biology
+
+VP Regulatory
+
+Signal Strength score
+
+Example:
+
+Signal Strength: 94
+
+This replaces unexplained numeric scores.
+
+3. Add AI Signal Explanation
+
+Every hiring signal must include an explanation of why the signal exists and why hiring is likely.
+
+Add a section:
+
+Why this signal exists
+
+Example:
+
+Signal Source
+Series B funding announcement
+
+AI Analysis
+Companies raising Series B funding in oncology typically expand leadership teams to support discovery and clinical strategy.
+
+Expected hires
+
+Chief Scientific Officer
+
+VP Biology
+
+VP Clinical Development
+
+This makes the intelligence explainable and actionable.
+
+4. Replace “Act Now” with BD Actions
+
+The button labelled “Act Now” should be replaced with recommended BD actions.
+
+Each signal should generate suggested actions such as:
+
+Recommended BD Actions
+
+Contact CEO or founder regarding leadership expansion
+
+Engage board members or venture investors
+
+Introduce relevant leadership candidates
+
+Reach out regarding organisational buildout
+
+This ensures the platform moves from signal detection to BD strategy.
+
+5. Improve Top Dashboard Metrics
+
+The top metrics should represent intelligence signals rather than generic counts.
+
+Replace current metrics with:
+
+Active Hiring Signals
+High Probability Searches
+New Funding Signals
+Market Momentum
+
+Each metric should reflect the current Market Scope.
+
+6. Improve Signal Cards with Stage & Funding Data
+
+Each signal card should include company stage information where possible.
+
+Example card:
+
+BioNova Therapeutics
+Boston, MA
+Series B – $75M
+
+Signal detected
+Post-funding leadership expansion
+
+Likely hires
+
+Chief Scientific Officer
+
+VP Clinical Development
+
+Head Translational Biology
+
+Signal Strength: 94
+
+This gives immediate context for BD outreach.
+
+7. Clarify Signal Scoring
+
+The numeric score currently shown (94 / 91 / etc) needs context.
+
+Rename to:
+
+Signal Strength
+
+or
+
+Hiring Probability Score
+
+Ensure the score represents the AI’s confidence that hiring activity will occur.
+
+8. Venture Intelligence Redesign
+
+The Venture Intelligence section should become a venture intelligence workspace.
+
+Layout:
+
+Left side panel
+List of venture firms active in the user’s market scope.
+
+Each VC entry should display:
+
+Firm name
+AUM
+Sector focus
+Stage focus
+
+Right side panel (when clicked)
+
+Firm overview
+AUM
+Stage focus
+Sector focus
+Geographic focus
+
+Portfolio companies
+
+Hiring signals within portfolio companies
+
+Recent activity where available
+
+Add a search bar to find venture firms quickly.
+
+9. Trends Section Redesign
+
+The Trends section should present market intelligence rather than news aggregation.
+
+The page should identify:
+
+Growing subsectors
+Capital flow patterns
+Geographic growth hotspots
+Company stage activity
+Likely upcoming hiring patterns
+
+Example outputs:
+
+Fastest Growing Areas
+
+Radiopharmaceuticals
+
+AI drug discovery
+
+RNA editing
+
+Likely upcoming leadership hires
+
+CSO
+
+VP Translational Biology
+
+Head of Clinical Strategy
+
+This page should act as a predictive market insight dashboard.
+
+10. Candidate Matcher Clarification
+
+Candidate Matcher should remain a CV analysis tool, not a database.
+
+The system must not store or search candidate databases.
+
+Workflow:
+
+User uploads CV
+AI analyses candidate background
+System summarises:
+
+Core expertise
+Leadership level
+Sector expertise
+Geography relevance
+Unique strengths / USP
+
+Then output:
+
+Top companies likely to hire someone with this profile
+Based on:
+
+sector
+therapeutic area
+location
+company stage
+
+This is used for BD targeting, not candidate storage.
+
+11. Improve Search Bar Scope
+
+Update the main search bar to support:
+
+Companies
+Investors
+Hiring signals
+Roles
+Market insights
+
+Example placeholder text:
+
+Search companies, investors, roles, or signals…
+
+12. Rename “Run Intelligence”
+
+Rename the button:
+
+Run Intelligence
+
+to something clearer:
+
+Scan Market Signals
+
+or
+
+Refresh Market Intelligence
+
+This indicates the system will scan for:
+
+funding events
+
+hiring signals
+
+venture activity
+
+company developments
+
+13. Add Funding Signal Widget
+
+Add a dashboard widget:
+
+Recent Funding Signals
+
+Example:
+
+NeuroAxis Therapeutics
+Series A – $42M
+
+Expected hires
+
+VP Clinical Development
+
+Head Regulatory
+
+CSO
+
+Funding events are one of the strongest BD signals.
+
+14. Rename Momentum Leaders
+
+Momentum Leaders should be renamed to something clearer.
+
+Suggested replacement:
+
+Hiring Momentum
+
+or
+
+Fastest Growing Companies
+
+This widget should display companies showing the strongest hiring signals.
+
+15. Add Role Demand Heatmap
+
+Add a widget showing:
+
+Most In-Demand Leadership Roles
+
+Example:
+
+Chief Scientific Officer — 12 signals
+VP Clinical Development — 9 signals
+Head of CMC — 7 signals
+VP Regulatory — 5 signals
+
+This helps recruiters understand market demand patterns.
+
+16. Add Emerging Companies Module
+
+Add a module highlighting newly funded or newly created companies.
+
+Example:
+
+Emerging Companies (Last 90 Days)
+
+Axion Therapeutics
+Atlas Oncology
+Radiant Bio
+
+Stage: Seed / Series A
+
+Expected hires
+
+CSO
+
+Head of Biology
+
+Platform Lead
+
+This helps recruiters identify companies before searches are launched.
+
+17. Add Signal Timeline Feature
+
+Each company should have a timeline of signals.
+
+Example:
+
+BioNova Therapeutics
+
+Timeline
+
+January – Series A funding
+February – VP Biology hire
+March – Platform expansion
+
+Next likely hire
+
+Chief Scientific Officer
+
+This allows the system to predict hiring cycles.
+
+18. Improve Platform Identity
+
+The platform should clearly present itself as a BD intelligence system.
+
+Under the main title add a description:
+
+Market Intelligence & Hiring Signal Engine for Executive Search
+
+This clarifies the product purpose.
+
+Final Objective
+
+The platform should operate as:
+
+An AI-powered BD intelligence terminal for executive search.
+
+Core workflow:
+
+Scan markets
+Detect hiring signals
+Explain why signals exist
+Predict leadership hiring
+Recommend BD actions
+Enable strategic outreach
