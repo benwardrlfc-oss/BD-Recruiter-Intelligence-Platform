@@ -4,10 +4,21 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { matchCandidateToCompanies } from '@/lib/agents/candidate-monetisation-agent'
 import { mockCompanies } from '@/lib/mock-data'
+import { checkAiUsage, recordAiUsage } from '@/lib/ai-usage'
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions)
+
+  // Rate limit check
+  if (session?.user) {
+    const planId = (session.user as any).planId ?? 'trial'
+    const check = await checkAiUsage(session.user.id, 'candidate_matcher', planId)
+    if (!check.allowed) {
+      return NextResponse.json({ error: check.reason }, { status: 429 })
+    }
+  }
+
   try {
-    const session = await getServerSession(authOptions)
     const { rawText, fileName, recruiterNotes } = await request.json()
 
     if (!rawText) {
@@ -72,6 +83,13 @@ export async function POST(request: NextRequest) {
       }
     } catch (dbError) {
       // DB save failed, still return results
+    }
+
+    // Record usage
+    if (session?.user) {
+      const planId = (session.user as any).planId ?? 'trial'
+      const orgId = (session.user as any).orgId
+      recordAiUsage(session.user.id, 'candidate_matcher', planId, { model: 'claude-sonnet-4-6' }, orgId)
     }
 
     return NextResponse.json(matchResult)

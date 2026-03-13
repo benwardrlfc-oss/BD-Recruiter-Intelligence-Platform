@@ -10,44 +10,14 @@ export type AiFeature =
   | 'market_briefing'
   | 'signal_explain'
 
-// ── In-memory rate limit store (replace with Redis in production) ──────────────
+// ── Feature → billing limit field mapping ─────────────────────────────────────
 
-const usageStore = new Map<string, { count: number; resetAt: number }>()
-
-function getKey(userId: string, feature: AiFeature, window: 'day' | 'month') {
-  const now = new Date()
-  const period = window === 'day'
-    ? `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`
-    : `${now.getFullYear()}-${now.getMonth()}`
-  return `${userId}:${feature}:${period}`
-}
-
-function getCount(key: string): number {
-  const entry = usageStore.get(key)
-  if (!entry) return 0
-  if (Date.now() > entry.resetAt) {
-    usageStore.delete(key)
-    return 0
-  }
-  return entry.count
-}
-
-function increment(key: string, window: 'day' | 'month') {
-  const resetAt = window === 'day'
-    ? new Date().setHours(24, 0, 0, 0)
-    : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getTime()
-  const current = getCount(key)
-  usageStore.set(key, { count: current + 1, resetAt })
-}
-
-// ── Feature → limit field mapping ─────────────────────────────────────────────
-
-const FEATURE_LIMIT_KEY: Record<AiFeature, keyof ReturnType<typeof PLAN_AI_LIMITS[PlanId]['bdScriptsPerDay' extends string ? 'bdScriptsPerDay' : never]> | string> = {
+const FEATURE_LIMIT_KEY: Record<AiFeature, string> = {
   bd_scripts: 'bdScriptsPerDay',
   content_studio: 'contentStudioPerDay',
   candidate_matcher: 'candidateMatcherPerDay',
   eshot: 'eShotPerDay',
-  market_briefing: 'bdScriptsPerDay', // shares BD script limit
+  market_briefing: 'bdScriptsPerDay',  // shares BD script limit
   signal_explain: 'contentStudioPerDay',
 }
 
@@ -60,33 +30,55 @@ export interface UsageCheckResult {
   reason?: string
 }
 
-export function checkAiUsage(
+/**
+ * Check whether a user is within their AI usage limit for today.
+ * Reads from the AiUsageLog DB table so limits survive serverless restarts.
+ * Falls back to allowing the request when the DB is unavailable.
+ */
+export async function checkAiUsage(
   userId: string,
   feature: AiFeature,
   planId: PlanId,
-): UsageCheckResult {
+): Promise<UsageCheckResult> {
   const limits = PLAN_AI_LIMITS[planId]
   const limitKey = FEATURE_LIMIT_KEY[feature]
   const limit = (limits as Record<string, number | null>)[limitKey] ?? 0
 
+  // null = unlimited (enterprise plan)
   if (limit === null) return { allowed: true, remaining: 999, limit: 999 }
 
-  const key = getKey(userId, feature, 'day')
-  const used = getCount(key)
-  const remaining = Math.max(0, limit - used)
+  try {
+    if (prisma) {
+      const startOfDay = new Date()
+      startOfDay.setHours(0, 0, 0, 0)
 
-  if (used >= limit) {
-    return {
-      allowed: false,
-      remaining: 0,
-      limit,
-      reason: `Daily limit reached for ${feature.replace('_', ' ')}. Resets at midnight.`,
+      const used = await prisma.aiUsageLog.count({
+        where: { userId, feature, createdAt: { gte: startOfDay } },
+      })
+
+      const remaining = Math.max(0, limit - used)
+
+      if (used >= limit) {
+        return {
+          allowed: false,
+          remaining: 0,
+          limit,
+          reason: `Daily limit of ${limit} reached for ${feature.replace(/_/g, ' ')}. Resets at midnight.`,
+        }
+      }
+
+      return { allowed: true, remaining, limit }
     }
+  } catch {
+    // DB unavailable — allow request rather than block users
   }
 
-  return { allowed: true, remaining, limit }
+  return { allowed: true, remaining: limit, limit }
 }
 
+/**
+ * Record an AI usage event. Fire-and-forget.
+ */
 export function recordAiUsage(
   userId: string,
   feature: AiFeature,
@@ -94,16 +86,16 @@ export function recordAiUsage(
   meta?: { inputTokens?: number; outputTokens?: number; cacheHit?: boolean; model?: string },
   orgId?: string,
 ) {
-  const key = getKey(userId, feature, 'day')
-  increment(key, 'day')
-
   const estimatedCost = ((meta?.inputTokens || 0) * 3 + (meta?.outputTokens || 0) * 15) / 1_000_000
 
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[AI Usage] user=${userId} feature=${feature} tokens=${meta?.inputTokens}/${meta?.outputTokens} cost=$${estimatedCost.toFixed(4)} cache=${meta?.cacheHit}`)
+    console.log(
+      `[AI Usage] user=${userId} feature=${feature} ` +
+      `tokens=${meta?.inputTokens}/${meta?.outputTokens} ` +
+      `cost=$${estimatedCost.toFixed(4)} cache=${meta?.cacheHit}`,
+    )
   }
 
-  // Fire-and-forget DB persistence (in-memory store is fallback when DB unavailable)
   if (prisma) {
     prisma.aiUsageLog.create({
       data: {
@@ -116,24 +108,55 @@ export function recordAiUsage(
         estimatedCost,
         cacheHit: meta?.cacheHit || false,
       },
-    }).catch(() => {}) // don't block the response
+    }).catch(() => {})
   }
 }
 
-export function getRemainingUsage(userId: string, planId: PlanId): Record<AiFeature, { used: number; limit: number }> {
+/**
+ * Get usage summary for all AI features for a user today.
+ */
+export async function getRemainingUsage(
+  userId: string,
+  planId: PlanId,
+): Promise<Record<AiFeature, { used: number; limit: number }>> {
   const limits = PLAN_AI_LIMITS[planId]
   const features: AiFeature[] = ['bd_scripts', 'content_studio', 'candidate_matcher', 'eshot', 'market_briefing', 'signal_explain']
   const result: Record<string, { used: number; limit: number }> = {}
+
+  try {
+    if (prisma) {
+      const startOfDay = new Date()
+      startOfDay.setHours(0, 0, 0, 0)
+
+      const counts = await prisma.aiUsageLog.groupBy({
+        by: ['feature'],
+        where: { userId, createdAt: { gte: startOfDay } },
+        _count: { feature: true },
+      })
+
+      const countMap: Record<string, number> = {}
+      for (const c of counts) countMap[c.feature] = c._count.feature
+
+      for (const feature of features) {
+        const limitKey = FEATURE_LIMIT_KEY[feature]
+        const limit = (limits as Record<string, number | null>)[limitKey] ?? 0
+        result[feature] = { used: countMap[feature] ?? 0, limit: limit ?? 999 }
+      }
+      return result as Record<AiFeature, { used: number; limit: number }>
+    }
+  } catch {}
+
+  // Fallback: assume 0 used
   for (const feature of features) {
     const limitKey = FEATURE_LIMIT_KEY[feature]
     const limit = (limits as Record<string, number | null>)[limitKey] ?? 0
-    const used = getCount(getKey(userId, feature, 'day'))
-    result[feature] = { used, limit: limit ?? 999 }
+    result[feature] = { used: 0, limit: limit ?? 999 }
   }
   return result as Record<AiFeature, { used: number; limit: number }>
 }
 
-// ── Simple response cache (in-memory, production should use Redis) ─────────────
+// ── In-process response cache ─────────────────────────────────────────────────
+// Per-execution caching only; use Redis for cross-request deduplication.
 
 const responseCache = new Map<string, { data: string; cachedAt: number; ttlMs: number }>()
 
