@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import {
   Save, CheckCircle, ChevronDown, ChevronRight, Globe, Sparkles,
   Plus, Trash2, ChevronLeft, RefreshCw, AlertCircle, ArrowRight,
@@ -181,6 +182,7 @@ function MarketSummaryPanel({
 export default function SettingsPage() {
   const { settings, updateSettings, activeProfile, addProfile, updateProfile, deleteProfile, switchProfile } = useSettings()
   const { theme, setTheme, palette, setPalette } = useTheme()
+  const { data: session } = useSession()
 
   // ── Wizard state ──────────────────────────────────────────────────────────
   const [wizardStep, setWizardStep] = useState<number>(0)
@@ -200,6 +202,16 @@ export default function SettingsPage() {
   const [selectedSignalFamilies, setSelectedSignalFamilies] = useState<string[]>([])
   const [expandedRegion, setExpandedRegion] = useState<string | null>('USA')
   const [saved, setSaved] = useState(false)
+
+  // ── AI usage ──────────────────────────────────────────────────────────────
+  const [aiUsage, setAiUsage] = useState<Record<string, { used: number; limit: number }> | null>(null)
+
+  useEffect(() => {
+    fetch('/api/user/ai-usage')
+      .then((r) => r.json())
+      .then((data) => { if (data && typeof data === 'object') setAiUsage(data) })
+      .catch(() => {})
+  }, [])
 
   // ── AI builder state ──────────────────────────────────────────────────────
   const [nlpInput, setNlpInput] = useState('')
@@ -1005,16 +1017,16 @@ export default function SettingsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">Name</label>
-              <Input placeholder="Your name" defaultValue="Demo User" />
+              <Input placeholder="Your name" defaultValue={session?.user?.name ?? ''} />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
-              <Input placeholder="your@email.com" defaultValue="demo@bdintelligence.ai" />
+              <Input placeholder="your@email.com" defaultValue={session?.user?.email ?? ''} readOnly />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">Company</label>
-            <Input placeholder="Your recruiting firm" defaultValue="Elite Life Sciences Search" />
+            <Input placeholder="Your recruiting firm" defaultValue="" />
           </div>
           <Button variant="outline">Update Account</Button>
         </CardContent>
@@ -1034,6 +1046,38 @@ export default function SettingsPage() {
           <Button variant="outline">Save API Keys</Button>
         </CardContent>
       </Card>
+
+      {/* ── AI Usage ── */}
+      {aiUsage && (
+        <Card>
+          <CardHeader>
+            <CardTitle>AI Usage Today</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              {Object.entries(aiUsage).map(([feature, { used, limit }]) => {
+                const pct = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0
+                const label = feature.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+                return (
+                  <div key={feature} className="bg-slate-900 rounded-lg p-3 border border-slate-800">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-xs text-slate-400">{label}</span>
+                      <span className="text-xs font-medium text-white">{used}/{limit === 999 ? '∞' : limit}</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={cn('h-full rounded-full transition-all', pct >= 90 ? 'bg-red-500' : pct >= 60 ? 'bg-amber-500' : 'bg-indigo-500')}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-xs text-slate-500 mt-3">Resets at midnight UTC · Limits are per-user per day</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── Theme ── */}
       <Card>

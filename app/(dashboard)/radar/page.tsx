@@ -34,7 +34,7 @@ export default function RadarPage() {
   const [dateRange, setDateRange] = useState<'all' | '7d' | '30d' | '90d'>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
-  const [refreshResult, setRefreshResult] = useState<{ signalsFound: number } | null>(null)
+  const [refreshResult, setRefreshResult] = useState<{ signalsFound: number; opportunitiesCreated: number; opportunitiesUpdated: number } | null>(null)
 
   const handleRefreshIntelligence = useCallback(async () => {
     setRefreshing(true)
@@ -43,17 +43,21 @@ export default function RadarPage() {
       const res = await fetch('/api/intelligence/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ marketProfileId: settings.activeProfileId }),
       })
       const data = await res.json()
       if (res.ok) {
-        setRefreshResult({ signalsFound: data.signalsFound ?? 0 })
-        // Clear result badge after 5 seconds
-        setTimeout(() => setRefreshResult(null), 5000)
+        setRefreshResult({
+          signalsFound: data.signalsFound ?? 0,
+          opportunitiesCreated: data.opportunitiesCreated ?? 0,
+          opportunitiesUpdated: data.opportunitiesUpdated ?? 0,
+        })
+        // Clear result badge after 8 seconds
+        setTimeout(() => setRefreshResult(null), 8000)
       }
     } catch {}
     setRefreshing(false)
-  }, [])
+  }, [settings.activeProfileId])
 
   const filtered = useMemo(() => {
     const now = new Date()
@@ -89,7 +93,12 @@ export default function RadarPage() {
           {refreshResult && (
             <div className="flex items-center gap-1.5 text-xs text-emerald-400">
               <CheckCircle className="h-3.5 w-3.5" />
-              {refreshResult.signalsFound} new signals
+              {refreshResult.signalsFound} signals
+              {(refreshResult.opportunitiesCreated > 0 || refreshResult.opportunitiesUpdated > 0) && (
+                <span className="text-slate-400">
+                  · {refreshResult.opportunitiesCreated} created, {refreshResult.opportunitiesUpdated} updated
+                </span>
+              )}
             </div>
           )}
           <Button
