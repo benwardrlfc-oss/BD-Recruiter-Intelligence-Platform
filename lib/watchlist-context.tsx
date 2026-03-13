@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { useSession } from 'next-auth/react'
 
 export interface WatchedCompany {
   id: string
@@ -51,25 +52,54 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
   const [watchedCompanies, setWatchedCompanies] = useState<WatchedCompany[]>(DEFAULT_WATCHLIST.companies)
   const [watchedVCs, setWatchedVCs] = useState<WatchedVC[]>(DEFAULT_WATCHLIST.vcs)
   const [loaded, setLoaded] = useState(false)
+  const { data: session } = useSession()
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        const parsed: StoredWatchlist = JSON.parse(stored)
-        setWatchedCompanies(parsed.companies || DEFAULT_WATCHLIST.companies)
-        setWatchedVCs(parsed.vcs || DEFAULT_WATCHLIST.vcs)
+    ;(async () => {
+      // Try backend first if session is available
+      if (session?.user) {
+        try {
+          const res = await fetch('/api/watchlist')
+          if (res.ok) {
+            const data = await res.json()
+            if (data && (Array.isArray(data.companies) || Array.isArray(data.vcs))) {
+              setWatchedCompanies(data.companies || DEFAULT_WATCHLIST.companies)
+              setWatchedVCs(data.vcs || DEFAULT_WATCHLIST.vcs)
+              setLoaded(true)
+              return
+            }
+          }
+        } catch {}
       }
-    } catch {}
-    setLoaded(true)
+      // Fall back to localStorage
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          const parsed: StoredWatchlist = JSON.parse(stored)
+          setWatchedCompanies(parsed.companies || DEFAULT_WATCHLIST.companies)
+          setWatchedVCs(parsed.vcs || DEFAULT_WATCHLIST.vcs)
+        }
+      } catch {}
+      setLoaded(true)
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (!loaded) return
+    // Persist to localStorage
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ companies: watchedCompanies, vcs: watchedVCs }))
     } catch {}
-  }, [watchedCompanies, watchedVCs, loaded])
+    // Sync to backend if session exists
+    if (session?.user) {
+      fetch('/api/watchlist', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ watchedCompanies, watchedVCs }),
+      }).catch(() => {})
+    }
+  }, [watchedCompanies, watchedVCs, loaded, session])
 
   const isWatchingCompany = (id: string) => watchedCompanies.some((w) => w.entityId === id)
   const isWatchingVC = (id: string) => watchedVCs.some((w) => w.entityId === id)

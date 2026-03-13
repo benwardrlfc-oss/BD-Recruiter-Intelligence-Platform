@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Sparkles,
   Copy,
@@ -105,12 +105,38 @@ export default function ContentPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  useEffect(() => {
+    fetch('/api/content/save')
+      .then((r) => r.json())
+      .then((items) => {
+        if (Array.isArray(items)) {
+          setSavedItems(
+            items.map((i: any) => ({
+              type: i.contentType,
+              content: i.draftText,
+              date: new Date(i.createdAt),
+            }))
+          )
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   const handleSave = () => {
     if (!generatedContent) return
     setSavedItems((prev) => [
       { type: selectedType, content: generatedContent, date: new Date() },
       ...prev,
     ])
+    fetch('/api/content/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contentType: selectedType,
+        draftText: generatedContent,
+        linkedSignals: selectedSignals,
+      }),
+    }).catch(() => {})
   }
 
   return (

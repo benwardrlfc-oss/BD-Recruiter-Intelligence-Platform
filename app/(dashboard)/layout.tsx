@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
+import { TrialBanner } from '@/components/layout/TrialBanner'
 import { WatchlistProvider } from '@/lib/watchlist-context'
 
 export default function DashboardLayout({
@@ -12,6 +13,7 @@ export default function DashboardLayout({
       <div className="flex h-screen" style={{ background: 'var(--background)' }}>
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+          <TrialBanner />
           <Header />
           <main className="flex-1 overflow-y-auto p-4 lg:p-6" style={{ background: 'var(--background)' }}>
             {children}

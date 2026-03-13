@@ -114,6 +114,11 @@ export default function OnboardingPage() {
     } catch {
       // DB not yet available
     }
+    try {
+      await fetch('/api/user/complete-onboarding', { method: 'POST' })
+    } catch {
+      // non-blocking
+    }
     router.push('/dashboard')
   }
 

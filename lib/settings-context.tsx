@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 
 // ── Market Profile ──────────────────────────────────────────────────────────
 
@@ -224,21 +225,55 @@ function profileToFlatSettings(profile: MarketProfile): Partial<UserSettings> {
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings)
+  const { data: session } = useSession()
+
+  const syncToBackend = useCallback((next: UserSettings) => {
+    if (!session?.user) return
+    fetch('/api/user/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ settings: next }),
+    }).catch(() => {})
+  }, [session])
+
+  const loadFromBackend = useCallback(async (): Promise<boolean> => {
+    if (!session?.user) return false
+    try {
+      const res = await fetch('/api/user/settings')
+      if (!res.ok) return false
+      const data = await res.json()
+      const s = data?.settings
+      if (s && typeof s === 'object' && Array.isArray(s.marketProfiles) && s.marketProfiles.length > 0) {
+        setSettings({ ...defaultSettings, ...s })
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user-market-settings', JSON.stringify(s))
+        }
+        return true
+      }
+    } catch {}
+    return false
+  }, [session])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    try {
-      const stored = localStorage.getItem('user-market-settings')
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        // Ensure marketProfiles array exists (migration from old format)
-        if (!parsed.marketProfiles || parsed.marketProfiles.length === 0) {
-          parsed.marketProfiles = [makeDefaultProfile()]
-          parsed.activeProfileId = 'default'
+    ;(async () => {
+      const hydrated = await loadFromBackend()
+      if (hydrated) return
+      // Fall back to localStorage
+      try {
+        const stored = localStorage.getItem('user-market-settings')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          // Ensure marketProfiles array exists (migration from old format)
+          if (!parsed.marketProfiles || parsed.marketProfiles.length === 0) {
+            parsed.marketProfiles = [makeDefaultProfile()]
+            parsed.activeProfileId = 'default'
+          }
+          setSettings({ ...defaultSettings, ...parsed })
         }
-        setSettings({ ...defaultSettings, ...parsed })
-      }
-    } catch {}
+      } catch {}
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const persist = useCallback((next: UserSettings) => {
@@ -266,10 +301,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         ...profileToFlatSettings(newProfile),
       }
       persist(next)
+      syncToBackend(next)
       return next
     })
     return id
-  }, [persist])
+  }, [persist, syncToBackend])
 
   const updateProfile = useCallback((id: string, updates: Partial<MarketProfile>) => {
     setSettings((prev) => {
@@ -281,9 +317,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         ...(active ? profileToFlatSettings(active) : {}),
       }
       persist(next)
+      syncToBackend(next)
       return next
     })
-  }, [persist])
+  }, [persist, syncToBackend])
 
   const deleteProfile = useCallback((id: string) => {
     setSettings((prev) => {
@@ -298,9 +335,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         ...profileToFlatSettings(active),
       }
       persist(next)
+      syncToBackend(next)
       return next
     })
-  }, [persist])
+  }, [persist, syncToBackend])
 
   const switchProfile = useCallback((id: string) => {
     setSettings((prev) => {
@@ -312,9 +350,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         ...profileToFlatSettings(active),
       }
       persist(next)
+      syncToBackend(next)
       return next
     })
-  }, [persist])
+  }, [persist, syncToBackend])
 
   const activeProfile = settings.marketProfiles.find((p) => p.id === settings.activeProfileId)
 

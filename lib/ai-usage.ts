@@ -1,5 +1,6 @@
 import { PLAN_AI_LIMITS } from './billing'
 import type { PlanId } from './permissions'
+import { prisma } from '@/lib/db'
 
 export type AiFeature =
   | 'bd_scripts'
@@ -90,16 +91,32 @@ export function recordAiUsage(
   userId: string,
   feature: AiFeature,
   planId: PlanId,
-  meta?: { inputTokens?: number; outputTokens?: number; cacheHit?: boolean },
+  meta?: { inputTokens?: number; outputTokens?: number; cacheHit?: boolean; model?: string },
+  orgId?: string,
 ) {
   const key = getKey(userId, feature, 'day')
   increment(key, 'day')
 
-  // In production, persist to AiUsageLog table via prisma
-  // await prisma.aiUsageLog.create({ data: { userId, orgId, feature, ... } })
   const estimatedCost = ((meta?.inputTokens || 0) * 3 + (meta?.outputTokens || 0) * 15) / 1_000_000
+
   if (process.env.NODE_ENV === 'development') {
     console.log(`[AI Usage] user=${userId} feature=${feature} tokens=${meta?.inputTokens}/${meta?.outputTokens} cost=$${estimatedCost.toFixed(4)} cache=${meta?.cacheHit}`)
+  }
+
+  // Fire-and-forget DB persistence (in-memory store is fallback when DB unavailable)
+  if (prisma) {
+    prisma.aiUsageLog.create({
+      data: {
+        userId,
+        orgId: orgId || 'unknown',
+        feature,
+        model: meta?.model || 'claude-sonnet-4-6',
+        inputTokens: meta?.inputTokens || 0,
+        outputTokens: meta?.outputTokens || 0,
+        estimatedCost,
+        cacheHit: meta?.cacheHit || false,
+      },
+    }).catch(() => {}) // don't block the response
   }
 }
 
