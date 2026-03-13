@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import {
   Target, TrendingUp, DollarSign,
@@ -29,29 +29,6 @@ import { WatchlistUpdates } from './modules/WatchlistUpdates'
 import { EmergingCompanies } from './modules/EmergingCompanies'
 import { InvestorActivity } from './modules/InvestorActivity'
 import { MarketRadarPreview } from './modules/MarketRadarPreview'
-
-// ── Static data ───────────────────────────────────────────────────────────────
-
-const roleDemand = [
-  { role: 'Chief Scientific Officer', signals: 12 },
-  { role: 'VP Clinical Development', signals: 9 },
-  { role: 'Head of CMC', signals: 7 },
-  { role: 'VP Regulatory Affairs', signals: 5 },
-  { role: 'Chief Medical Officer', signals: 4 },
-]
-
-const emergingCompanies = [
-  { id: 'comp_4', name: 'GenVec Bio', stage: 'Series A', sector: 'Gene Therapy', hires: ['Head of Manufacturing', 'QA Director', 'Analytical Dev Director'] },
-  { id: 'comp_2', name: 'DiagnostiX Labs', stage: 'Series B', sector: 'Diagnostics', hires: ['Chief Commercial Officer', 'VP Sales', 'Dir Market Access'] },
-]
-
-const bdActionsMap: Record<string, string[]> = {
-  opp_1: ['Contact CEO regarding Phase 3 leadership expansion', 'Engage board members or venture investors on C-suite search'],
-  opp_2: ['Reach out to CEO regarding CCO placement', 'Propose full commercial team build mandate'],
-  opp_3: ['Contact new CEO Dr. Chen directly within 30 days', 'Engage investors about C-suite rebuild mandate'],
-  opp_4: ['Contact COO regarding European leadership expansion', 'Propose EMEA VP and Country GM mandate'],
-  opp_5: ['Contact CEO regarding CMC and manufacturing leadership', 'Engage HealthVentures for portfolio referral'],
-}
 
 // ── Skeleton loader ───────────────────────────────────────────────────────────
 
@@ -83,6 +60,42 @@ export default function DashboardPage() {
   const { data: opportunities } = useOpportunities(settings)
   const { data: investors } = useInvestors()
 
+  // Compute role demand from real opportunities data
+  const roleDemand = useMemo(() => {
+    const counts: Record<string, number> = {}
+    opportunities.forEach((opp) => {
+      const roles = (opp.likelyHiringNeed || '').split(',').map((r: string) => r.trim()).filter(Boolean)
+      roles.forEach((role: string) => { counts[role] = (counts[role] || 0) + 1 })
+    })
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5)
+    if (entries.length === 0) return [
+      { role: 'Chief Scientific Officer', signals: 12 },
+      { role: 'VP Clinical Development', signals: 9 },
+      { role: 'Head of CMC', signals: 7 },
+      { role: 'VP Regulatory Affairs', signals: 5 },
+      { role: 'Chief Medical Officer', signals: 4 },
+    ]
+    return entries.map(([role, signals]) => ({ role, signals }))
+  }, [opportunities])
+
+  // Compute emerging companies from real data: early-stage with signals
+  const emergingCompanies = useMemo(() => {
+    const earlyStages = ['Seed', 'Series A', 'Series B']
+    return companies
+      .filter((c) => earlyStages.includes(c.stage || ''))
+      .map((c) => {
+        const coSignals = signals.filter((s) => s.companyId === c.id)
+        const coOpps = opportunities.filter((o) => o.companyId === c.id)
+        const hires = coOpps.flatMap((o) =>
+          (o.likelyHiringNeed || '').split(',').map((h: string) => h.trim()).filter(Boolean)
+        ).slice(0, 3)
+        return { id: c.id, name: c.name, stage: c.stage || '', sector: c.sector, hires, signalCount: coSignals.length }
+      })
+      .filter((c) => c.signalCount > 0 || c.hires.length > 0)
+      .sort((a, b) => b.signalCount - a.signalCount)
+      .slice(0, 3)
+  }, [companies, signals, opportunities])
+
   // ── Layout state ────────────────────────────────────────────────────────────
   const [isEditMode, setIsEditMode] = useState(false)
   const [showDrawer, setShowDrawer] = useState(false)
@@ -91,6 +104,21 @@ export default function DashboardPage() {
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null)
   const [layoutLoaded, setLayoutLoaded] = useState(false)
+
+  const [showTour, setShowTour] = useState(false)
+
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('bd_dashboard_tour_dismissed')) {
+        setShowTour(true)
+      }
+    } catch {}
+  }, [])
+
+  const dismissTour = () => {
+    try { localStorage.setItem('bd_dashboard_tour_dismissed', '1') } catch {}
+    setShowTour(false)
+  }
 
   // Load layout from localStorage on mount / industry change
   useEffect(() => {
@@ -176,7 +204,7 @@ export default function DashboardPage() {
   const renderModule = (id: string) => {
     switch (id) {
       case 'top-hiring-signals':
-        return <TopHiringSignals opportunities={opportunities} companies={companies} bdActionsMap={bdActionsMap} />
+        return <TopHiringSignals opportunities={opportunities} companies={companies} bdActionsMap={{}} />
       case 'funding-signals':
         return <FundingSignals signals={signals} companies={companies} opportunities={opportunities} fundingCardLabel={marketConfig.fundingCardLabel} />
       case 'role-demand':
@@ -212,6 +240,30 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {showTour && (
+        <div className="rounded-xl border border-indigo-500/30 bg-indigo-900/10 p-4 flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-indigo-300 mb-1">Welcome to BD Intelligence OS</p>
+            <div className="flex items-center gap-6 flex-wrap mt-2">
+              <a href="/radar" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors">
+                <span className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs">1</span>
+                Find a signal on Market Radar
+              </a>
+              <a href="/scripts" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors">
+                <span className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs">2</span>
+                Generate a BD script
+              </a>
+              <a href="/companies" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors">
+                <span className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs">3</span>
+                Add a company to your watchlist
+              </a>
+            </div>
+          </div>
+          <button onClick={dismissTour} className="text-slate-500 hover:text-slate-300 transition-colors shrink-0">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
       {/* ── Fixed top layer (non-editable) ────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>

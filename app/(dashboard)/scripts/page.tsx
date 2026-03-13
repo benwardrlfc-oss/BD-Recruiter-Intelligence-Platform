@@ -30,6 +30,8 @@ export default function ScriptsPage() {
   const [signalTypeFilter, setSignalTypeFilter] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [rateLimited, setRateLimited] = useState(false)
+  const [usageInfo, setUsageInfo] = useState<{ used: number; limit: number } | null>(null)
   const { settings } = useSettings()
   const searchParams = useSearchParams()
   const { data: allOpportunities } = useOpportunities(settings)
@@ -43,20 +45,52 @@ export default function ScriptsPage() {
     }
   }, [searchParams, allOpportunities])
 
+  // Persist last generated scripts to localStorage keyed by opportunity
+  useEffect(() => {
+    if (scripts && selectedOpp) {
+      try {
+        localStorage.setItem(`bd_scripts_${selectedOpp}`, JSON.stringify(scripts))
+      } catch {}
+    }
+  }, [scripts, selectedOpp])
+
+  // Restore scripts when opportunity selected
+  useEffect(() => {
+    if (!selectedOpp) return
+    try {
+      const saved = localStorage.getItem(`bd_scripts_${selectedOpp}`)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        setScripts(parsed)
+      } else {
+        setScripts(null)
+      }
+    } catch {
+      setScripts(null)
+    }
+  }, [selectedOpp])
+
+  useEffect(() => {
+    fetch('/api/user/ai-usage')
+      .then((r) => r.json())
+      .then((data) => { if (data?.bd_scripts) setUsageInfo(data.bd_scripts) })
+      .catch(() => {})
+  }, [scripts]) // refetch after generation
+
   // Filter opportunities by signal type and search
   const filteredOpportunities = allOpportunities.filter((opp) => {
     const company = allCompanies.find((c) => c.id === opp.companyId)
-    const signal = allSignals.find((s) => s.companyId === opp.companyId)
+    const signals = allSignals.filter((s) => s.companyId === opp.companyId)
 
     const typeMatch =
       signalTypeFilter === 'All' ||
-      (signal?.signalType || '').toLowerCase().includes(signalTypeFilter.toLowerCase()) ||
+      signals.some((s) => s.signalType.toLowerCase().includes(signalTypeFilter.toLowerCase())) ||
       (opp.likelyHiringNeed || '').toLowerCase().includes(signalTypeFilter.toLowerCase())
 
     const searchMatch =
       !searchQuery ||
       (company?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (signal?.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      signals.some((s) => s.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (opp.likelyHiringNeed || '').toLowerCase().includes(searchQuery.toLowerCase())
 
     return typeMatch && searchMatch
@@ -64,8 +98,9 @@ export default function ScriptsPage() {
 
   const handleGenerate = async () => {
     if (!selectedOpp) return
-    setIsLoading(true)
     setError(null)
+    setRateLimited(false)
+    setIsLoading(true)
     try {
       const response = await fetch('/api/scripts/generate', {
         method: 'POST',
@@ -80,6 +115,12 @@ export default function ScriptsPage() {
           },
         }),
       })
+      if (response.status === 429) {
+        const data = await response.json()
+        setRateLimited(true)
+        setError(data.error || 'Daily script limit reached. Upgrade your plan for more.')
+        return
+      }
       if (!response.ok) throw new Error(`API error ${response.status}`)
       const data = await response.json()
       setScripts(data)
@@ -108,7 +149,7 @@ export default function ScriptsPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">BD Scripts</h1>
         <p className="text-sm text-slate-400 mt-1">
-          AI-generated outreach scripts tailored to each signal and your market profile
+          Select a hiring signal, generate signal-grounded outreach scripts across email, LinkedIn, cold call and follow-up
         </p>
       </div>
 
@@ -154,7 +195,7 @@ export default function ScriptsPage() {
               <div className="space-y-1.5 max-h-72 overflow-y-auto">
                 {filteredOpportunities.map((opp) => {
                   const company = allCompanies.find((c) => c.id === opp.companyId)
-                  const signal = allSignals.find((s) => s.companyId === opp.companyId)
+                  const signals = allSignals.filter((s) => s.companyId === opp.companyId)
                   const isSelected = selectedOpp === opp.id
                   return (
                     <button
@@ -171,13 +212,13 @@ export default function ScriptsPage() {
                         <p className="text-xs font-semibold text-white">{company?.name}</p>
                         <span className="text-xs font-bold text-emerald-400">{opp.opportunityScore}</span>
                       </div>
-                      {signal && (
-                        <p className="text-xs text-slate-500 line-clamp-1">{signal.title}</p>
+                      {signals[0] && (
+                        <p className="text-xs text-slate-500 line-clamp-1">{signals[0].title}</p>
                       )}
                       <div className="flex gap-1 mt-1">
                         <Badge variant="secondary" className="text-xs py-0">{company?.stage}</Badge>
-                        {signal && (
-                          <Badge variant="outline" className="text-xs py-0">{signal.signalType}</Badge>
+                        {signals[0] && (
+                          <Badge variant="outline" className="text-xs py-0">{signals[0].signalType}</Badge>
                         )}
                       </div>
                     </button>
@@ -219,6 +260,11 @@ export default function ScriptsPage() {
                   <><Sparkles className="h-4 w-4" /> Generate Scripts</>
                 )}
               </Button>
+              {usageInfo && usageInfo.limit < 999 && (
+                <p className="text-xs text-center text-slate-500 mt-1">
+                  {usageInfo.used}/{usageInfo.limit} scripts used today · resets midnight UTC
+                </p>
+              )}
             </CardContent>
           </Card>
 
@@ -247,8 +293,13 @@ export default function ScriptsPage() {
         {/* Scripts Output */}
         <div className="col-span-2">
           {error && (
-            <div className="mb-4 rounded-lg border border-rose-700/40 bg-rose-900/10 px-4 py-3 text-sm text-rose-400">
-              {error}
+            <div className={`mb-4 rounded-lg border px-4 py-3 ${rateLimited ? 'border-amber-600/40 bg-amber-900/10' : 'border-rose-700/40 bg-rose-900/10'}`}>
+              <p className={`text-sm ${rateLimited ? 'text-amber-400' : 'text-rose-400'}`}>{error}</p>
+              {rateLimited && (
+                <a href="/org-admin?tab=billing" className="mt-2 inline-block text-xs font-semibold text-amber-300 underline underline-offset-2 hover:no-underline">
+                  View upgrade options →
+                </a>
+              )}
             </div>
           )}
           {scripts ? (

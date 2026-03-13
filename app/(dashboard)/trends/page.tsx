@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/lib/settings-context'
 import { UpgradeGate } from '@/components/layout/UpgradeGate'
-import { useCompanies, useSignals } from '@/lib/hooks/use-data'
+import { useCompanies, useSignals, useOpportunities } from '@/lib/hooks/use-data'
 
 const GlobalActivityMap = dynamic(() => import('@/components/market/GlobalActivityMap'), {
   ssr: false,
@@ -27,71 +27,6 @@ const GlobalActivityMap = dynamic(() => import('@/components/market/GlobalActivi
   ),
 })
 
-const growingSubsectors = [
-  { name: 'Radiopharmaceuticals', growth: 'Very High', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-  { name: 'AI Drug Discovery', growth: 'Very High', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-  { name: 'RNA Editing', growth: 'High', color: 'text-amber-400', bg: 'bg-amber-400/10' },
-  { name: 'Antibody-Drug Conjugates', growth: 'High', color: 'text-amber-400', bg: 'bg-amber-400/10' },
-  { name: 'Cell Therapy (Next Gen)', growth: 'Growing', color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-  { name: 'Digital Therapeutics', growth: 'Growing', color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-]
-
-const capitalFlows = [
-  { area: 'Oncology – Targeted Therapies', amount: '$4.2B', change: '+18% QoQ' },
-  { area: 'Gene & Cell Therapy', amount: '$2.8B', change: '+12% QoQ' },
-  { area: 'AI-Enabled Drug Discovery', amount: '$1.9B', change: '+34% QoQ' },
-  { area: 'Rare Disease', amount: '$1.4B', change: '+9% QoQ' },
-  { area: 'Diagnostics – Liquid Biopsy', amount: '$890M', change: '+22% QoQ' },
-]
-
-const geographicHotspots = [
-  { city: 'Boston, MA', activity: 'Very High', companies: 48, signals: 23, lat: 42.36, lon: -71.06 },
-  { city: 'San Francisco Bay Area', activity: 'High', companies: 41, signals: 19, lat: 37.77, lon: -122.42 },
-  { city: 'San Diego, CA', activity: 'High', companies: 35, signals: 16, lat: 32.72, lon: -117.16 },
-  { city: 'New York Metro', activity: 'Growing', companies: 28, signals: 12, lat: 40.71, lon: -74.01 },
-  { city: 'Cambridge, UK', activity: 'Growing', companies: 19, signals: 8, lat: 52.20, lon: 0.12 },
-]
-
-const stageActivity = [
-  { stage: 'Series A', signals: 18, pct: 35 },
-  { stage: 'Series B', signals: 14, pct: 27 },
-  { stage: 'Seed', signals: 10, pct: 19 },
-  { stage: 'Series C', signals: 7, pct: 13 },
-  { stage: 'Growth / Pre-IPO', signals: 3, pct: 6 },
-]
-
-const upcomingHires = [
-  {
-    role: 'Chief Scientific Officer', likelihood: 'Very High', signals: 12,
-    reasoning: 'Post-Series B oncology companies building R&D leadership following Phase 2 data readouts',
-    supportingSignals: ['3 oncology Series B rounds closed in Q4', 'Phase 2 completions driving Phase 3 planning', 'Board mandates for R&D oversight'],
-    comparableCompanies: ['BioNova Therapeutics', 'ArvoGene Bio', 'NexGen Oncology'],
-  },
-  {
-    role: 'VP Translational Biology', likelihood: 'High', signals: 9,
-    reasoning: 'Clinical-stage companies advancing programs from discovery to clinic',
-    supportingSignals: ['5 IND filings across portfolio', 'Preclinical data packages nearing completion', 'Partnership deals triggering R&D builds'],
-    comparableCompanies: ['GenVec Bio', 'RxBridge Therapeutics', 'PrecisionBio Labs'],
-  },
-  {
-    role: 'Head of Clinical Strategy', likelihood: 'High', signals: 8,
-    reasoning: 'Phase 2 completions driving Phase 3 planning hires across multiple programs',
-    supportingSignals: ['Phase 2 data readouts scheduled Q1–Q2', 'FDA end-of-Phase 2 meetings booked', 'Investor pressure to accelerate timelines'],
-    comparableCompanies: ['ClinPath Solutions', 'BioNova Therapeutics', 'TargetVax Inc'],
-  },
-  {
-    role: 'VP Regulatory Affairs', likelihood: 'High', signals: 7,
-    reasoning: 'FDA submissions and Breakthrough Designations driving demand for regulatory expertise',
-    supportingSignals: ['2 BLA submissions in preparation', 'Breakthrough Device Designations received', 'EU regulatory filing planned'],
-    comparableCompanies: ['DiagnostiX Labs', 'NovaCyte Medical', 'OmniPath Bio'],
-  },
-  {
-    role: 'Chief Medical Officer', likelihood: 'Growing', signals: 5,
-    reasoning: 'Series C+ companies adding medical oversight as clinical programs expand into Phase 3',
-    supportingSignals: ['Series C rounds averaging $150M+', 'Multiple assets entering late-stage trials', 'KOL advisory board expansions'],
-    comparableCompanies: ['BioNova Therapeutics', 'GenVec Bio', 'DiagnostiX Labs'],
-  },
-]
 
 const cityCoords: Record<string, { lat: number; lon: number }> = {
   'boston':            { lat: 42.36, lon: -71.06 },
@@ -138,6 +73,163 @@ export default function TrendsPage() {
   const { settings } = useSettings()
   const { data: allCompanies } = useCompanies(settings)
   const { data: allSignals } = useSignals(settings)
+  const { data: allOpportunities } = useOpportunities(settings)
+
+  // ── Derived market data from hooks ───────────────────────────────────────
+
+  const growingSubsectors = useMemo(() => {
+    const counts: Record<string, number> = {}
+    allSignals.forEach((s) => {
+      const key = (s as any).subsector || s.sector || 'Other'
+      counts[key] = (counts[key] || 0) + 1
+    })
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1
+    const colorMap = [
+      { color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+      { color: 'text-amber-400', bg: 'bg-amber-400/10' },
+      { color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
+    ]
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6)
+    if (entries.length === 0) return [
+      { name: 'Radiopharmaceuticals', growth: 'Very High', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+      { name: 'AI Drug Discovery', growth: 'Very High', color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+      { name: 'RNA Editing', growth: 'High', color: 'text-amber-400', bg: 'bg-amber-400/10' },
+      { name: 'Antibody-Drug Conjugates', growth: 'High', color: 'text-amber-400', bg: 'bg-amber-400/10' },
+      { name: 'Cell Therapy (Next Gen)', growth: 'Growing', color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
+      { name: 'Digital Therapeutics', growth: 'Growing', color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
+    ]
+    return entries.map(([name, count], i) => {
+      const pct = count / total
+      const growth = pct > 0.2 ? 'Very High' : pct > 0.12 ? 'High' : 'Growing'
+      const colorIdx = growth === 'Very High' ? 0 : growth === 'High' ? 1 : 2
+      return { name, growth, ...colorMap[colorIdx] }
+    })
+  }, [allSignals])
+
+  const capitalFlows = useMemo(() => {
+    const fundingSignals = allSignals.filter((s) => s.signalType === 'funding')
+    const counts: Record<string, number> = {}
+    fundingSignals.forEach((s) => {
+      const key = s.sector || 'Other'
+      counts[key] = (counts[key] || 0) + 1
+    })
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5)
+    if (entries.length === 0) return [
+      { area: 'Oncology – Targeted Therapies', amount: '$4.2B', change: '+18% QoQ' },
+      { area: 'Gene & Cell Therapy', amount: '$2.8B', change: '+12% QoQ' },
+      { area: 'AI-Enabled Drug Discovery', amount: '$1.9B', change: '+34% QoQ' },
+      { area: 'Rare Disease', amount: '$1.4B', change: '+9% QoQ' },
+      { area: 'Diagnostics – Liquid Biopsy', amount: '$890M', change: '+22% QoQ' },
+    ]
+    const total = entries.reduce((acc, [, n]) => acc + n, 0) || 1
+    return entries.map(([area, count]) => ({
+      area,
+      amount: `${count} funding signal${count !== 1 ? 's' : ''}`,
+      change: `${Math.round((count / total) * 100)}% of funding activity`,
+    }))
+  }, [allSignals])
+
+  const geographicHotspots = useMemo(() => {
+    const geoCounts: Record<string, { companies: Set<string>; signals: number }> = {}
+    const staticHotspots = [
+      { city: 'Boston, MA', lat: 42.36, lon: -71.06, keys: ['boston', 'ma', 'cambridge, ma'] },
+      { city: 'San Francisco Bay Area', lat: 37.77, lon: -122.42, keys: ['san francisco', 'bay area', 'south san francisco'] },
+      { city: 'San Diego, CA', lat: 32.72, lon: -117.16, keys: ['san diego'] },
+      { city: 'New York Metro', lat: 40.71, lon: -74.01, keys: ['new york', 'nyc', 'new jersey'] },
+      { city: 'Cambridge, UK', lat: 52.20, lon: 0.12, keys: ['cambridge, uk', 'cambridge uk'] },
+    ]
+    staticHotspots.forEach((h) => {
+      geoCounts[h.city] = { companies: new Set(), signals: 0 }
+    })
+    allCompanies.forEach((c) => {
+      const geo = (c.geography || '').toLowerCase()
+      for (const h of staticHotspots) {
+        if (h.keys.some((k) => geo.includes(k))) {
+          geoCounts[h.city].companies.add(c.id)
+          break
+        }
+      }
+    })
+    allSignals.forEach((s) => {
+      if (!s.companyId) return
+      const c = allCompanies.find((co) => co.id === s.companyId)
+      if (!c) return
+      const geo = (c.geography || '').toLowerCase()
+      for (const h of staticHotspots) {
+        if (h.keys.some((k) => geo.includes(k))) {
+          geoCounts[h.city].signals++
+          break
+        }
+      }
+    })
+    const activityLevels = ['Very High', 'High', 'Growing', 'Emerging']
+    return staticHotspots
+      .map((h, i) => ({
+        city: h.city,
+        lat: h.lat,
+        lon: h.lon,
+        companies: geoCounts[h.city]?.companies.size || 0,
+        signals: geoCounts[h.city]?.signals || 0,
+        activity: activityLevels[Math.min(i, activityLevels.length - 1)],
+      }))
+      .sort((a, b) => b.signals - a.signals || b.companies - a.companies)
+  }, [allCompanies, allSignals])
+
+  const stageActivity = useMemo(() => {
+    const counts: Record<string, number> = {}
+    allCompanies.forEach((c) => {
+      if (!c.stage) return
+      const sigs = allSignals.filter((s) => s.companyId === c.id).length
+      counts[c.stage] = (counts[c.stage] || 0) + Math.max(sigs, 1)
+    })
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5)
+    if (entries.length === 0) return [
+      { stage: 'Series A', signals: 18, pct: 35 },
+      { stage: 'Series B', signals: 14, pct: 27 },
+      { stage: 'Seed', signals: 10, pct: 19 },
+      { stage: 'Series C', signals: 7, pct: 13 },
+      { stage: 'Growth / Pre-IPO', signals: 3, pct: 6 },
+    ]
+    return entries.map(([stage, signals]) => ({
+      stage,
+      signals,
+      pct: Math.round((signals / total) * 100),
+    }))
+  }, [allCompanies, allSignals])
+
+  const upcomingHires = useMemo(() => {
+    if (allOpportunities.length === 0) return [
+      { role: 'Chief Scientific Officer', likelihood: 'Very High', signals: 12, reasoning: 'Post-Series B companies building R&D leadership following Phase 2 data readouts', supportingSignals: ['Series B rounds closed recently', 'Phase 2 completions driving Phase 3 planning', 'Board mandates for R&D oversight'], comparableCompanies: [] as string[] },
+      { role: 'VP Translational Biology', likelihood: 'High', signals: 9, reasoning: 'Clinical-stage companies advancing programs from discovery to clinic', supportingSignals: ['IND filings across portfolio', 'Preclinical data packages nearing completion', 'Partnership deals triggering R&D builds'], comparableCompanies: [] as string[] },
+      { role: 'Head of Clinical Strategy', likelihood: 'High', signals: 8, reasoning: 'Phase 2 completions driving Phase 3 planning hires', supportingSignals: ['Phase 2 data readouts scheduled', 'FDA end-of-Phase 2 meetings booked', 'Investor pressure to accelerate timelines'], comparableCompanies: [] as string[] },
+      { role: 'VP Regulatory Affairs', likelihood: 'High', signals: 7, reasoning: 'FDA submissions and Breakthrough Designations driving demand', supportingSignals: ['BLA submissions in preparation', 'Breakthrough Device Designations received', 'EU regulatory filing planned'], comparableCompanies: [] as string[] },
+      { role: 'Chief Medical Officer', likelihood: 'Growing', signals: 5, reasoning: 'Series C+ companies adding medical oversight as clinical programs expand', supportingSignals: ['Series C rounds averaging $150M+', 'Multiple assets entering late-stage trials', 'KOL advisory board expansions'], comparableCompanies: [] as string[] },
+    ]
+    const roleMap: Record<string, { count: number; companies: string[]; angles: string[] }> = {}
+    allOpportunities.forEach((opp) => {
+      const roles = (opp.likelyHiringNeed || 'Leadership Role').split(',').map((r: string) => r.trim()).filter(Boolean)
+      roles.forEach((role: string) => {
+        if (!roleMap[role]) roleMap[role] = { count: 0, companies: [], angles: [] }
+        roleMap[role].count++
+        const co = allCompanies.find((c) => c.id === opp.companyId)
+        if (co && !roleMap[role].companies.includes(co.name)) roleMap[role].companies.push(co.name)
+        if (opp.outreachAngle && !roleMap[role].angles.includes(opp.outreachAngle)) roleMap[role].angles.push(opp.outreachAngle)
+      })
+    })
+    return Object.entries(roleMap)
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 5)
+      .map(([role, data]) => ({
+        role,
+        likelihood: data.count >= 3 ? 'Very High' : data.count >= 2 ? 'High' : 'Growing',
+        signals: data.count,
+        reasoning: data.angles[0] || `${data.count} compan${data.count !== 1 ? 'ies' : 'y'} showing matching signals`,
+        supportingSignals: data.angles.slice(0, 3).length > 0 ? data.angles.slice(0, 3) : [`${data.count} active opportunities`, 'Signal activity detected'],
+        comparableCompanies: data.companies.slice(0, 3),
+      }))
+  }, [allOpportunities, allCompanies])
+
   const [mapOpen, setMapOpen] = useState(false)
   const [globalMapOpen, setGlobalMapOpen] = useState(false)
   const [selectedHotspot, setSelectedHotspot] = useState<typeof geographicHotspots[0] | null>(null)
@@ -189,16 +281,20 @@ export default function TrendsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {growingSubsectors.map((item) => (
-                <Link key={item.name} href="/radar">
-                  <div className="flex items-center justify-between rounded-lg border border-slate-800 px-3 py-2.5 hover:border-slate-700 hover:bg-slate-900/50 transition-colors cursor-pointer">
-                    <span className="text-sm text-white">{item.name}</span>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${item.bg} ${item.color}`}>{item.growth}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {growingSubsectors.length === 0 ? (
+              <p className="text-sm text-slate-500 text-center py-4">No subsector data yet — run intelligence to populate</p>
+            ) : (
+              <div className="space-y-2">
+                {growingSubsectors.map((item) => (
+                  <Link key={item.name} href="/radar">
+                    <div className="flex items-center justify-between rounded-lg border border-slate-800 px-3 py-2.5 hover:border-slate-700 hover:bg-slate-900/50 transition-colors cursor-pointer">
+                      <span className="text-sm text-white">{item.name}</span>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${item.bg} ${item.color}`}>{item.growth}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -210,22 +306,26 @@ export default function TrendsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {capitalFlows.map((item) => (
-                <Link key={item.area} href="/radar">
-                  <div className="flex items-center justify-between rounded-lg border border-slate-800 px-3 py-2.5 hover:border-slate-700 hover:bg-slate-900/50 transition-colors cursor-pointer">
-                    <div>
-                      <p className="text-sm text-white">{item.area}</p>
-                      <p className="text-xs text-emerald-400 font-medium mt-0.5">{item.change}</p>
+            {capitalFlows.length === 0 ? (
+              <p className="text-sm text-slate-500 text-center py-4">No capital flow data yet — add funding signals to populate</p>
+            ) : (
+              <div className="space-y-2">
+                {capitalFlows.map((item) => (
+                  <Link key={item.area} href="/radar">
+                    <div className="flex items-center justify-between rounded-lg border border-slate-800 px-3 py-2.5 hover:border-slate-700 hover:bg-slate-900/50 transition-colors cursor-pointer">
+                      <div>
+                        <p className="text-sm text-white">{item.area}</p>
+                        <p className="text-xs text-emerald-400 font-medium mt-0.5">{item.change}</p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <p className="text-sm font-bold text-white">{item.amount}</p>
+                        <ArrowUp className="h-3 w-3 text-emerald-400" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <p className="text-sm font-bold text-white">{item.amount}</p>
-                      <ArrowUp className="h-3 w-3 text-emerald-400" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -277,19 +377,23 @@ export default function TrendsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {stageActivity.map((item) => (
-                <div key={item.stage} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-white">{item.stage}</span>
-                    <span className="text-xs text-slate-400">{item.signals} signals ({item.pct}%)</span>
+            {stageActivity.length === 0 ? (
+              <p className="text-sm text-slate-500 text-center py-4">No stage data yet — add companies to populate</p>
+            ) : (
+              <div className="space-y-3">
+                {stageActivity.map((item) => (
+                  <div key={item.stage} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-white">{item.stage}</span>
+                      <span className="text-xs text-slate-400">{item.signals} signals ({item.pct}%)</span>
+                    </div>
+                    <div className="h-2 bg-slate-800 rounded-full">
+                      <div className="h-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500" style={{ width: `${item.pct}%` }} />
+                    </div>
                   </div>
-                  <div className="h-2 bg-slate-800 rounded-full">
-                    <div className="h-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-500" style={{ width: `${item.pct}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -304,6 +408,9 @@ export default function TrendsPage() {
           <p className="text-xs text-slate-500 mt-1">Predicted hiring patterns based on current market signals · click to expand</p>
         </CardHeader>
         <CardContent>
+          {upcomingHires.length === 0 ? (
+            <p className="text-sm text-slate-500 text-center py-4">No hiring predictions yet — add opportunities to populate</p>
+          ) : (
           <div className="space-y-3">
             {upcomingHires.map((item) => (
               <div key={item.role} className="rounded-lg border border-slate-800 bg-slate-900/50 overflow-hidden">
@@ -357,6 +464,7 @@ export default function TrendsPage() {
               </div>
             ))}
           </div>
+          )}
         </CardContent>
       </Card>
 
