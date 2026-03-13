@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { mockCompanies, mockSignals } from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/lib/settings-context'
+import { UpgradeGate } from '@/components/layout/UpgradeGate'
 
 const GlobalActivityMap = dynamic(() => import('@/components/market/GlobalActivityMap'), {
   ssr: false,
@@ -164,6 +165,12 @@ export default function TrendsPage() {
   }).length
 
   return (
+    <UpgradeGate
+      moduleId="market_intelligence"
+      moduleName="Market Intelligence"
+      description="Macro market trends, capital flows, geographic hotspots and hiring forecasts for your configured market."
+      minPlan="Pro"
+    >
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Market Intelligence</h1>
@@ -551,5 +558,6 @@ export default function TrendsPage() {
         </div>
       )}
     </div>
+    </UpgradeGate>
   )
 }

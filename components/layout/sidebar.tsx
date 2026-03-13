@@ -44,6 +44,7 @@ const bottomNavItems: NavItem[] = [
   { label: 'BD Scripts',         href: '/scripts',    icon: FileText,   moduleId: 'bd_scripts' },
   { label: 'Content Studio',     href: '/content',    icon: Sparkles,   moduleId: 'content_studio' },
   { label: 'Market Intelligence',href: '/trends',     icon: BarChart3,  moduleId: 'market_intelligence' },
+  { label: 'Reporting',          href: '/reporting',  icon: BarChart3,  moduleId: 'reporting' },
   { label: 'Settings',           href: '/settings',   icon: Settings,   moduleId: null },
 ]
 

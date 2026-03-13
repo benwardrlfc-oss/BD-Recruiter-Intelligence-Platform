@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from '@/lib/theme-context'
 import { SettingsProvider } from '@/lib/settings-context'
 import { SessionProvider } from '@/components/providers/session-provider'
+import { PostHogProvider } from '@/components/providers/PostHogProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,7 +24,9 @@ export default function RootLayout({
         <ThemeProvider>
           <SettingsProvider>
             <SessionProvider>
-              {children}
+              <PostHogProvider>
+                {children}
+              </PostHogProvider>
             </SessionProvider>
           </SettingsProvider>
         </ThemeProvider>

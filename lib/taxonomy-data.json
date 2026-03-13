@@ -1,0 +1,372 @@
+{
+  "industries": [
+    "Life Sciences",
+    "Technology",
+    "Financial Services",
+    "Healthcare",
+    "Manufacturing & Engineering",
+    "Energy & Infrastructure",
+    "Legal",
+    "Consulting & Professional Services",
+    "Retail & Consumer",
+    "Logistics & Supply Chain",
+    "Real Estate & Construction",
+    "Education",
+    "Government & Public Sector",
+    "Media & Creative"
+  ],
+  "subsectors": {
+    "Life Sciences": [
+      "Biotech", "Pharma", "MedTech", "Diagnostics", "CRO", "CDMO",
+      "Cell & Gene Therapy", "Synthetic Biology", "Bioindustrial", "Digital Health", "Specialty Pharma"
+    ],
+    "Technology": [
+      "AI / Machine Learning", "SaaS", "Cybersecurity", "FinTech", "Cloud Infrastructure",
+      "Semiconductors", "Robotics", "DevTools", "Data Infrastructure", "Consumer Tech"
+    ],
+    "Financial Services": [
+      "Private Equity", "Venture Capital", "Investment Banking", "Asset Management",
+      "Hedge Funds", "Insurance", "Wealth Management", "FinTech"
+    ],
+    "Healthcare": [
+      "Hospitals & Health Systems", "Payers & Insurers", "Primary Care", "Specialty Care",
+      "Mental Health", "Home Health", "Healthcare IT", "Value-Based Care"
+    ],
+    "Manufacturing & Engineering": [
+      "Aerospace & Defense", "Automotive", "Industrial Equipment", "Electronics",
+      "Chemicals", "Food & Beverage", "Consumer Goods", "Advanced Materials"
+    ],
+    "Energy & Infrastructure": [
+      "Oil & Gas", "Renewable Energy", "Utilities", "Nuclear", "Grid Technology",
+      "Energy Storage", "Water & Environment", "Clean Tech"
+    ],
+    "Legal": [
+      "Law Firms", "In-House Legal", "Legal Tech", "Compliance", "IP & Patent", "Litigation", "M&A / Corporate"
+    ],
+    "Consulting & Professional Services": [
+      "Strategy Consulting", "Management Consulting", "IT Consulting", "HR Consulting",
+      "Financial Advisory", "Big 4", "Boutique Advisory"
+    ],
+    "Retail & Consumer": [
+      "E-commerce", "Luxury", "FMCG", "Fashion & Apparel", "Consumer Electronics", "Grocery", "DTC Brands"
+    ],
+    "Logistics & Supply Chain": [
+      "3PL / Freight", "Last-Mile Delivery", "Cold Chain", "Supply Chain Tech", "Maritime", "Aviation", "Rail"
+    ],
+    "Real Estate & Construction": [
+      "Commercial RE", "Residential RE", "PropTech", "Infrastructure", "Construction", "REIT"
+    ],
+    "Education": [
+      "EdTech", "Higher Education", "K-12", "Corporate Learning", "Vocational Training"
+    ],
+    "Government & Public Sector": [
+      "Federal Government", "State & Local Government", "Defence", "Public Health", "Non-profit"
+    ],
+    "Media & Creative": [
+      "Digital Media", "Advertising & PR", "Entertainment", "Gaming", "Publishing", "Sports"
+    ]
+  },
+  "niches": {
+    "Biotech": [
+      "Oncology biotech", "Radiopharma", "Liquid biopsy", "AI drug discovery",
+      "Rare disease biotech", "Immunology biotech", "Neuroscience biotech"
+    ],
+    "Cell & Gene Therapy": [
+      "CAR-T", "AAV gene therapy", "mRNA therapeutics", "CRISPR editing",
+      "Allogeneic cell therapy", "Lentiviral vectors"
+    ],
+    "CDMO": [
+      "Biologics CDMO", "Small molecule CDMO", "Cell therapy CDMO", "Gene therapy CDMO"
+    ],
+    "CRO": [
+      "Preclinical CRO", "Phase I CRO", "Phase II/III CRO", "Regulatory CRO"
+    ],
+    "Cybersecurity": [
+      "Cybersecurity GTM", "Endpoint security", "Cloud security",
+      "Identity & access management", "SOC services"
+    ],
+    "Private Equity": [
+      "PE-backed SaaS", "PE-backed industrial", "PE-backed healthcare",
+      "PE-backed services", "PE operational leadership"
+    ],
+    "SaaS": [
+      "PE-backed SaaS finance", "B2B SaaS GTM", "Vertical SaaS", "PLG SaaS"
+    ],
+    "Semiconductors": [
+      "Semiconductor manufacturing leadership", "Chip design", "Power semiconductors", "RF & wireless"
+    ],
+    "AI / Machine Learning": [
+      "AI infrastructure", "Foundation models", "AI for drug discovery", "Computer vision", "NLP / LLM"
+    ],
+    "Diagnostics": [
+      "Liquid biopsy diagnostics", "Molecular diagnostics", "Point-of-care",
+      "AI-enabled diagnostics", "Genomics / NGS"
+    ],
+    "MedTech": [
+      "Surgical robotics", "Cardiovascular devices", "Neuromodulation",
+      "Orthopedics", "Wearables", "Robotic surgery"
+    ]
+  },
+  "functions": [
+    "Executive Leadership",
+    "R&D",
+    "Clinical",
+    "Commercial",
+    "Sales",
+    "Marketing",
+    "Product",
+    "Engineering",
+    "Finance",
+    "Operations",
+    "Legal",
+    "HR",
+    "Manufacturing",
+    "Regulatory",
+    "Quality",
+    "Business Development",
+    "Medical Affairs",
+    "Supply Chain",
+    "Strategy",
+    "Data & Analytics"
+  ],
+  "functionsByIndustry": {
+    "Life Sciences": [
+      "Executive Leadership", "R&D", "Clinical", "Regulatory", "Medical Affairs",
+      "Commercial", "Sales", "Marketing", "Business Development", "Manufacturing",
+      "Quality", "Supply Chain", "Finance", "Operations", "Data & Analytics", "HR"
+    ],
+    "Technology": [
+      "Executive Leadership", "Engineering", "Product", "Sales", "Marketing",
+      "Customer Success", "DevOps / Platform", "Data & Analytics", "Security",
+      "Business Development", "Finance", "HR", "Strategy", "Operations"
+    ],
+    "Financial Services": [
+      "Executive Leadership", "Investment Management", "Deal Origination",
+      "Portfolio Management", "Risk", "Compliance", "Finance", "Operations",
+      "Investor Relations", "Data & Analytics", "Strategy", "HR"
+    ],
+    "Healthcare": [
+      "Executive Leadership", "Clinical", "Nursing", "Operations", "Finance",
+      "Healthcare IT", "Quality", "Compliance", "HR", "Strategy", "Data & Analytics"
+    ],
+    "Manufacturing & Engineering": [
+      "Executive Leadership", "Engineering", "Manufacturing", "Operations",
+      "Supply Chain", "Quality", "EHS", "Finance", "HR", "Strategy", "Sales"
+    ],
+    "Energy & Infrastructure": [
+      "Executive Leadership", "Engineering", "Operations", "Project Management",
+      "HSE", "Commercial", "Finance", "Strategy", "Regulatory", "HR"
+    ],
+    "Legal": [
+      "Partner", "Associate", "Legal Operations", "Compliance", "In-House Counsel",
+      "IP & Patent", "Litigation", "M&A / Corporate", "Finance", "HR", "Strategy"
+    ],
+    "Consulting & Professional Services": [
+      "Executive Leadership", "Strategy", "Operations", "Finance Advisory",
+      "HR Consulting", "IT Consulting", "Management Consulting", "Business Development", "HR"
+    ],
+    "Retail & Consumer": [
+      "Executive Leadership", "Commercial", "Marketing", "Operations", "Supply Chain",
+      "Finance", "HR", "Product", "Data & Analytics", "E-commerce", "Buying & Merchandising"
+    ],
+    "Logistics & Supply Chain": [
+      "Executive Leadership", "Operations", "Logistics", "Supply Chain", "Commercial",
+      "Finance", "HR", "Data & Analytics", "Engineering", "Safety"
+    ],
+    "Real Estate & Construction": [
+      "Executive Leadership", "Development", "Project Management", "Commercial",
+      "Quantity Surveying", "Finance", "Operations", "HR", "Site Management", "Planning"
+    ],
+    "Education": [
+      "Executive Leadership", "Academic", "Curriculum", "Operations", "Finance",
+      "HR", "EdTech", "Admissions", "Student Services", "Strategy"
+    ],
+    "Government & Public Sector": [
+      "Executive Leadership", "Policy", "Operations", "Finance", "HR",
+      "Compliance", "Programme Management", "Communications", "Strategy"
+    ],
+    "Media & Creative": [
+      "Executive Leadership", "Creative", "Content", "Marketing", "Commercial",
+      "Finance", "HR", "Product", "Data & Analytics", "Technology"
+    ]
+  },
+  "seniorityLevels": [
+    "Individual Contributor",
+    "Manager",
+    "Director",
+    "VP",
+    "C-Suite",
+    "Board"
+  ],
+  "companyTypes": [
+    "Startup",
+    "Scaleup",
+    "VC-backed",
+    "PE-backed",
+    "Public company",
+    "Private company",
+    "Family-owned",
+    "Government",
+    "Non-profit",
+    "Consultancy",
+    "Agency"
+  ],
+  "companyStages": [
+    "Pre-seed",
+    "Seed",
+    "Series A",
+    "Series B",
+    "Growth",
+    "Late stage",
+    "Enterprise",
+    "Public"
+  ],
+  "signalPreferences": [
+    "Funding rounds",
+    "Leadership changes",
+    "Job postings",
+    "Partnerships",
+    "Product / pipeline updates",
+    "Geographic expansion",
+    "M&A",
+    "Restructuring",
+    "New company launches",
+    "Investor / portfolio activity",
+    "Regulatory approval",
+    "Clinical milestone",
+    "Revenue milestone",
+    "Contract win"
+  ],
+  "signalFamilies": [
+    {
+      "id": "capital-ownership",
+      "label": "Capital & Ownership",
+      "description": "Funding events, investment rounds, M&A, ownership changes",
+      "signals": ["Funding rounds", "M&A", "Investor / portfolio activity", "New company launches"]
+    },
+    {
+      "id": "growth-commercial",
+      "label": "Growth & Commercial",
+      "description": "Revenue signals, contract wins, partnerships, expansion",
+      "signals": ["Partnerships", "Geographic expansion", "Revenue milestone", "Contract win"]
+    },
+    {
+      "id": "talent-hiring",
+      "label": "Talent & Hiring",
+      "description": "Job postings, leadership moves, restructuring",
+      "signals": ["Job postings", "Leadership changes", "Restructuring"]
+    },
+    {
+      "id": "market-product",
+      "label": "Market & Product",
+      "description": "Product launches, pipeline updates, technology milestones",
+      "signals": ["Product / pipeline updates"]
+    },
+    {
+      "id": "regulatory-milestone",
+      "label": "Regulatory & Milestone",
+      "description": "Regulatory approvals, clinical milestones, compliance events",
+      "signals": ["Regulatory approval", "Clinical milestone"]
+    }
+  ],
+  "marketTemplates": [
+    {
+      "id": "life-sciences",
+      "label": "Life Sciences Recruiter",
+      "description": "Biotech, Pharma, MedTech — clinical to commercial",
+      "industry": "Life Sciences",
+      "subsectors": ["Biotech", "Pharma", "MedTech"],
+      "functions": ["R&D", "Clinical", "Regulatory", "Commercial"],
+      "seniority": ["Director", "VP", "C-Suite"],
+      "stages": ["Series A", "Series B", "Growth"],
+      "companyTypes": ["VC-backed", "Public company"],
+      "signalPreferences": [
+        "Funding rounds", "Leadership changes", "Product / pipeline updates",
+        "Clinical milestone", "Regulatory approval"
+      ],
+      "signalFamilies": ["capital-ownership", "talent-hiring", "regulatory-milestone"]
+    },
+    {
+      "id": "tech",
+      "label": "Tech Recruiter",
+      "description": "SaaS, AI, Cybersecurity — engineering to GTM",
+      "industry": "Technology",
+      "subsectors": ["SaaS", "AI / Machine Learning", "Cybersecurity"],
+      "functions": ["Engineering", "Product", "Sales", "Marketing"],
+      "seniority": ["Manager", "Director", "VP"],
+      "stages": ["Series A", "Series B", "Growth"],
+      "companyTypes": ["VC-backed", "Startup", "Scaleup"],
+      "signalPreferences": [
+        "Funding rounds", "Job postings", "Leadership changes", "Product / pipeline updates"
+      ],
+      "signalFamilies": ["capital-ownership", "talent-hiring", "market-product"]
+    },
+    {
+      "id": "executive-search",
+      "label": "Executive Search",
+      "description": "C-suite & board placements across sectors",
+      "industry": "Life Sciences",
+      "subsectors": ["Biotech", "Pharma", "MedTech"],
+      "functions": ["Executive Leadership"],
+      "seniority": ["C-Suite", "Board"],
+      "stages": ["Series B", "Growth", "Late stage", "Public"],
+      "companyTypes": ["VC-backed", "PE-backed", "Public company"],
+      "signalPreferences": ["Leadership changes", "Funding rounds", "M&A"],
+      "signalFamilies": ["capital-ownership", "talent-hiring"]
+    },
+    {
+      "id": "finance",
+      "label": "Finance Recruiter",
+      "description": "PE, IB, asset management leadership",
+      "industry": "Financial Services",
+      "subsectors": ["Private Equity", "Investment Banking", "Asset Management"],
+      "functions": ["Investment Management", "Deal Origination", "Executive Leadership", "Strategy"],
+      "seniority": ["Director", "VP", "C-Suite"],
+      "stages": ["Growth", "Late stage", "Enterprise", "Public"],
+      "companyTypes": ["PE-backed", "Public company", "Private company"],
+      "signalPreferences": [
+        "M&A", "Leadership changes", "Funding rounds", "Investor / portfolio activity"
+      ],
+      "signalFamilies": ["capital-ownership", "talent-hiring", "growth-commercial"]
+    },
+    {
+      "id": "healthcare",
+      "label": "Healthcare Recruiter",
+      "description": "Health systems, payers, healthcare IT",
+      "industry": "Healthcare",
+      "subsectors": ["Hospitals & Health Systems", "Healthcare IT", "Value-Based Care"],
+      "functions": ["Clinical", "Operations", "Executive Leadership", "HR"],
+      "seniority": ["Director", "VP", "C-Suite"],
+      "stages": ["Growth", "Enterprise", "Public"],
+      "companyTypes": ["Public company", "Private company", "Non-profit"],
+      "signalPreferences": ["Leadership changes", "M&A", "Job postings", "Contract win"],
+      "signalFamilies": ["talent-hiring", "capital-ownership", "growth-commercial"]
+    },
+    {
+      "id": "industrial",
+      "label": "Industrial / Engineering Recruiter",
+      "description": "Aerospace, automotive, advanced manufacturing",
+      "industry": "Manufacturing & Engineering",
+      "subsectors": ["Aerospace & Defense", "Automotive", "Industrial Equipment"],
+      "functions": ["Engineering", "Manufacturing", "Operations", "Supply Chain"],
+      "seniority": ["Manager", "Director", "VP"],
+      "stages": ["Growth", "Enterprise", "Public"],
+      "companyTypes": ["Public company", "Private company", "PE-backed"],
+      "signalPreferences": ["Leadership changes", "Geographic expansion", "M&A", "Contract win"],
+      "signalFamilies": ["talent-hiring", "capital-ownership", "growth-commercial"]
+    },
+    {
+      "id": "generalist",
+      "label": "Generalist Recruiter",
+      "description": "Broad market coverage across tech and services",
+      "industry": "Technology",
+      "subsectors": ["SaaS", "AI / Machine Learning"],
+      "functions": ["Engineering", "Product", "Sales", "HR", "Finance"],
+      "seniority": ["Individual Contributor", "Manager", "Director"],
+      "stages": ["Seed", "Series A", "Series B", "Growth"],
+      "companyTypes": ["VC-backed", "Startup", "Scaleup", "PE-backed"],
+      "signalPreferences": ["Funding rounds", "Job postings", "Leadership changes"],
+      "signalFamilies": ["capital-ownership", "talent-hiring"]
+    }
+  ]
+}

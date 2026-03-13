@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { mockOpportunities, mockCompanies, mockSignals } from '@/lib/mock-data'
 import { getScoreColor, getSignalTypeColor, cn } from '@/lib/utils'
 import { useSettings, companyMatchesSettings } from '@/lib/settings-context'
+import { UpgradeGate } from '@/components/layout/UpgradeGate'
 
 const bdActionsMap: Record<string, string[]> = {
   opp_1: [
@@ -108,6 +109,12 @@ export default function HiringSignalsPage() {
   const marketIntelSignals = marketIntelOpp ? mockSignals.filter(s => marketIntelOpp.linkedSignals.includes(s.id)) : []
 
   return (
+    <UpgradeGate
+      moduleId="hiring_signals"
+      moduleName="Hiring Signals"
+      description="Hiring-specific signal intelligence with company context, velocity tracking and function-level breakdown."
+      minPlan="Core"
+    >
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -447,5 +454,6 @@ export default function HiringSignalsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </UpgradeGate>
   )
 }

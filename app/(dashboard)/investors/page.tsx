@@ -11,6 +11,7 @@ import { formatCurrency, cn } from '@/lib/utils'
 import { useWatchlist } from '@/lib/watchlist-context'
 import { WatchButton } from '@/components/ui/watch-button'
 import { useMarketConfig } from '@/lib/market-config'
+import { UpgradeGate } from '@/components/layout/UpgradeGate'
 
 function EngagementBar({ score }: { score: number }) {
   const color = score >= 90 ? '#10b981' : score >= 75 ? '#14b8a6' : score >= 60 ? '#f59e0b' : '#ef4444'
@@ -69,6 +70,12 @@ export default function InvestorsPage() {
   )
 
   return (
+    <UpgradeGate
+      moduleId="capital_intelligence"
+      moduleName="Capital Intelligence"
+      description="VC and PE fund intelligence with portfolio company mapping and hiring signal correlation."
+      minPlan="Core"
+    >
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold text-white">{marketConfig.capitalTabLabel}</h1>
@@ -405,5 +412,6 @@ export default function InvestorsPage() {
         </div>
       </div>
     </div>
+    </UpgradeGate>
   )
 }

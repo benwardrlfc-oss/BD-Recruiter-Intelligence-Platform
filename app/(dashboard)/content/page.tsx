@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { mockSignals } from '@/lib/mock-data'
+import { UpgradeGate } from '@/components/layout/UpgradeGate'
 import { getSignalTypeColor, formatTimeAgo, cn } from '@/lib/utils'
 
 const contentTypes = [
@@ -140,6 +141,12 @@ export default function ContentPage() {
   }
 
   return (
+    <UpgradeGate
+      moduleId="content_studio"
+      moduleName="Content Studio"
+      description="Generate thought leadership posts, market commentaries, and newsletter content from live market intelligence."
+      minPlan="Core"
+    >
     <div className="space-y-6">
       {/* Header */}
       <div>
@@ -423,5 +430,6 @@ export default function ContentPage() {
         </div>
       </div>
     </div>
+    </UpgradeGate>
   )
 }

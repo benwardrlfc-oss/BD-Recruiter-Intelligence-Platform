@@ -2,6 +2,7 @@ import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
+import taxonomyData from '../lib/taxonomy-data.json'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { Pool } = require('pg')
@@ -9,8 +10,28 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const adapter = new PrismaPg(pool as any)
 const prisma = new PrismaClient({ adapter } as any)
 
+async function seedTaxonomy() {
+  // TODO: Add IndustryTaxonomy model to schema.prisma before enabling actual upserts.
+  // The model should include fields for: id, industry, subsectors (Json), functions (Json),
+  // companyStages (Json), seniorityLevels (Json), signalFamilies (Json), marketTemplates (Json).
+  //
+  // When the model exists, replace the console.log calls below with actual prisma upserts, e.g.:
+  //   await prisma.industryTaxonomy.upsert({
+  //     where: { industry: industryName },
+  //     update: { subsectors: taxonomyData.subsectors[industryName] ?? [] },
+  //     create: { industry: industryName, subsectors: taxonomyData.subsectors[industryName] ?? [] },
+  //   })
+
+  console.log('Seeding taxonomy data...')
+  console.log(`Would seed ${taxonomyData.industries.length} industries`)
+  console.log(`Would seed ${Object.keys(taxonomyData.subsectors).length} subsector groups`)
+  console.log(`Would seed ${taxonomyData.marketTemplates.length} market templates`)
+}
+
 async function main() {
   console.log('Seeding database...')
+
+  await seedTaxonomy()
 
   // Create demo user
   const hashedPassword = await bcrypt.hash('demo1234', 12)
