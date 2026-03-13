@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Filter, ExternalLink, Building2, Clock, ChevronDown, ChevronRight, Zap, Loader2, CheckCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -21,6 +22,8 @@ export default function RadarPage() {
   const marketConfig = useMarketConfig()
   const { data: allSignals } = useSignals(settings)
   const { data: allCompanies } = useCompanies()
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   // Build signal type filter list: market-priority types first, then remaining, prefixed with All
   const signalTypes = [
@@ -28,10 +31,21 @@ export default function RadarPage() {
     ...marketConfig.prioritySignalTypes,
     ...allSignalTypes.filter((t) => t !== 'All' && !marketConfig.prioritySignalTypes.includes(t)),
   ]
-  const [selectedType, setSelectedType] = useState('All')
-  const [selectedSector, setSelectedSector] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [dateRange, setDateRange] = useState<'all' | '7d' | '30d' | '90d'>('all')
+  const [selectedType, setSelectedType] = useState(() => searchParams.get('type') || 'All')
+  const [selectedSector, setSelectedSector] = useState(() => searchParams.get('sector') || 'All')
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '')
+  const [dateRange, setDateRange] = useState<'all' | '7d' | '30d' | '90d'>(() => (searchParams.get('range') as any) || 'all')
+
+  // Sync filter state to URL so preferences survive navigation
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (selectedType !== 'All') params.set('type', selectedType)
+    if (selectedSector !== 'All') params.set('sector', selectedSector)
+    if (dateRange !== 'all') params.set('range', dateRange)
+    if (searchQuery) params.set('q', searchQuery)
+    const query = params.toString()
+    router.replace(query ? `/radar?${query}` : '/radar', { scroll: false })
+  }, [selectedType, selectedSector, dateRange, searchQuery])
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [refreshResult, setRefreshResult] = useState<{ signalsFound: number; opportunitiesCreated: number; opportunitiesUpdated: number } | null>(null)

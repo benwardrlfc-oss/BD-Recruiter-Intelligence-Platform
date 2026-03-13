@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import {
   Upload, FileText, Building2, User, Copy, CheckCircle,
@@ -142,6 +142,30 @@ export default function CandidatesPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<CandidateMatchResult | null>(null)
+  const [fromCache, setFromCache] = useState(false)
+
+  // Persist last result for 24h
+  const CACHE_KEY = 'bd_candidate_last_result'
+  const CACHE_TS_KEY = 'bd_candidate_last_result_ts'
+
+  useEffect(() => {
+    try {
+      const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || '0', 10)
+      if (Date.now() - ts < 86400000) {
+        const cached = localStorage.getItem(CACHE_KEY)
+        if (cached) { setResult(JSON.parse(cached)); setFromCache(true) }
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!result || fromCache) return
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(result))
+      localStorage.setItem(CACHE_TS_KEY, String(Date.now()))
+    } catch {}
+  }, [result, fromCache])
 
   // Company targeting
   const [companyCount, setCompanyCount] = useState(10)
@@ -197,20 +221,26 @@ export default function CandidatesPage() {
     if (!cvText.trim()) return
     setIsLoading(true)
     setError(null)
-    setSelectedCompanyIdx(null)
-    setShowEshot(false)
-    setEditedProfile({})
-    setEditing(null)
+    setFromCache(false)
     try {
       const response = await fetch('/api/candidates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rawText: cvText, fileName, recruiterNotes }),
       })
+      if (response.status === 429) {
+        const data = await response.json()
+        setError(data.error || 'Daily candidate match limit reached. Upgrade your plan for more.')
+        return
+      }
       if (!response.ok) throw new Error(`API error ${response.status}`)
       const data: CandidateMatchResult = await response.json()
       setResult(data)
       setCompanyCount(Math.min(10, data.matches?.length || 10))
+      setSelectedCompanyIdx(null)
+      setShowEshot(false)
+      setEditedProfile({})
+      setEditing(null)
     } catch (err) {
       setError('Failed to match candidate. Check your API key in Settings.')
       console.error(err)
@@ -410,9 +440,27 @@ ACHIEVEMENTS: Successfully delivered 3 Phase 3 programs to NDA submission. Built
             </CardContent>
           </Card>
 
+          {fromCache && result && (
+            <div className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-xs text-slate-400 mb-2">
+              <span>Showing last session results</span>
+              <button
+                onClick={() => { setResult(null); setFromCache(false); try { localStorage.removeItem(CACHE_KEY); localStorage.removeItem(CACHE_TS_KEY) } catch {} }}
+                className="text-slate-500 hover:text-white transition-colors underline"
+              >
+                Clear
+              </button>
+            </div>
+          )}
           {error && (
-            <div className="rounded-lg border border-rose-700/40 bg-rose-900/10 px-4 py-3 text-sm text-rose-400">
-              {error}
+            <div className="rounded-lg border border-rose-700/40 bg-rose-900/10 px-4 py-3">
+              <p className="text-sm text-rose-400">{error}</p>
+              <button
+                onClick={handleSubmit}
+                disabled={!cvText.trim() || isLoading}
+                className="mt-2 text-xs font-medium text-rose-300 underline underline-offset-2 hover:no-underline disabled:opacity-50"
+              >
+                Retry
+              </button>
             </div>
           )}
         </div>

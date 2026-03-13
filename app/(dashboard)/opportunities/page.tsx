@@ -124,7 +124,7 @@ export default function HiringSignalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Hiring Signals</h1>
           <p className="text-sm text-slate-400 mt-1">
-            {sorted.length} matching your profile · {totalCount} total
+            AI-scored companies with active hiring momentum · {sorted.length} matching your profile · {totalCount} total
           </p>
         </div>
         <div className="flex items-center gap-2">

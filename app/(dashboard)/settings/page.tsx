@@ -205,12 +205,15 @@ export default function SettingsPage() {
 
   // ── AI usage ──────────────────────────────────────────────────────────────
   const [aiUsage, setAiUsage] = useState<Record<string, { used: number; limit: number }> | null>(null)
+  const [aiUsageLoading, setAiUsageLoading] = useState(true)
 
   useEffect(() => {
+    setAiUsageLoading(true)
     fetch('/api/user/ai-usage')
       .then((r) => r.json())
       .then((data) => { if (data && typeof data === 'object') setAiUsage(data) })
       .catch(() => {})
+      .finally(() => setAiUsageLoading(false))
   }, [])
 
   // ── AI builder state ──────────────────────────────────────────────────────

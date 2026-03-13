@@ -82,12 +82,19 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               </Button>
             </a>
           )}
-          <Link href={opportunity ? `/scripts?opp=${opportunity.id}` : '/scripts'}>
-            <Button size="sm" className="gap-2">
+          {opportunity ? (
+            <Link href={`/scripts?opp=${opportunity.id}`}>
+              <Button size="sm" className="gap-2">
+                <Sparkles className="h-4 w-4" />
+                Generate Script
+              </Button>
+            </Link>
+          ) : (
+            <Button size="sm" className="gap-2" disabled title="No opportunity data yet — run intelligence to generate">
               <Sparkles className="h-4 w-4" />
               Generate Script
             </Button>
-          </Link>
+          )}
         </div>
       </div>
 
@@ -302,7 +309,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {mockCompanies
+                {allCompanies
                   .filter((c) => c.id !== id && c.sector === company.sector)
                   .slice(0, 3)
                   .map((similar) => (
@@ -316,7 +323,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                       </div>
                     </Link>
                   ))}
-                {mockCompanies.filter((c) => c.id !== id && c.sector === company.sector).length === 0 && (
+                {allCompanies.filter((c) => c.id !== id && c.sector === company.sector).length === 0 && (
                   <p className="text-xs text-slate-500">No similar companies found</p>
                 )}
               </div>
