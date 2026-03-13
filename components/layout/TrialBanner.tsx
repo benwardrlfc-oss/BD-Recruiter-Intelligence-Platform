@@ -7,7 +7,10 @@ import Link from 'next/link'
 
 export function TrialBanner() {
   const { data: session } = useSession()
-  const [dismissed, setDismissed] = useState(false)
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return sessionStorage.getItem('trial_banner_dismissed') === '1'
+  })
 
   if (dismissed) return null
 
@@ -48,7 +51,10 @@ export function TrialBanner() {
         </Link>
       </div>
       <button
-        onClick={() => setDismissed(true)}
+        onClick={() => {
+          sessionStorage.setItem('trial_banner_dismissed', '1')
+          setDismissed(true)
+        }}
         aria-label="Dismiss banner"
         className={`shrink-0 rounded p-0.5 transition-opacity hover:opacity-70 ${
           isPastDue ? 'text-white' : 'text-amber-950'

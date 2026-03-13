@@ -11,6 +11,7 @@ interface UpgradeGateProps {
   moduleName: string
   description: string
   minPlan: string
+  ctaDetail?: string
   children: React.ReactNode
 }
 
@@ -19,21 +20,30 @@ export function UpgradeGate({
   moduleName,
   description,
   minPlan,
+  ctaDetail,
   children,
 }: UpgradeGateProps) {
   const { data: session, status } = useSession()
 
-  // If loading or no session, render children without blocking
-  if (status === 'loading' || !session) {
-    return <>{children}</>
+  // During session load, show a minimal skeleton rather than unguarded content
+  if (status === 'loading') {
+    return (
+      <div className="animate-pulse space-y-4 p-6">
+        <div className="h-8 bg-slate-800 rounded-lg w-1/3" />
+        <div className="h-40 bg-slate-800/50 rounded-xl" />
+        <div className="h-40 bg-slate-800/50 rounded-xl" />
+      </div>
+    )
   }
+  // No session = demo/dev mode, render normally
+  if (!session) return <>{children}</>
 
   const enabledModules: string[] =
     (session.user?.enabledModules as string[] | undefined) ?? []
   const role =
     (session.user?.orgRole as Parameters<typeof canAccessModule>[2] | undefined) ?? 'member'
   const billingStatus =
-    (session.user?.billingStatus as Parameters<typeof canAccessModule>[3] | undefined) ?? 'active'
+    (session.user?.billingStatus as Parameters<typeof canAccessModule>[3] | undefined) ?? 'trialing'
 
   const hasAccess = canAccessModule(
     moduleId as ModuleId,
@@ -62,6 +72,9 @@ export function UpgradeGate({
 
           {/* Description */}
           <p className="text-sm text-slate-400 leading-relaxed mb-5">{description}</p>
+          {ctaDetail && (
+            <p className="text-xs text-indigo-300/70 leading-relaxed mb-5 -mt-2">{ctaDetail}</p>
+          )}
 
           {/* Plan requirement */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-600/15 border border-indigo-500/20 mb-8">

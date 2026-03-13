@@ -6,8 +6,10 @@ export interface Plan {
   id: PlanId
   label: string
   description: string
-  monthlyPrice: number  // USD per seat/month
-  annualPrice: number   // USD per seat/year (billed annually)
+  monthlyPrice: number | null  // USD per seat/month
+  annualPrice: number | null   // USD per seat/year (billed annually)
+  isCustomPricing?: boolean
+  seatsNote?: string
   maxSeats: number | null // null = unlimited
   trialDays: number
   stripePriceIdMonthly?: string
@@ -46,6 +48,7 @@ export const PLANS: Record<PlanId, Plan> = {
     description: 'Full intelligence suite for power users',
     monthlyPrice: 179,
     annualPrice: 149,
+    seatsNote: 'Up to 3 seats',
     maxSeats: 3,
     trialDays: 0,
     stripePriceIdMonthly: process.env.STRIPE_PRICE_PRO_MONTHLY,
@@ -56,8 +59,9 @@ export const PLANS: Record<PlanId, Plan> = {
     id: 'team',
     label: 'Team',
     description: 'Multi-seat access for recruitment firms',
-    monthlyPrice: 149,
-    annualPrice: 119,
+    monthlyPrice: 249,
+    annualPrice: 199,
+    seatsNote: 'Unlimited seats · flat rate',
     maxSeats: null,
     trialDays: 0,
     stripePriceIdMonthly: process.env.STRIPE_PRICE_TEAM_MONTHLY,
@@ -68,8 +72,9 @@ export const PLANS: Record<PlanId, Plan> = {
     id: 'enterprise',
     label: 'Enterprise',
     description: 'Custom plans for large firms',
-    monthlyPrice: 0, // custom
-    annualPrice: 0,
+    monthlyPrice: null,
+    annualPrice: null,
+    isCustomPricing: true,
     maxSeats: null,
     trialDays: 0,
     features: ['Everything in Team', 'Custom seat pricing', 'SSO / SAML', 'Dedicated support', 'SLA', 'Custom modules'],
