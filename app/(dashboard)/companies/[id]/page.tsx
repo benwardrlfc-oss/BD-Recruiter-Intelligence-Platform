@@ -18,15 +18,20 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockCompanies, mockSignals, mockOpportunities, mockInvestors } from '@/lib/mock-data'
 import { formatDate, formatCurrency, getScoreColor, getSignalTypeColor, getTimingBadgeColor, formatTimeAgo, signalTypeIcons } from '@/lib/utils'
+import { useCompanies, useSignals, useOpportunities, useInvestors } from '@/lib/hooks/use-data'
 
 export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const company = mockCompanies.find((c) => c.id === id)
-  const signals = mockSignals.filter((s) => s.companyId === id)
-  const opportunity = mockOpportunities.find((o) => o.companyId === id)
-  const leadInvestor = company?.leadInvestorId ? mockInvestors.find((i) => i.id === company.leadInvestorId) : null
+  const { data: allCompanies } = useCompanies()
+  const { data: allSignals } = useSignals()
+  const { data: allOpportunities } = useOpportunities()
+  const { data: allInvestors } = useInvestors()
+
+  const company = allCompanies.find((c) => c.id === id)
+  const signals = allSignals.filter((s) => s.companyId === id)
+  const opportunity = allOpportunities.find((o) => o.companyId === id)
+  const leadInvestor = company?.leadInvestorId ? allInvestors.find((i) => i.id === company.leadInvestorId) : null
 
   if (!company) {
     return (

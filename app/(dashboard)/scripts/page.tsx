@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { mockOpportunities, mockCompanies, mockSignals } from '@/lib/mock-data'
 import { useSettings } from '@/lib/settings-context'
 import { cn } from '@/lib/utils'
+import { useOpportunities, useCompanies, useSignals } from '@/lib/hooks/use-data'
 
 interface ScriptResult {
   emailOpener: string
@@ -32,18 +32,21 @@ export default function ScriptsPage() {
   const [error, setError] = useState<string | null>(null)
   const { settings } = useSettings()
   const searchParams = useSearchParams()
+  const { data: allOpportunities } = useOpportunities(settings)
+  const { data: allCompanies } = useCompanies()
+  const { data: allSignals } = useSignals()
 
   useEffect(() => {
     const oppParam = searchParams.get('opp')
-    if (oppParam && mockOpportunities.find((o) => o.id === oppParam)) {
+    if (oppParam && allOpportunities.find((o) => o.id === oppParam)) {
       setSelectedOpp(oppParam)
     }
-  }, [searchParams])
+  }, [searchParams, allOpportunities])
 
   // Filter opportunities by signal type and search
-  const filteredOpportunities = mockOpportunities.filter((opp) => {
-    const company = mockCompanies.find((c) => c.id === opp.companyId)
-    const signal = mockSignals.find((s) => s.companyId === opp.companyId)
+  const filteredOpportunities = allOpportunities.filter((opp) => {
+    const company = allCompanies.find((c) => c.id === opp.companyId)
+    const signal = allSignals.find((s) => s.companyId === opp.companyId)
 
     const typeMatch =
       signalTypeFilter === 'All' ||
@@ -94,9 +97,9 @@ export default function ScriptsPage() {
     setTimeout(() => setCopiedKey(null), 2000)
   }
 
-  const selectedOpportunity = mockOpportunities.find((o) => o.id === selectedOpp)
+  const selectedOpportunity = allOpportunities.find((o) => o.id === selectedOpp)
   const selectedCompany = selectedOpportunity
-    ? mockCompanies.find((c) => c.id === selectedOpportunity.companyId)
+    ? allCompanies.find((c) => c.id === selectedOpportunity.companyId)
     : null
 
   return (
@@ -150,8 +153,8 @@ export default function ScriptsPage() {
               {/* Opportunities list */}
               <div className="space-y-1.5 max-h-72 overflow-y-auto">
                 {filteredOpportunities.map((opp) => {
-                  const company = mockCompanies.find((c) => c.id === opp.companyId)
-                  const signal = mockSignals.find((s) => s.companyId === opp.companyId)
+                  const company = allCompanies.find((c) => c.id === opp.companyId)
+                  const signal = allSignals.find((s) => s.companyId === opp.companyId)
                   const isSelected = selectedOpp === opp.id
                   return (
                     <button

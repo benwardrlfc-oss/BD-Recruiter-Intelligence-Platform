@@ -12,11 +12,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockOpportunities, mockCompanies, mockSignals } from '@/lib/mock-data'
 import { getScoreColor, cn } from '@/lib/utils'
 import { useSettings, companyMatchesSettings } from '@/lib/settings-context'
 import { useWatchlist } from '@/lib/watchlist-context'
 import { WatchButton } from '@/components/ui/watch-button'
+import { useOpportunities, useCompanies, useSignals } from '@/lib/hooks/use-data'
 
 type SortKey = 'opportunityScore' | 'momentumScore' | 'name'
 type FilterLocation = 'all' | string
@@ -29,11 +29,14 @@ export default function CompaniesPage() {
   const [filterStage, setFilterStage] = useState<FilterStage>('all')
   const { settings } = useSettings()
   const { isWatchingCompany, toggleCompany } = useWatchlist()
+  const { data: allOpportunities } = useOpportunities(settings)
+  const { data: allCompanies } = useCompanies(settings)
+  const { data: allSignals } = useSignals(settings)
 
-  const allTargets = mockOpportunities
+  const allTargets = allOpportunities
     .map((opp) => ({
       ...opp,
-      company: mockCompanies.find((c) => c.id === opp.companyId),
+      company: (opp as any).company ?? allCompanies.find((c) => c.id === opp.companyId),
     }))
     .filter((t) => t.company && companyMatchesSettings(t.company, settings))
 
@@ -98,7 +101,7 @@ export default function CompaniesPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Companies</h1>
         <p className="text-sm text-slate-400 mt-1">
-          {allTargets.length} companies matching your profile · {mockOpportunities.length} total tracked
+          {allTargets.length} companies matching your profile · {allOpportunities.length} total tracked
         </p>
       </div>
 
@@ -116,7 +119,7 @@ export default function CompaniesPage() {
         <CardContent>
           <div className="space-y-3">
             {top10.map((target, idx) => {
-              const companySignals = mockSignals.filter((s) => s.companyId === target.companyId)
+              const companySignals = allSignals.filter((s) => s.companyId === target.companyId)
               const latestSignal = companySignals[0]
               return (
                 <div
@@ -291,7 +294,7 @@ export default function CompaniesPage() {
 
             <div className="divide-y divide-slate-800">
               {sorted.map((target, idx) => {
-                const coSignals = mockSignals.filter((s) => s.companyId === target.companyId)
+                const coSignals = allSignals.filter((s) => s.companyId === target.companyId)
                 return (
                   <div
                     key={target.id}

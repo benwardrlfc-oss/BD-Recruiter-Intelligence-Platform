@@ -22,8 +22,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useWatchlist } from '@/lib/watchlist-context'
-import { mockCompanies, mockInvestors, mockSignals } from '@/lib/mock-data'
 import { formatTimeAgo, getSignalTypeColor, cn } from '@/lib/utils'
+import { useCompanies, useInvestors, useSignals } from '@/lib/hooks/use-data'
 
 type FilterType = 'all' | 'companies' | 'vcs' | 'movement' | 'high-priority'
 type TimeRange = '7d' | '30d' | '90d'
@@ -57,6 +57,9 @@ const whyItMattersMap: Record<string, string> = {
 
 export default function WatchlistPage() {
   const { watchedCompanies, watchedVCs, removeCompany, removeVC } = useWatchlist()
+  const { data: allCompanies } = useCompanies()
+  const { data: allInvestors } = useInvestors()
+  const { data: allSignals } = useSignals()
   const [filterType, setFilterType] = useState<FilterType>('all')
   const [timeRange, setTimeRange] = useState<TimeRange>('30d')
 
@@ -64,13 +67,13 @@ export default function WatchlistPage() {
   const watchedVCIds = new Set(watchedVCs.map((w) => w.entityId))
 
   const companies = useMemo(
-    () => mockCompanies.filter((c) => watchedCompanyIds.has(c.id)),
-    [watchedCompanies]
+    () => allCompanies.filter((c) => watchedCompanyIds.has(c.id)),
+    [allCompanies, watchedCompanies]
   )
 
   const investors = useMemo(
-    () => mockInvestors.filter((inv) => watchedVCIds.has(inv.id)),
-    [watchedVCs]
+    () => allInvestors.filter((inv) => watchedVCIds.has(inv.id)),
+    [allInvestors, watchedVCs]
   )
 
   // Movement feed: signals from watched companies + portfolio activity from watched VCs
@@ -89,9 +92,9 @@ export default function WatchlistPage() {
     }> = []
 
     // Signals for watched companies
-    for (const signal of mockSignals) {
+    for (const signal of allSignals) {
       if (signal.companyId && watchedCompanyIds.has(signal.companyId)) {
-        const company = mockCompanies.find((c) => c.id === signal.companyId)
+        const company = allCompanies.find((c) => c.id === signal.companyId)
         if (!company) continue
         items.push({
           id: signal.id,
@@ -110,9 +113,9 @@ export default function WatchlistPage() {
 
     // Portfolio activity for watched VCs
     for (const inv of investors) {
-      for (const signal of mockSignals) {
+      for (const signal of allSignals) {
         if (signal.companyId && inv.portfolioCompanyIds?.includes(signal.companyId)) {
-          const portCo = mockCompanies.find((c) => c.id === signal.companyId)
+          const portCo = allCompanies.find((c) => c.id === signal.companyId)
           if (!portCo) continue
           // avoid duplicates if same signal already added via company watch
           if (items.some((i) => i.id === `vc_${signal.id}`)) continue
@@ -133,7 +136,7 @@ export default function WatchlistPage() {
     }
 
     return items.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
-  }, [watchedCompanies, watchedVCs, investors])
+  }, [allSignals, allCompanies, watchedCompanies, watchedVCs, investors])
 
   // Time-filtered movement
   const daysMap: Record<TimeRange, number> = { '7d': 7, '30d': 30, '90d': 90 }
@@ -395,7 +398,7 @@ export default function WatchlistPage() {
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {companies.map((co) => {
-                  const companySignals = mockSignals.filter((s) => s.companyId === co.id)
+                  const companySignals = allSignals.filter((s) => s.companyId === co.id)
                   const latestSignal = companySignals[0]
                   const addedEntry = watchedCompanies.find((w) => w.entityId === co.id)
                   return (
@@ -486,8 +489,8 @@ export default function WatchlistPage() {
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {investors.map((inv) => {
-                  const portfolioCompanies = mockCompanies.filter((c) => inv.portfolioCompanyIds?.includes(c.id))
-                  const portfolioSignals = mockSignals.filter((s) => s.companyId && inv.portfolioCompanyIds?.includes(s.companyId))
+                  const portfolioCompanies = allCompanies.filter((c) => inv.portfolioCompanyIds?.includes(c.id))
+                  const portfolioSignals = allSignals.filter((s) => s.companyId && inv.portfolioCompanyIds?.includes(s.companyId))
                   const latestPortfolioSignal = portfolioSignals[0]
                   const addedEntry = watchedVCs.find((w) => w.entityId === inv.id)
                   return (

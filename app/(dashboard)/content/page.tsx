@@ -17,8 +17,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { mockSignals } from '@/lib/mock-data'
 import { UpgradeGate } from '@/components/layout/UpgradeGate'
+import { useSignals } from '@/lib/hooks/use-data'
 import { getSignalTypeColor, formatTimeAgo, cn } from '@/lib/utils'
 
 const contentTypes = [
@@ -43,6 +43,7 @@ const contentTypes = [
 ]
 
 export default function ContentPage() {
+  const { data: allSignals } = useSignals()
   const [selectedType, setSelectedType] = useState('linkedin_post')
   const [selectedSignals, setSelectedSignals] = useState<string[]>([])
   const [selectedTone, setSelectedTone] = useState('')
@@ -56,13 +57,13 @@ export default function ContentPage() {
   const [lengthWarning, setLengthWarning] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const filteredSignals = mockSignals.filter((s) => {
+  const filteredSignals = allSignals.filter((s) => {
     const typeMatch = signalTypeFilter === 'all' || s.signalType === signalTypeFilter
     const searchMatch = !signalSearch || s.title.toLowerCase().includes(signalSearch.toLowerCase())
     return typeMatch && searchMatch
   })
 
-  const signalTypes = ['all', ...Array.from(new Set(mockSignals.map((s) => s.signalType)))]
+  const signalTypes = ['all', ...Array.from(new Set(allSignals.map((s) => s.signalType)))]
 
   const toggleSignal = (id: string) => {
     setSelectedSignals((prev) =>

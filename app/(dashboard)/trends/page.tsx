@@ -10,10 +10,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockCompanies, mockSignals } from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/lib/settings-context'
 import { UpgradeGate } from '@/components/layout/UpgradeGate'
+import { useCompanies, useSignals } from '@/lib/hooks/use-data'
 
 const GlobalActivityMap = dynamic(() => import('@/components/market/GlobalActivityMap'), {
   ssr: false,
@@ -122,9 +122,9 @@ function getMapPos(lat: number, lon: number) {
   return { x: ((lon + 180) / 360) * 100, y: ((90 - lat) / 180) * 100 }
 }
 
-function getCompaniesForCity(cityName: string) {
+function getCompaniesForCity(cityName: string, companies: Array<{ id: string; geography?: string | null }>) {
   const key = cityName.split(',')[0].toLowerCase()
-  return mockCompanies.filter((c) => {
+  return companies.filter((c) => {
     const geo = (c.geography || '').toLowerCase()
     return geo.includes(key) ||
       (key === 'boston' && geo.includes('ma')) ||
@@ -136,6 +136,8 @@ function getCompaniesForCity(cityName: string) {
 
 export default function TrendsPage() {
   const { settings } = useSettings()
+  const { data: allCompanies } = useCompanies(settings)
+  const { data: allSignals } = useSignals(settings)
   const [mapOpen, setMapOpen] = useState(false)
   const [globalMapOpen, setGlobalMapOpen] = useState(false)
   const [selectedHotspot, setSelectedHotspot] = useState<typeof geographicHotspots[0] | null>(null)
@@ -148,7 +150,7 @@ export default function TrendsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedMapCompanyId, setSelectedMapCompanyId] = useState<string | null>(null)
 
-  const mapCompanies = selectedHotspot ? getCompaniesForCity(selectedHotspot.city) : []
+  const mapCompanies = selectedHotspot ? getCompaniesForCity(selectedHotspot.city, allCompanies) : []
 
   const openGlobalMap = useCallback(() => {
     setGlobalMapOpen(true)
@@ -159,8 +161,8 @@ export default function TrendsPage() {
     else setGeoFilter('North America')
   }, [settings.regions])
 
-  const activeCompanyCount = mockCompanies.filter((c) => {
-    const sigs = mockSignals.filter((s) => s.companyId === c.id && (signalFilter === 'All' || s.signalType === signalFilter))
+  const activeCompanyCount = allCompanies.filter((c) => {
+    const sigs = allSignals.filter((s) => s.companyId === c.id && (signalFilter === 'All' || s.signalType === signalFilter))
     return sigs.length > 0
   }).length
 
@@ -339,7 +341,7 @@ export default function TrendsPage() {
                       <p className="text-xs font-semibold text-slate-400 mb-1.5">Comparable companies</p>
                       <div className="flex flex-wrap gap-1.5">
                         {item.comparableCompanies.map((co, i) => {
-                          const match = mockCompanies.find((c) => c.name === co)
+                          const match = allCompanies.find((c) => c.name === co)
                           return match ? (
                             <Link key={i} href={`/companies/${match.id}`}>
                               <span className="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-indigo-300 border border-slate-700 hover:border-indigo-500/40 transition-colors cursor-pointer">{co}</span>
@@ -398,7 +400,7 @@ export default function TrendsPage() {
               <div className="overflow-y-auto p-4 space-y-3" style={{ height: '420px' }}>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Companies in {selectedHotspot.city.split(',')[0]}</p>
                 {mapCompanies.length > 0 ? mapCompanies.map((co) => {
-                  const coSignals = mockSignals.filter((s) => s.companyId === co.id)
+                  const coSignals = allSignals.filter((s) => s.companyId === co.id)
                   return (
                     <Link key={co.id} href={`/companies/${co.id}`}>
                       <div className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3.5 hover:border-indigo-500/40 hover:bg-indigo-900/10 transition-all cursor-pointer group mb-2">

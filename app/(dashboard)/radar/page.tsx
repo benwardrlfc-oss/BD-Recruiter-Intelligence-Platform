@@ -7,10 +7,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip } from '@/components/ui/tooltip'
-import { mockSignals, mockCompanies } from '@/lib/mock-data'
 import { formatTimeAgo, formatDate, getSignalTypeColor, signalTypeIcons, cn } from '@/lib/utils'
 import { useSettings } from '@/lib/settings-context'
 import { useMarketConfig } from '@/lib/market-config'
+import { useSignals, useCompanies } from '@/lib/hooks/use-data'
 
 const allSignalTypes = ['All', 'funding', 'hiring', 'leadership', 'partnership', 'expansion', 'regulatory', 'clinical']
 const sectors = ['All', 'Biotechnology', 'Biotech', 'MedTech', 'Diagnostics', 'CRO/CDMO', 'CRO / CDMO', 'Gene Therapy', 'Cell Therapy', 'Pharma', 'Digital Health']
@@ -18,6 +18,8 @@ const sectors = ['All', 'Biotechnology', 'Biotech', 'MedTech', 'Diagnostics', 'C
 export default function RadarPage() {
   const { settings } = useSettings()
   const marketConfig = useMarketConfig()
+  const { data: allSignals } = useSignals(settings)
+  const { data: allCompanies } = useCompanies()
 
   // Build signal type filter list: market-priority types first, then remaining, prefixed with All
   const signalTypes = [
@@ -36,7 +38,7 @@ export default function RadarPage() {
     // When user picks a sector from the dropdown, use it directly.
     // When set to 'All', fall back to the user's saved settings sector.
     const effectiveSector = selectedSector !== 'All' ? selectedSector : settings.sector
-    return mockSignals.filter((s) => {
+    return allSignals.filter((s) => {
       if (selectedType !== 'All' && s.signalType !== selectedType) return false
       if (effectiveSector && effectiveSector !== 'All' && s.sector) {
         if (s.sector.toLowerCase() !== effectiveSector.toLowerCase()) return false
@@ -49,7 +51,7 @@ export default function RadarPage() {
       }
       return true
     })
-  }, [selectedType, selectedSector, searchQuery, dateRange, settings.sector])
+  }, [allSignals, selectedType, selectedSector, searchQuery, dateRange, settings.sector])
 
   return (
     <div className="space-y-6">
@@ -131,7 +133,7 @@ export default function RadarPage() {
       {/* Signal Cards Grid */}
       <div className="grid grid-cols-2 gap-4">
         {filtered.map((signal) => {
-          const company = mockCompanies.find((c) => c.id === signal.companyId)
+          const company = allCompanies.find((c) => c.id === signal.companyId)
           const isExpanded = expandedId === signal.id
 
           return (

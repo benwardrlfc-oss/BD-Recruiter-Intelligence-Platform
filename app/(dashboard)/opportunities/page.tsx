@@ -19,10 +19,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { mockOpportunities, mockCompanies, mockSignals } from '@/lib/mock-data'
 import { getScoreColor, getSignalTypeColor, cn } from '@/lib/utils'
 import { useSettings, companyMatchesSettings } from '@/lib/settings-context'
 import { UpgradeGate } from '@/components/layout/UpgradeGate'
+import { useOpportunities, useCompanies, useSignals } from '@/lib/hooks/use-data'
 
 const bdActionsMap: Record<string, string[]> = {
   opp_1: [
@@ -95,18 +95,21 @@ export default function HiringSignalsPage() {
   const [sortBy, setSortBy] = useState<'opportunityScore' | 'momentumScore'>('opportunityScore')
   const [marketIntelId, setMarketIntelId] = useState<string | null>(null)
   const { settings } = useSettings()
+  const { data: allOpportunities } = useOpportunities(settings)
+  const { data: allCompanies } = useCompanies(settings)
+  const { data: allSignals } = useSignals(settings)
 
-  const matching = mockOpportunities.filter((o) => {
-    const company = mockCompanies.find((c) => c.id === o.companyId)
-    return company ? companyMatchesSettings(company, settings) : false
+  const matching = allOpportunities.filter((o) => {
+    const company = allCompanies.find((c) => c.id === o.companyId)
+    return company ? companyMatchesSettings(company, settings) : true
   })
   const sorted = [...matching].sort((a, b) => b[sortBy] - a[sortBy])
-  const totalCount = mockOpportunities.length
+  const totalCount = allOpportunities.length
 
   const marketIntelOpp = marketIntelId ? sorted.find(o => o.id === marketIntelId) : null
-  const marketIntelCompany = marketIntelOpp ? mockCompanies.find(c => c.id === marketIntelOpp.companyId) : null
+  const marketIntelCompany = marketIntelOpp ? allCompanies.find(c => c.id === marketIntelOpp.companyId) : null
   const marketIntelExplanation = marketIntelId ? signalExplanations[marketIntelId] : null
-  const marketIntelSignals = marketIntelOpp ? mockSignals.filter(s => marketIntelOpp.linkedSignals.includes(s.id)) : []
+  const marketIntelSignals = marketIntelOpp ? allSignals.filter(s => marketIntelOpp.linkedSignals.includes(s.id)) : []
 
   return (
     <UpgradeGate
@@ -166,8 +169,8 @@ export default function HiringSignalsPage() {
       {/* Hiring Signals List */}
       <div className="space-y-3">
         {sorted.map((opp) => {
-          const company = mockCompanies.find((c) => c.id === opp.companyId)
-          const linkedSignalData = mockSignals.filter((s) => opp.linkedSignals.includes(s.id))
+          const company = allCompanies.find((c) => c.id === opp.companyId)
+          const linkedSignalData = allSignals.filter((s) => opp.linkedSignals.includes(s.id))
           const isExpanded = expandedId === opp.id
           const actions = bdActionsMap[opp.id] || []
           const explanation = signalExplanations[opp.id]

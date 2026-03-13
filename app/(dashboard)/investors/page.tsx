@@ -6,12 +6,12 @@ import { Building2, DollarSign, Globe, TrendingUp, MapPin, Search, ChevronRight,
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip } from '@/components/ui/tooltip'
-import { mockInvestors, mockSignals, mockCompanies } from '@/lib/mock-data'
 import { formatCurrency, cn } from '@/lib/utils'
 import { useWatchlist } from '@/lib/watchlist-context'
 import { WatchButton } from '@/components/ui/watch-button'
 import { useMarketConfig } from '@/lib/market-config'
 import { UpgradeGate } from '@/components/layout/UpgradeGate'
+import { useInvestors, useSignals, useCompanies } from '@/lib/hooks/use-data'
 
 function EngagementBar({ score }: { score: number }) {
   const color = score >= 90 ? '#10b981' : score >= 75 ? '#14b8a6' : score >= 60 ? '#f59e0b' : '#ef4444'
@@ -32,12 +32,17 @@ function EngagementBar({ score }: { score: number }) {
 }
 
 export default function InvestorsPage() {
-  const [selectedId, setSelectedId] = useState<string | null>(mockInvestors[0]?.id || null)
+  const { data: allInvestors } = useInvestors()
+  const { data: allSignals } = useSignals()
+  const { data: allCompanies } = useCompanies()
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'recentFundSize' | 'capitalDeployed' | 'engagementScore' | 'name'>('capitalDeployed')
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
   const { isWatchingVC, toggleVC } = useWatchlist()
   const marketConfig = useMarketConfig()
+
+  const effectiveSelectedId = selectedId ?? allInvestors[0]?.id ?? null
 
   const handleFilterClick = (key: typeof sortBy) => {
     if (sortBy === key) {
@@ -48,7 +53,7 @@ export default function InvestorsPage() {
     }
   }
 
-  const filtered = mockInvestors
+  const filtered = allInvestors
     .filter((inv) =>
       inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inv.sectorFocus.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -63,9 +68,9 @@ export default function InvestorsPage() {
       return sortDir === 'desc' ? bVal - aVal : aVal - bVal
     })
 
-  const selected = mockInvestors.find((inv) => inv.id === selectedId)
-  const selectedSignals = mockSignals.filter((s) => s.investorId === selectedId)
-  const portfolioCompanies = mockCompanies.filter((c) =>
+  const selected = allInvestors.find((inv) => inv.id === effectiveSelectedId)
+  const selectedSignals = allSignals.filter((s) => s.investorId === effectiveSelectedId)
+  const portfolioCompanies = allCompanies.filter((c) =>
     selected?.portfolioCompanyIds?.includes(c.id)
   )
 
@@ -121,8 +126,8 @@ export default function InvestorsPage() {
           {/* Firm List */}
           <div className="space-y-2 overflow-y-auto flex-1">
             {filtered.map((investor, idx) => {
-              const firmSignals = mockSignals.filter((s) => s.investorId === investor.id)
-              const isSelected = selectedId === investor.id
+              const firmSignals = allSignals.filter((s) => s.investorId === investor.id)
+              const isSelected = effectiveSelectedId === investor.id
               return (
                 <button
                   key={investor.id}
@@ -259,7 +264,7 @@ export default function InvestorsPage() {
                   <CardContent>
                     <div className="space-y-2">
                       {portfolioCompanies.map((co) => {
-                        const coSignals = mockSignals.filter((s) => s.companyId === co.id)
+                        const coSignals = allSignals.filter((s) => s.companyId === co.id)
                         return (
                           <Link key={co.id} href={`/companies/${co.id}`}>
                             <div className="flex items-center justify-between rounded-xl border border-slate-800/60 px-4 py-3 hover:border-indigo-500/30 hover:bg-indigo-900/10 transition-all cursor-pointer">
@@ -300,7 +305,7 @@ export default function InvestorsPage() {
                   <CardContent>
                     <div className="space-y-3">
                       {selectedSignals.map((signal) => {
-                        const co = mockCompanies.find((c) => c.id === signal.companyId)
+                        const co = allCompanies.find((c) => c.id === signal.companyId)
                         return (
                           <div key={signal.id} className="rounded-xl border border-slate-800/60 bg-slate-900/50 p-4">
                             <div className="flex items-center justify-between mb-2">

@@ -11,7 +11,6 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockSignals, mockInvestors } from '@/lib/mock-data'
 import { formatTimeAgo } from '@/lib/utils'
 import { useSettings } from '@/lib/settings-context'
 import { useWatchlist } from '@/lib/watchlist-context'
@@ -191,9 +190,9 @@ export default function DashboardPage() {
           <WatchlistUpdates
             watchedCompanies={watchedCompanies}
             watchedVCs={watchedVCs}
-            allSignals={mockSignals}
+            allSignals={signals}
             allCompanies={companies}
-            allInvestors={mockInvestors}
+            allInvestors={investors}
           />
         )
       case 'emerging-companies':
