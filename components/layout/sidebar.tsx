@@ -17,29 +17,40 @@ import {
   Brain,
   Bookmark,
   DollarSign,
+  Lock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useMarketConfig } from '@/lib/market-config'
+import { useSession } from 'next-auth/react'
+import { canAccessModule, ModuleId } from '@/lib/permissions'
 
-const staticNavItems = [
-  { label: 'BD Command Centre', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Market Radar', href: '/radar', icon: Radar },
-  { label: 'Hiring Signals', href: '/opportunities', icon: Target },
-  { label: 'Companies', href: '/companies', icon: Building2 },
+interface NavItem {
+  label: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  moduleId: ModuleId | null
+}
+
+const staticNavItems: NavItem[] = [
+  { label: 'BD Command Centre', href: '/dashboard',    icon: LayoutDashboard, moduleId: 'dashboard' },
+  { label: 'Market Radar',      href: '/radar',        icon: Radar,           moduleId: 'radar' },
+  { label: 'Hiring Signals',    href: '/opportunities',icon: Target,          moduleId: 'hiring_signals' },
+  { label: 'Companies',         href: '/companies',    icon: Building2,       moduleId: 'companies' },
 ]
 
-const bottomNavItems = [
-  { label: 'Watchlist', href: '/watchlist', icon: Bookmark },
-  { label: 'Candidate Matcher', href: '/candidates', icon: Users },
-  { label: 'BD Scripts', href: '/scripts', icon: FileText },
-  { label: 'Content Studio', href: '/content', icon: Sparkles },
-  { label: 'Market Intelligence', href: '/trends', icon: BarChart3 },
-  { label: 'Settings', href: '/settings', icon: Settings },
+const bottomNavItems: NavItem[] = [
+  { label: 'Watchlist',          href: '/watchlist',  icon: Bookmark,   moduleId: 'watchlist' },
+  { label: 'Candidate Matcher',  href: '/candidates', icon: Users,      moduleId: 'candidate_matcher' },
+  { label: 'BD Scripts',         href: '/scripts',    icon: FileText,   moduleId: 'bd_scripts' },
+  { label: 'Content Studio',     href: '/content',    icon: Sparkles,   moduleId: 'content_studio' },
+  { label: 'Market Intelligence',href: '/trends',     icon: BarChart3,  moduleId: 'market_intelligence' },
+  { label: 'Settings',           href: '/settings',   icon: Settings,   moduleId: null },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const marketConfig = useMarketConfig()
+  const { data: session } = useSession()
 
   const capitalIcon =
     marketConfig.commercialModel === 'vc'
@@ -48,11 +59,40 @@ export function Sidebar() {
       ? DollarSign
       : BarChart3
 
-  const allNavItems = [
+  const capitalNavItem: NavItem = {
+    label: marketConfig.capitalTabLabel,
+    href: '/investors',
+    icon: capitalIcon,
+    moduleId: 'capital_intelligence',
+  }
+
+  const allNavItems: NavItem[] = [
     ...staticNavItems,
-    { label: marketConfig.capitalTabLabel, href: '/investors', icon: capitalIcon },
+    capitalNavItem,
     ...bottomNavItems,
   ]
+
+  // Determine enabled modules from session, or assume all enabled if no session
+  const enabledModules: string[] = session?.user
+    ? ((session.user as Record<string, unknown>).enabledModules as string[] | undefined) ??
+      allNavItems.map((i) => i.moduleId).filter(Boolean) as string[]
+    : allNavItems.map((i) => i.moduleId).filter(Boolean) as string[]
+
+  const role = ((session?.user as Record<string, unknown> | undefined)?.role as string | undefined) ?? 'member'
+  const billingStatus = ((session?.user as Record<string, unknown> | undefined)?.billingStatus as string | undefined) ?? 'active'
+
+  function isAccessible(moduleId: ModuleId | null): boolean {
+    // No session — show all items normally
+    if (!session) return true
+    // Always accessible
+    if (moduleId === null) return true
+    return canAccessModule(
+      moduleId,
+      enabledModules,
+      role as Parameters<typeof canAccessModule>[2],
+      billingStatus as Parameters<typeof canAccessModule>[3],
+    )
+  }
 
   return (
     <div
@@ -82,7 +122,8 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
         {allNavItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-          return (
+          const accessible = isAccessible(item.moduleId)
+          return accessible ? (
             <Link
               key={item.href}
               href={item.href}
@@ -101,6 +142,15 @@ export function Sidebar() {
               />
               {item.label}
             </Link>
+          ) : (
+            <div
+              key={item.href}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium opacity-50 pointer-events-none select-none"
+              title="Upgrade to access this feature"
+            >
+              <Lock className="h-4 w-4 flex-shrink-0 text-slate-500" />
+              {item.label}
+            </div>
           )
         })}
       </nav>

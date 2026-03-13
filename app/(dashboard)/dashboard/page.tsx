@@ -3,140 +3,33 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
-  Target, TrendingUp, Zap, Sparkles, Building2, DollarSign, Users,
-  ArrowRight, ChevronRight, MapPin, Radio, Newspaper, Bookmark,
-  Activity, GripVertical, X, Plus, Settings2, RotateCcw, LayoutGrid,
-  Eye, EyeOff, Expand, Shrink,
+  Target, TrendingUp, DollarSign,
+  ArrowRight, MapPin, Radio, Newspaper,
+  X, Plus, Settings2, RotateCcw, LayoutGrid,
+  Eye,
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockOpportunities, mockCompanies, mockSignals, mockInvestors } from '@/lib/mock-data'
-import { formatTimeAgo, formatCurrency, getScoreColor, getSignalTypeColor, signalTypeIcons, cn } from '@/lib/utils'
-import { useSettings, companyMatchesSettings } from '@/lib/settings-context'
+import { mockSignals, mockInvestors } from '@/lib/mock-data'
+import { formatTimeAgo } from '@/lib/utils'
+import { useSettings } from '@/lib/settings-context'
 import { useWatchlist } from '@/lib/watchlist-context'
 import { useMarketConfig } from '@/lib/market-config'
+import { useCompanies, useSignals, useOpportunities, useInvestors } from '@/lib/hooks/use-data'
 
-// ── Module catalogue ──────────────────────────────────────────────────────────
-
-type ModuleSize = 'full' | 'half'
-type ModuleCategory = 'Signals' | 'Accounts' | 'Capital' | 'Geography' | 'Intelligence' | 'Execution'
-
-interface ModuleDef {
-  id: string
-  label: string
-  description: string
-  category: ModuleCategory
-  defaultSize: ModuleSize
-}
-
-const MODULE_CATALOGUE: ModuleDef[] = [
-  { id: 'top-hiring-signals',  label: 'Top Hiring Signals',       description: 'Ranked companies with active hiring probability signals',     category: 'Signals',      defaultSize: 'full' },
-  { id: 'funding-signals',     label: 'Capital Signals',           description: 'Recent funding rounds and capital activity',                  category: 'Capital',      defaultSize: 'half' },
-  { id: 'watchlist-updates',   label: 'Watchlist Updates',         description: 'Movement from your watched companies and VCs',                category: 'Accounts',     defaultSize: 'full' },
-  { id: 'emerging-companies',  label: 'Emerging Companies',        description: 'New entrants showing early hiring signals',                   category: 'Accounts',     defaultSize: 'full' },
-  { id: 'role-demand',         label: 'Role Demand Heatmap',       description: 'Most in-demand leadership roles in your market',             category: 'Intelligence', defaultSize: 'half' },
-  { id: 'hiring-momentum',     label: 'Hiring Momentum',           description: 'Companies ranked by momentum score',                          category: 'Intelligence', defaultSize: 'half' },
-  { id: 'quick-actions',       label: 'Quick Actions',             description: 'Shortcuts to key BD workflows',                              category: 'Execution',    defaultSize: 'half' },
-  { id: 'investor-activity',   label: 'Investor Activity',         description: 'Top investors by portfolio signal activity',                  category: 'Capital',      defaultSize: 'half' },
-  { id: 'market-radar-preview',label: 'Market Radar',             description: 'Latest market signals from your radar',                       category: 'Signals',      defaultSize: 'half' },
-]
-
-// ── Industry default module layouts ──────────────────────────────────────────
-
-interface LayoutEntry { id: string; size: ModuleSize }
-
-const INDUSTRY_DEFAULT_LAYOUTS: Record<string, LayoutEntry[]> = {
-  'Life Sciences': [
-    { id: 'top-hiring-signals', size: 'full' },
-    { id: 'funding-signals', size: 'half' },
-    { id: 'role-demand', size: 'half' },
-    { id: 'watchlist-updates', size: 'full' },
-    { id: 'investor-activity', size: 'half' },
-    { id: 'emerging-companies', size: 'full' },
-  ],
-  Technology: [
-    { id: 'top-hiring-signals', size: 'full' },
-    { id: 'funding-signals', size: 'half' },
-    { id: 'hiring-momentum', size: 'half' },
-    { id: 'market-radar-preview', size: 'half' },
-    { id: 'role-demand', size: 'half' },
-    { id: 'watchlist-updates', size: 'full' },
-  ],
-  Legal: [
-    { id: 'top-hiring-signals', size: 'full' },
-    { id: 'role-demand', size: 'half' },
-    { id: 'hiring-momentum', size: 'half' },
-    { id: 'market-radar-preview', size: 'half' },
-    { id: 'quick-actions', size: 'half' },
-    { id: 'watchlist-updates', size: 'full' },
-  ],
-  'Financial Services': [
-    { id: 'top-hiring-signals', size: 'full' },
-    { id: 'funding-signals', size: 'half' },
-    { id: 'investor-activity', size: 'half' },
-    { id: 'role-demand', size: 'half' },
-    { id: 'hiring-momentum', size: 'half' },
-    { id: 'watchlist-updates', size: 'full' },
-  ],
-  'Real Estate & Construction': [
-    { id: 'top-hiring-signals', size: 'full' },
-    { id: 'funding-signals', size: 'half' },
-    { id: 'role-demand', size: 'half' },
-    { id: 'market-radar-preview', size: 'half' },
-    { id: 'quick-actions', size: 'half' },
-    { id: 'watchlist-updates', size: 'full' },
-    { id: 'emerging-companies', size: 'full' },
-  ],
-  Healthcare: [
-    { id: 'top-hiring-signals', size: 'full' },
-    { id: 'funding-signals', size: 'half' },
-    { id: 'role-demand', size: 'half' },
-    { id: 'watchlist-updates', size: 'full' },
-    { id: 'emerging-companies', size: 'full' },
-  ],
-}
-
-const DEFAULT_LAYOUT: LayoutEntry[] = [
-  { id: 'top-hiring-signals', size: 'full' },
-  { id: 'funding-signals', size: 'half' },
-  { id: 'role-demand', size: 'half' },
-  { id: 'watchlist-updates', size: 'full' },
-  { id: 'quick-actions', size: 'half' },
-  { id: 'hiring-momentum', size: 'half' },
-  { id: 'emerging-companies', size: 'full' },
-]
-
-function getDefaultLayout(industry: string): LayoutEntry[] {
-  return INDUSTRY_DEFAULT_LAYOUTS[industry] || DEFAULT_LAYOUT
-}
-
-// ── Persisted layout state ────────────────────────────────────────────────────
-
-interface SavedLayout {
-  industry: string
-  entries: LayoutEntry[]
-  hidden: string[]
-}
-
-const STORAGE_KEY = 'bd_dashboard_layout_v1'
-
-function loadLayout(industry: string): { entries: LayoutEntry[]; hidden: string[] } {
-  if (typeof window === 'undefined') return { entries: getDefaultLayout(industry), hidden: [] }
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const saved: SavedLayout = JSON.parse(raw)
-      if (saved.industry === industry) return { entries: saved.entries, hidden: saved.hidden }
-    }
-  } catch {}
-  return { entries: getDefaultLayout(industry), hidden: [] }
-}
-
-function saveLayout(industry: string, entries: LayoutEntry[], hidden: string[]) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ industry, entries, hidden }))
-}
+import { MODULE_CATALOGUE, LayoutEntry, getDefaultLayout } from './module-catalogue'
+import { loadLayout, saveLayout } from './layout-storage'
+import { ModuleWrapper } from './ModuleWrapper'
+import { TopHiringSignals } from './modules/TopHiringSignals'
+import { FundingSignals } from './modules/FundingSignals'
+import { RoleDemand } from './modules/RoleDemand'
+import { HiringMomentum } from './modules/HiringMomentum'
+import { QuickActions } from './modules/QuickActions'
+import { WatchlistUpdates } from './modules/WatchlistUpdates'
+import { EmergingCompanies } from './modules/EmergingCompanies'
+import { InvestorActivity } from './modules/InvestorActivity'
+import { MarketRadarPreview } from './modules/MarketRadarPreview'
 
 // ── Static data ───────────────────────────────────────────────────────────────
 
@@ -161,70 +54,17 @@ const bdActionsMap: Record<string, string[]> = {
   opp_5: ['Contact CEO regarding CMC and manufacturing leadership', 'Engage HealthVentures for portfolio referral'],
 }
 
-// ── Module wrapper ────────────────────────────────────────────────────────────
+// ── Skeleton loader ───────────────────────────────────────────────────────────
 
-function ModuleWrapper({
-  id, size, isEditMode, isDragOver, isDragging,
-  onDragStart, onDragOver, onDrop, onDragEnd,
-  onHide, onToggleSize, children,
-}: {
-  id: string
-  size: ModuleSize
-  isEditMode: boolean
-  isDragOver: boolean
-  isDragging: boolean
-  onDragStart: () => void
-  onDragOver: (e: React.DragEvent) => void
-  onDrop: () => void
-  onDragEnd: () => void
-  onHide: () => void
-  onToggleSize: () => void
-  children: React.ReactNode
-}) {
-  const def = MODULE_CATALOGUE.find((m) => m.id === id)
+function DashboardSkeleton() {
   return (
-    <div
-      className={cn(
-        'relative transition-all duration-200',
-        size === 'full' ? 'col-span-2' : 'col-span-1',
-        isEditMode && isDragOver && !isDragging && 'ring-2 ring-indigo-500/60 ring-offset-2 ring-offset-slate-950 rounded-xl',
-        isEditMode && isDragging && 'opacity-40 scale-[0.98]',
-      )}
-      draggable={isEditMode}
-      onDragStart={isEditMode ? onDragStart : undefined}
-      onDragOver={isEditMode ? onDragOver : undefined}
-      onDrop={isEditMode ? onDrop : undefined}
-      onDragEnd={isEditMode ? onDragEnd : undefined}
-    >
-      {isEditMode && (
-        <div className="absolute top-2 right-2 z-20 flex items-center gap-1">
-          <button
-            onClick={onToggleSize}
-            title={size === 'full' ? 'Make half-width' : 'Make full-width'}
-            className="h-7 w-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
-          >
-            {size === 'full' ? <Shrink className="h-3.5 w-3.5" /> : <Expand className="h-3.5 w-3.5" />}
-          </button>
-          <button
-            onClick={onHide}
-            title="Hide module"
-            className="h-7 w-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-slate-700 transition-colors"
-          >
-            <EyeOff className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
-      {isEditMode && (
-        <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 cursor-grab active:cursor-grabbing">
-          <div className="h-7 px-2 rounded-lg bg-slate-800 border border-slate-700 flex items-center gap-1.5 text-slate-400">
-            <GripVertical className="h-3.5 w-3.5" />
-            <span className="text-xs">{def?.label}</span>
-          </div>
-        </div>
-      )}
-      <div className={cn(isEditMode && 'pt-2')}>
-        {children}
-      </div>
+    <div className="grid grid-cols-2 gap-6 animate-pulse">
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={i}
+          className={`rounded-xl bg-slate-800/50 ${i % 3 === 0 ? 'col-span-2 h-48' : 'col-span-1 h-40'}`}
+        />
+      ))}
     </div>
   )
 }
@@ -238,11 +78,11 @@ export default function DashboardPage() {
 
   const industry = activeProfile?.industry || settings.sector || 'Life Sciences'
 
-  // ── Data ────────────────────────────────────────────────────────────────────
-  const companies = mockCompanies.filter((c) => companyMatchesSettings(c, settings))
-  const filteredCompanyIds = new Set(companies.map((c) => c.id))
-  const opportunities = mockOpportunities.filter((o) => filteredCompanyIds.has(o.companyId))
-  const signals = mockSignals.filter((s) => s.companyId && filteredCompanyIds.has(s.companyId))
+  // ── Data via hooks ───────────────────────────────────────────────────────────
+  const { data: companies } = useCompanies(settings)
+  const { data: signals } = useSignals(settings)
+  const { data: opportunities } = useOpportunities(settings)
+  const { data: investors } = useInvestors()
 
   // ── Layout state ────────────────────────────────────────────────────────────
   const [isEditMode, setIsEditMode] = useState(false)
@@ -332,372 +172,38 @@ export default function DashboardPage() {
     { label: 'Market Momentum', value: opportunities.filter((o) => o.momentumScore > 80).length, icon: TrendingUp, color: 'text-purple-400', bg: 'bg-purple-400/10', change: 'High momentum companies', href: '/opportunities' },
   ]
 
-  // ── Module renderers ─────────────────────────────────────────────────────────
-
-  const renderTopHiringSignals = () => (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Top Hiring Signals</CardTitle>
-          <Link href="/opportunities"><Button variant="ghost" size="sm" className="gap-1 text-xs">View all <ChevronRight className="h-3 w-3" /></Button></Link>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {opportunities.slice(0, 5).map((opp) => {
-            const company = companies.find((c) => c.id === opp.companyId)
-            const actions = bdActionsMap[opp.id] || []
-            return (
-              <div key={opp.id} className="rounded-lg border border-slate-800 bg-slate-900/50 px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="h-9 w-9 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
-                      <Building2 className="h-4 w-4 text-slate-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Link href={`/companies/${opp.companyId}`}>
-                          <p className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors truncate">{company?.name}</p>
-                        </Link>
-                        <Badge variant="outline" className="text-xs shrink-0">{company?.sector}</Badge>
-                        <Badge variant="secondary" className="text-xs shrink-0">{company?.stage}</Badge>
-                      </div>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 text-slate-600" />
-                        <p className="text-xs text-slate-500">{company?.geography}</p>
-                      </div>
-                      <p className="text-xs text-slate-500 truncate mt-0.5">Likely hire: {opp.recommendedStakeholder}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 ml-3 shrink-0">
-                    <div className="text-center">
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${getScoreColor(opp.opportunityScore)}`}>{opp.opportunityScore}</span>
-                      <p className="text-xs text-slate-600 mt-0.5">Signal Strength</p>
-                    </div>
-                    <Link href="/opportunities"><Button variant="ghost" size="icon" className="h-7 w-7"><ArrowRight className="h-3 w-3" /></Button></Link>
-                  </div>
-                </div>
-                {actions.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-slate-800">
-                    <p className="text-xs text-slate-500 mb-1 font-medium">Recommended BD Actions:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {actions.map((action, i) => (
-                        <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-700/30">{action}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  const renderFundingSignals = () => (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{marketConfig.fundingCardLabel}</CardTitle>
-          <Link href="/radar"><Button variant="ghost" size="sm" className="gap-1 text-xs">View all <ChevronRight className="h-3 w-3" /></Button></Link>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {signals.filter((s) => s.signalType === 'funding').slice(0, 4).map((signal) => {
-            const company = companies.find((c) => c.id === signal.companyId)
-            const linkedOpp = opportunities.find((o) => o.companyId === signal.companyId)
-            const likelyHires = linkedOpp?.likelyHiringNeed?.split(',').slice(0, 2) || []
-            return (
-              <div key={signal.id} className="rounded-lg border border-slate-800 px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <DollarSign className="h-4 w-4 text-emerald-400" />
-                    </div>
-                    <div>
-                      <Link href={company ? `/companies/${company.id}` : '#'}>
-                        <p className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors">{company?.name || 'Unknown'}</p>
-                      </Link>
-                      <p className="text-xs text-slate-500">{company?.stage} · {company?.geography}</p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-bold text-emerald-400">{company?.fundingTotal ? formatCurrency(company.fundingTotal) : 'N/A'}</p>
-                </div>
-                {likelyHires.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-xs text-slate-500 mb-1">Expected hires:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {likelyHires.map((hire, i) => (
-                        <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-emerald-900/20 text-emerald-400 border border-emerald-700/20">{hire.trim()}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  const renderRoleDemand = () => (
-    <Card>
-      <CardHeader className="pb-3"><CardTitle className="text-base">Most In-Demand Leadership Roles</CardTitle></CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {roleDemand.map((item, idx) => (
-            <div key={item.role} className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-600 w-4">{idx + 1}</span>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-white">{item.role}</span>
-                  <span className="text-xs font-bold text-indigo-400">{item.signals} signals</span>
-                </div>
-                <div className="h-1.5 bg-slate-800 rounded-full">
-                  <div className="h-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-400" style={{ width: `${(item.signals / roleDemand[0].signals) * 100}%` }} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  const renderHiringMomentum = () => (
-    <Card>
-      <CardHeader className="pb-3"><CardTitle className="text-base">Hiring Momentum</CardTitle></CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {opportunities.sort((a, b) => b.momentumScore - a.momentumScore).slice(0, 5).map((opp, idx) => {
-            const company = companies.find((c) => c.id === opp.companyId)
-            return (
-              <div key={opp.id} className="flex items-center gap-3">
-                <span className="text-xs font-bold text-slate-500 w-4">{idx + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <Link href={`/companies/${opp.companyId}`}>
-                    <p className="text-sm font-medium text-white hover:text-indigo-400 transition-colors truncate">{company?.name}</p>
-                  </Link>
-                  <p className="text-xs text-slate-500">{company?.stage} · {company?.sector}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3 text-emerald-400" />
-                  <span className="text-xs font-semibold text-emerald-400">{opp.momentumScore}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  const renderQuickActions = () => (
-    <Card>
-      <CardHeader className="pb-3"><CardTitle className="text-base">Quick Actions</CardTitle></CardHeader>
-      <CardContent className="space-y-2">
-        <Link href="/candidates"><Button variant="secondary" className="w-full justify-start gap-2 text-sm"><Users className="h-4 w-4" />Match a Candidate</Button></Link>
-        <Link href="/scripts"><Button variant="secondary" className="w-full justify-start gap-2 text-sm"><Sparkles className="h-4 w-4" />Generate BD Script</Button></Link>
-        <Link href="/content"><Button variant="secondary" className="w-full justify-start gap-2 text-sm"><Zap className="h-4 w-4" />Create LinkedIn Post</Button></Link>
-        <Link href="/radar"><Button variant="secondary" className="w-full justify-start gap-2 text-sm"><Target className="h-4 w-4" />Browse Signals</Button></Link>
-      </CardContent>
-    </Card>
-  )
-
-  const renderWatchlistUpdates = () => {
-    const watchedCompanyIds = new Set(watchedCompanies.map((w) => w.entityId))
-    const watchedVCIds = new Set(watchedVCs.map((w) => w.entityId))
-    const watchlistSignals = mockSignals.filter((s) => (s.companyId && watchedCompanyIds.has(s.companyId)) || (s.investorId && watchedVCIds.has(s.investorId))).slice(0, 4)
-    const watchedInvestors = mockInvestors.filter((inv) => watchedVCIds.has(inv.id))
-    const portfolioSignals = mockSignals
-      .filter((s) => s.companyId && watchedInvestors.some((inv) => inv.portfolioCompanyIds?.includes(s.companyId!)))
-      .filter((s) => !watchlistSignals.some((ws) => ws.id === s.id))
-      .slice(0, 2)
-    const updates = [...watchlistSignals, ...portfolioSignals].slice(0, 5)
-
-    if (updates.length === 0 && watchedCompanies.length === 0) {
-      return (
-        <Card className="border-indigo-500/20 bg-indigo-900/5">
-          <CardContent className="p-6 text-center">
-            <Bookmark className="h-8 w-8 text-slate-600 mx-auto mb-2" />
-            <p className="text-sm text-slate-400">No watchlist activity yet</p>
-            <p className="text-xs text-slate-600 mt-1">Watch companies and VCs to see their updates here</p>
-            <Link href="/watchlist"><Button variant="outline" size="sm" className="mt-3 gap-2"><Plus className="h-3.5 w-3.5" />Go to Watchlist</Button></Link>
-          </CardContent>
-        </Card>
-      )
-    }
-
-    return (
-      <Card className="border-indigo-500/20 bg-indigo-900/5">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bookmark className="h-4 w-4 text-indigo-400" />
-              <CardTitle className="text-base">Watchlist Updates</CardTitle>
-            </div>
-            <Link href="/watchlist"><Button variant="ghost" size="sm" className="gap-1 text-xs">View watchlist <ChevronRight className="h-3 w-3" /></Button></Link>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">Recent movement from your watched accounts</p>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {updates.map((signal) => {
-              const company = signal.companyId ? mockCompanies.find((c) => c.id === signal.companyId) : null
-              const investor = signal.investorId ? mockInvestors.find((inv) => inv.id === signal.investorId) : null
-              const isPortfolioSignal = !watchlistSignals.some((ws) => ws.id === signal.id)
-              const entityName = isPortfolioSignal && investor ? `${investor.name} Portfolio` : (company?.name || investor?.name || 'Unknown')
-              const entityId = company?.id
-              return (
-                <div key={signal.id} className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-900/40 px-4 py-3">
-                  <div className="h-8 w-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Activity className="h-3.5 w-3.5 text-indigo-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          {entityId ? (
-                            <Link href={`/companies/${entityId}`}><span className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors">{entityName}</span></Link>
-                          ) : (
-                            <span className="text-sm font-semibold text-white">{entityName}</span>
-                          )}
-                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 capitalize">{signal.signalType}</span>
-                        </div>
-                        <p className="text-xs text-slate-400 line-clamp-1">{signal.title}</p>
-                        <p className="text-xs text-teal-300 mt-0.5 line-clamp-1"><Zap className="h-3 w-3 inline mr-1 text-teal-400" />{signal.whyItMatters}</p>
-                      </div>
-                      <span className="text-xs text-slate-500 shrink-0">{formatTimeAgo(signal.publishedAt)}</span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      {entityId && <Link href={`/companies/${entityId}`}><button className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"><ChevronRight className="h-3 w-3" />Open</button></Link>}
-                      <Link href="/scripts"><button className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"><Sparkles className="h-3 w-3" />BD Script</button></Link>
-                      <Link href="/radar"><button className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"><Radio className="h-3 w-3" />Signal</button></Link>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  const renderEmergingCompanies = () => (
-    <Card>
-      <CardHeader className="pb-3"><CardTitle className="text-base">Emerging Companies (Last 90 Days)</CardTitle></CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          {emergingCompanies.map((co) => {
-            const fullCo = companies.find((c) => c.id === co.id)
-            return (
-              <div key={co.id} className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <Link href={`/companies/${co.id}`}><p className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors">{co.name}</p></Link>
-                    <p className="text-xs text-slate-500">{fullCo?.geography}</p>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <Badge variant="secondary" className="text-xs">{co.stage}</Badge>
-                    <Badge variant="outline" className="text-xs">{co.sector}</Badge>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 mb-1">Expected hires:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {co.hires.map((hire, i) => (
-                      <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">{hire}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  const renderInvestorActivity = () => (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{marketConfig.capitalTabLabel}</CardTitle>
-          <Link href="/investors"><Button variant="ghost" size="sm" className="gap-1 text-xs">View all <ChevronRight className="h-3 w-3" /></Button></Link>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {mockInvestors.slice(0, 4).map((inv) => {
-            const portfolioSignalCount = mockSignals.filter((s) => s.companyId && inv.portfolioCompanyIds?.includes(s.companyId)).length
-            return (
-              <div key={inv.id} className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/50 px-4 py-3">
-                <div className="h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center shrink-0">
-                  <DollarSign className="h-4 w-4 text-indigo-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <Link href="/investors"><p className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors truncate">{inv.name}</p></Link>
-                  <p className="text-xs text-slate-500">{inv.totalInvestments ? formatCurrency(inv.totalInvestments) : ''} · {inv.portfolioCompanyIds?.length || 0} portfolio cos</p>
-                </div>
-                <div className="text-center shrink-0">
-                  <span className="text-xs font-bold text-indigo-400">{portfolioSignalCount}</span>
-                  <p className="text-xs text-slate-600">signals</p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  )
-
-  const renderMarketRadarPreview = () => (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Market Radar</CardTitle>
-          <Link href="/radar"><Button variant="ghost" size="sm" className="gap-1 text-xs">Open Radar <ChevronRight className="h-3 w-3" /></Button></Link>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {signals.slice(0, 4).map((signal) => {
-            const company = companies.find((c) => c.id === signal.companyId)
-            return (
-              <div key={signal.id} className="flex items-start gap-3">
-                <span className="text-lg shrink-0">{signalTypeIcons[signal.signalType] || '📊'}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full border capitalize ${getSignalTypeColor(signal.signalType)}`}>{signal.signalType}</span>
-                    <span className="text-xs text-slate-500">{formatTimeAgo(signal.publishedAt)}</span>
-                  </div>
-                  <p className="text-sm text-white truncate">{signal.title}</p>
-                  {company && <p className="text-xs text-slate-500 truncate">{company.name}</p>}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  )
+  // ── Module renderer ──────────────────────────────────────────────────────────
 
   const renderModule = (id: string) => {
     switch (id) {
-      case 'top-hiring-signals':   return renderTopHiringSignals()
-      case 'funding-signals':      return renderFundingSignals()
-      case 'role-demand':          return renderRoleDemand()
-      case 'hiring-momentum':      return renderHiringMomentum()
-      case 'quick-actions':        return renderQuickActions()
-      case 'watchlist-updates':    return renderWatchlistUpdates()
-      case 'emerging-companies':   return renderEmergingCompanies()
-      case 'investor-activity':    return renderInvestorActivity()
-      case 'market-radar-preview': return renderMarketRadarPreview()
-      default: return null
+      case 'top-hiring-signals':
+        return <TopHiringSignals opportunities={opportunities} companies={companies} bdActionsMap={bdActionsMap} />
+      case 'funding-signals':
+        return <FundingSignals signals={signals} companies={companies} opportunities={opportunities} fundingCardLabel={marketConfig.fundingCardLabel} />
+      case 'role-demand':
+        return <RoleDemand roleDemand={roleDemand} />
+      case 'hiring-momentum':
+        return <HiringMomentum opportunities={opportunities} companies={companies} />
+      case 'quick-actions':
+        return <QuickActions />
+      case 'watchlist-updates':
+        return (
+          <WatchlistUpdates
+            watchedCompanies={watchedCompanies}
+            watchedVCs={watchedVCs}
+            allSignals={mockSignals}
+            allCompanies={companies}
+            allInvestors={mockInvestors}
+          />
+        )
+      case 'emerging-companies':
+        return <EmergingCompanies emergingCompanies={emergingCompanies} companies={companies} />
+      case 'investor-activity':
+        return <InvestorActivity investors={investors} signals={signals} capitalTabLabel={marketConfig.capitalTabLabel} />
+      case 'market-radar-preview':
+        return <MarketRadarPreview signals={signals} companies={companies} />
+      default:
+        return null
     }
   }
 
@@ -825,29 +331,34 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ── Dynamic module workspace ───────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-6">
-        {activeEntries.map((entry, idx) => (
-          <ModuleWrapper
-            key={entry.id}
-            id={entry.id}
-            size={entry.size}
-            isEditMode={isEditMode}
-            isDragging={dragIdx === idx}
-            isDragOver={dragOverIdx === idx}
-            onDragStart={() => handleDragStart(idx)}
-            onDragOver={(e) => handleDragOver(e, idx)}
-            onDrop={() => handleDrop(idx)}
-            onDragEnd={handleDragEnd}
-            onHide={() => hideModule(entry.id)}
-            onToggleSize={() => toggleSize(entry.id)}
-          >
-            {renderModule(entry.id)}
-          </ModuleWrapper>
-        ))}
-      </div>
+      {/* ── Skeleton while layout loads ───────────────────────────────────── */}
+      {!layoutLoaded && <DashboardSkeleton />}
 
-      {activeEntries.length === 0 && (
+      {/* ── Dynamic module workspace ───────────────────────────────────────── */}
+      {layoutLoaded && (
+        <div className="grid grid-cols-2 gap-6">
+          {activeEntries.map((entry, idx) => (
+            <ModuleWrapper
+              key={entry.id}
+              id={entry.id}
+              size={entry.size}
+              isEditMode={isEditMode}
+              isDragging={dragIdx === idx}
+              isDragOver={dragOverIdx === idx}
+              onDragStart={() => handleDragStart(idx)}
+              onDragOver={(e) => handleDragOver(e, idx)}
+              onDrop={() => handleDrop(idx)}
+              onDragEnd={handleDragEnd}
+              onHide={() => hideModule(entry.id)}
+              onToggleSize={() => toggleSize(entry.id)}
+            >
+              {renderModule(entry.id)}
+            </ModuleWrapper>
+          ))}
+        </div>
+      )}
+
+      {layoutLoaded && activeEntries.length === 0 && (
         <div className="rounded-xl border border-dashed border-slate-700 p-12 text-center">
           <LayoutGrid className="h-8 w-8 text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400 font-medium">No modules visible</p>

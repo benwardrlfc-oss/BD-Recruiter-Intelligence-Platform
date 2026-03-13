@@ -256,7 +256,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, [persist])
 
   const addProfile = useCallback((profile: Omit<MarketProfile, 'id' | 'createdAt'>): string => {
-    const id = `profile-${Date.now()}`
+    const id = crypto.randomUUID()
     const newProfile: MarketProfile = { ...profile, id, createdAt: new Date().toISOString() }
     setSettings((prev) => {
       const next: UserSettings = {
