@@ -8,6 +8,7 @@ import {
   ChevronRight,
   MapPin,
   Star,
+  Upload,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -17,6 +18,7 @@ import { useSettings, companyMatchesSettings } from '@/lib/settings-context'
 import { useWatchlist } from '@/lib/watchlist-context'
 import { WatchButton } from '@/components/ui/watch-button'
 import { useOpportunities, useCompanies, useSignals } from '@/lib/hooks/use-data'
+import { ImportCompaniesDialog } from '@/components/companies/ImportCompaniesDialog'
 
 type SortKey = 'opportunityScore' | 'momentumScore' | 'name'
 type FilterLocation = 'all' | string
@@ -27,6 +29,7 @@ export default function CompaniesPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [filterLocation, setFilterLocation] = useState<FilterLocation>('all')
   const [filterStage, setFilterStage] = useState<FilterStage>('all')
+  const [importOpen, setImportOpen] = useState(false)
   const { settings } = useSettings()
   const { isWatchingCompany, toggleCompany } = useWatchlist()
   const { data: allOpportunities } = useOpportunities(settings)
@@ -98,12 +101,24 @@ export default function CompaniesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Companies</h1>
-        <p className="text-sm text-slate-400 mt-1">
-          {allTargets.length} companies matching your profile · {allOpportunities.length} total tracked
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Companies</h1>
+          <p className="text-sm text-slate-400 mt-1">
+            {allTargets.length} companies matching your profile · {allOpportunities.length} total tracked
+          </p>
+        </div>
+        <Button variant="outline" size="sm" className="gap-2 shrink-0" onClick={() => setImportOpen(true)}>
+          <Upload className="h-3.5 w-3.5" />
+          Import CSV
+        </Button>
       </div>
+
+      <ImportCompaniesDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onSuccess={() => { /* Data hooks will re-fetch on next render cycle */ }}
+      />
 
       {/* Section 1: Top 10 Accounts */}
       <Card className="border-indigo-500/20 bg-indigo-900/5">
