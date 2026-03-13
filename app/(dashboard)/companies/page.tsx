@@ -19,6 +19,8 @@ import { useWatchlist } from '@/lib/watchlist-context'
 import { WatchButton } from '@/components/ui/watch-button'
 import { useOpportunities, useCompanies, useSignals } from '@/lib/hooks/use-data'
 import { ImportCompaniesDialog } from '@/components/companies/ImportCompaniesDialog'
+import { rankCompanies } from '@/lib/scoring'
+import { useMarketConfig } from '@/lib/market-config'
 
 type SortKey = 'opportunityScore' | 'momentumScore' | 'name'
 type FilterLocation = 'all' | string
@@ -32,16 +34,59 @@ export default function CompaniesPage() {
   const [importOpen, setImportOpen] = useState(false)
   const { settings } = useSettings()
   const { isWatchingCompany, toggleCompany } = useWatchlist()
+  const marketConfig = useMarketConfig()
   const { data: allOpportunities } = useOpportunities(settings)
   const { data: allCompanies } = useCompanies(settings)
   const { data: allSignals } = useSignals(settings)
 
-  const allTargets = allOpportunities
+  // Build signal lookup per company
+  const signalsByCompany = useMemo(() => {
+    const map: Record<string, typeof allSignals> = {}
+    for (const s of allSignals) {
+      if (s.companyId) {
+        if (!map[s.companyId]) map[s.companyId] = []
+        map[s.companyId].push(s)
+      }
+    }
+    return map
+  }, [allSignals])
+
+  // Companies with no opportunity record — score them using scoring engine
+  const oppCompanyIds = new Set(allOpportunities.map((o) => o.companyId))
+  const unscoredCompanies = allCompanies
+    .filter((c) => !oppCompanyIds.has(c.id) && companyMatchesSettings(c, settings))
+  const engineScored = useMemo(() =>
+    rankCompanies(unscoredCompanies, signalsByCompany, marketConfig.scoringWeights),
+    [unscoredCompanies, signalsByCompany, marketConfig.scoringWeights]
+  )
+
+  // Merge opportunity-backed targets + engine-scored targets
+  const oppTargets = allOpportunities
     .map((opp) => ({
       ...opp,
       company: (opp as any).company ?? allCompanies.find((c) => c.id === opp.companyId),
     }))
     .filter((t) => t.company && companyMatchesSettings(t.company, settings))
+
+  // Engine-scored companies formatted to match opp shape
+  const engineTargets = engineScored
+    .filter((c) => c.opportunityScore > 0)
+    .map((c) => ({
+      id: `scored_${c.id}`,
+      companyId: c.id,
+      company: c,
+      opportunityScore: c.opportunityScore,
+      momentumScore: c.momentumScore,
+      timingWindow: c.timingWindow,
+      linkedSignals: [],
+      likelyHiringNeed: null,
+      outreachAngle: null,
+      lifecycleContext: null,
+      recommendedStakeholder: null,
+      isArchived: false,
+    }))
+
+  const allTargets = [...oppTargets, ...engineTargets]
 
   // Top 10 by opportunity score
   const top10 = useMemo(
