@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { Filter, ExternalLink, Building2, Clock, ChevronDown, ChevronRight } from 'lucide-react'
+import { Filter, ExternalLink, Building2, Clock, ChevronDown, ChevronRight, Zap, Loader2, CheckCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip } from '@/components/ui/tooltip'
 import { formatTimeAgo, formatDate, getSignalTypeColor, signalTypeIcons, cn } from '@/lib/utils'
@@ -32,6 +33,27 @@ export default function RadarPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<'all' | '7d' | '30d' | '90d'>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshResult, setRefreshResult] = useState<{ signalsFound: number } | null>(null)
+
+  const handleRefreshIntelligence = useCallback(async () => {
+    setRefreshing(true)
+    setRefreshResult(null)
+    try {
+      const res = await fetch('/api/intelligence/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setRefreshResult({ signalsFound: data.signalsFound ?? 0 })
+        // Clear result badge after 5 seconds
+        setTimeout(() => setRefreshResult(null), 5000)
+      }
+    } catch {}
+    setRefreshing(false)
+  }, [])
 
   const filtered = useMemo(() => {
     const now = new Date()
@@ -56,11 +78,34 @@ export default function RadarPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Market Radar</h1>
-        <p className="text-sm text-slate-400 mt-1">
-          {filtered.length} signals · {settings.sector} · {settings.regions.join(', ')}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Market Radar</h1>
+          <p className="text-sm text-slate-400 mt-1">
+            {filtered.length} signals · {settings.sector} · {settings.regions.join(', ')}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {refreshResult && (
+            <div className="flex items-center gap-1.5 text-xs text-emerald-400">
+              <CheckCircle className="h-3.5 w-3.5" />
+              {refreshResult.signalsFound} new signals
+            </div>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleRefreshIntelligence}
+            disabled={refreshing}
+          >
+            {refreshing
+              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              : <Zap className="h-3.5 w-3.5" />
+            }
+            {refreshing ? 'Running…' : 'Run Intelligence'}
+          </Button>
+        </div>
       </div>
 
       {/* Filter Bar */}
