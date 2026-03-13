@@ -1,0 +1,983 @@
+I need you to design and build the authentication, multi-tenant account structure, permissions, billing, subscription, payment, trial, and admin architecture for this product so it can scale properly.
+
+This is not just about a login page. This is about the full account and access model for a B2B SaaS product that needs to support:
+
+individual users
+
+recruitment firms with multiple licences
+
+different user roles
+
+organisation admins
+
+my own platform admin / super admin access
+
+trials
+
+paid subscriptions
+
+seat management
+
+payment failure handling
+
+module-based access
+
+The system must be clean, secure, scalable, and designed so it will still make sense when the product grows.
+
+I need this built in a way that is commercially usable and technically sound.
+
+1. Core product model
+
+Build this as a multi-tenant SaaS application.
+
+That means the system should have four clear layers:
+
+A. Platform layer
+
+This is the global platform level for internal use.
+
+It should support:
+
+platform-owned configuration
+
+taxonomy
+
+templates
+
+global settings
+
+feature flags
+
+platform-wide reporting
+
+organisation management
+
+trial and billing oversight
+
+super admin controls
+
+B. Organisation layer
+
+Each customer company / recruitment firm should have its own organisation.
+
+The organisation should contain:
+
+organisation name
+
+logo / branding
+
+subscription plan
+
+billing status
+
+seat count
+
+enabled modules
+
+admins
+
+organisation defaults
+
+usage reporting
+
+Even if a solo user signs up, they should still belong to an organisation, even if that organisation only has one user.
+
+C. Team layer
+
+Support optional team grouping inside an organisation for future scale.
+
+Teams may later support:
+
+team users
+
+team watchlists
+
+team defaults
+
+team reporting
+
+This does not need to be overbuilt now, but the architecture should support it.
+
+D. User layer
+
+Each individual user should have:
+
+account details
+
+role
+
+seat assignment
+
+market profiles
+
+dashboard layout
+
+watchlist
+
+settings
+
+module permissions
+
+onboarding state
+
+2. Authentication and login
+
+Build the login and authentication system as a proper secure SaaS auth flow.
+
+Do not build auth from scratch.
+
+Use a proper auth provider and implement the app around it.
+
+Support:
+
+email + password
+
+Google login
+
+Microsoft login
+
+The system should also be structured so enterprise SSO / SAML can be added later.
+
+Login page requirements
+
+The login page should include:
+
+sign in with Google
+
+sign in with Microsoft
+
+sign in with email
+
+forgot password
+
+create account
+
+accept invite flow support
+
+The login page should feel clean, premium, and simple.
+
+Signup flows
+
+Support three types of signup:
+
+1. Individual self-signup
+
+A solo user creates an account and gets their own organisation automatically.
+
+2. Organisation admin signup
+
+A recruitment firm creates the first admin account for its organisation.
+
+3. Invited user signup
+
+An existing organisation admin invites another user into the organisation.
+
+Post-login routing logic
+
+After login, the app must check:
+
+is the user authenticated
+
+which organisation do they belong to
+
+what role do they have
+
+do they have an active seat
+
+is onboarding complete
+
+what market profile is active
+
+what modules are enabled for them
+
+Then route them correctly.
+
+If onboarding is incomplete:
+
+route to onboarding
+
+If onboarding is complete:
+
+route to dashboard
+
+Logout and security
+
+Users must be able to:
+
+log out securely
+
+access account settings
+
+access password / security settings
+
+later switch organisation if supported
+
+Use secure session handling and proper route protection.
+
+Support:
+
+email verification
+
+password reset
+
+invite token validation
+
+secure logout
+
+server-side permission checks
+
+Do not rely only on frontend checks for private routes.
+
+3. First-time onboarding and trial entry
+
+Build onboarding so first-time users are guided into setup properly.
+
+Support:
+
+first login after signup
+
+first login after invite
+
+first login as trial user
+
+The onboarding flow should:
+
+collect name / title / company
+
+define market profile
+
+configure settings
+
+set dashboard defaults
+
+add first watched accounts
+
+choose notification preferences
+
+Store onboarding state so users can resume if they leave halfway through.
+
+The system must know:
+
+has_completed_onboarding
+
+onboarding_step
+
+active_market_profile_id
+
+4. User roles and permissions
+
+Implement proper role-based access control.
+
+At minimum support the following roles:
+
+A. Platform Super Admin
+
+This is my internal admin role.
+
+Can:
+
+see all organisations
+
+manage all customer accounts
+
+manage plans and trials
+
+manage subscriptions and billing status
+
+manage feature flags
+
+access platform analytics and reports
+
+manage templates and taxonomy
+
+manage support tooling
+
+access organisation admin data
+
+impersonate users later if needed
+
+enable / disable modules by organisation
+
+pause / reactivate accounts
+
+This should live in a separate platform admin panel, not the standard product UI.
+
+B. Organisation Admin
+
+This is the admin for a customer company.
+
+Can:
+
+manage users
+
+invite users
+
+remove users
+
+assign seats
+
+update organisation name and logo
+
+view billing summary
+
+request or buy more licences
+
+manage organisation defaults
+
+control some organisation-level settings
+
+view organisation-level usage
+
+manage which users have which roles
+
+C. Team Manager
+
+Optional but important for scale.
+
+Can:
+
+manage team users
+
+see team-level usage
+
+manage team watchlists or shared resources later
+
+assign certain team-level defaults
+
+The product architecture should support this even if the UI is light at first.
+
+D. Standard User
+
+This is the normal recruiter / consultant.
+
+Can:
+
+use the product
+
+access their allowed modules
+
+manage their own watchlist
+
+use candidate matcher
+
+generate scripts
+
+customise their own dashboard
+
+manage their own market profiles
+
+E. Limited / Read-Only User
+
+Optional but useful.
+
+This could be:
+
+researcher
+
+junior user
+
+viewer
+
+analyst
+
+They may have restricted access to modules or no access to certain actions.
+
+5. Module access / entitlements
+
+The system must support module-based access control.
+
+Not every organisation or user will have access to every module.
+
+Examples of modules:
+
+BD Command Centre
+
+Market Radar
+
+Hiring Signals
+
+Companies
+
+Capital / Ownership Intelligence
+
+Watchlist
+
+Candidate Matcher
+
+BD Scripts
+
+Content Studio
+
+Market Intelligence
+
+Advanced Reporting
+
+Admin pages
+
+Each organisation should have:
+
+plan-level module entitlements
+
+optional add-ons
+
+seat count
+
+usage rules
+
+Each user should have:
+
+role-based access
+
+possibly restricted module access depending on role
+
+This needs to be enforced properly in the UI and backend.
+
+6. Billing and subscription model
+
+Design the product around a subscription + seat-based billing model.
+
+The organisation is the billing entity, not the individual user.
+
+Each organisation should have:
+
+subscription plan
+
+billing status
+
+seat count
+
+active seats
+
+invited seats
+
+unassigned seats
+
+plan start date
+
+renewal date
+
+trial status if applicable
+
+payment provider customer ID
+
+subscription ID
+
+invoice history references
+
+module entitlements / add-ons
+
+Suggested commercial model
+
+Support:
+
+monthly or annual subscription
+
+seat-based licensing
+
+plan tiers
+
+optional module add-ons later
+
+Example plans:
+
+Trial
+
+Core
+
+Pro
+
+Team
+
+Enterprise
+
+This can be adjusted later, but the structure should support it.
+
+7. Payment handling
+
+Integrate a real billing provider such as Stripe.
+
+Use Stripe or equivalent for:
+
+checkout
+
+subscription management
+
+recurring payments
+
+invoices
+
+payment methods
+
+failed payment handling
+
+webhooks for billing state updates
+
+The product must track:
+
+whether an organisation is active
+
+whether a subscription is trialing
+
+whether payment succeeded
+
+whether payment failed
+
+whether the account should remain active or be restricted
+
+Store these billing states in the database and update them via billing webhooks.
+
+8. What happens if they do not pay
+
+This must be handled clearly.
+
+Design billing states such as:
+
+trialing
+
+active
+
+past_due
+
+unpaid
+
+cancelled
+
+suspended
+
+If payment fails:
+
+mark the organisation as past_due
+
+notify organisation admin
+
+optionally provide a grace period
+
+restrict account if unresolved after grace period
+
+If the subscription is unpaid or cancelled:
+
+do not delete data immediately
+
+lock or limit access based on account state
+
+show a clear billing message to admins
+
+allow reactivation if payment is resolved
+
+Normal users should not manage billing; only organisation admins should.
+
+9. Trial model
+
+I need the ability to give people free trial access.
+
+Support trial organisations properly.
+
+A trial should have:
+
+trial start date
+
+trial end date
+
+trial status
+
+limited seat count if needed
+
+limited modules if needed
+
+ability for me to create or grant a trial manually
+
+ability to convert trial to paid subscription later
+
+Support both:
+
+A. Self-serve trial
+
+User signs up and gets a free trial automatically
+
+B. Admin-granted trial
+
+I can manually create or activate a trial account for a specific organisation or user
+
+At trial end:
+
+organisation admin should be prompted to subscribe
+
+the account should move into either paid or restricted state
+
+access should be governed by billing status
+
+10. Organisation admin page
+
+Build a customer-facing admin area for organisation admins.
+
+This page should allow them to:
+
+view organisation name
+
+upload / change logo
+
+manage users
+
+invite users
+
+assign roles
+
+assign seats
+
+see seats used vs available
+
+view subscription plan
+
+view billing status
+
+update payment method via Stripe portal or equivalent
+
+request or purchase more licences
+
+manage organisation defaults
+
+view light usage reporting
+
+This page should be clean and premium, not overly technical.
+
+11. Platform super admin panel
+
+Build a separate internal admin experience for me.
+
+This should allow me to:
+
+view all organisations
+
+search organisations
+
+see plan and billing status
+
+see trial accounts
+
+create / extend trials
+
+adjust seat counts
+
+enable / disable modules by organisation
+
+view user counts
+
+view usage metrics
+
+manage taxonomy / templates later
+
+manage support actions
+
+access reporting
+
+flag or suspend accounts
+
+This must not be mixed into the standard customer product interface.
+
+12. Reporting
+
+Support two levels of reporting.
+
+A. Platform reports (for me)
+
+Examples:
+
+total organisations
+
+active users
+
+seat usage
+
+module usage
+
+trials active
+
+trials converting
+
+subscriptions by plan
+
+churn / unpaid accounts
+
+organisation engagement
+
+feature adoption
+
+B. Organisation reports (for customer admins)
+
+Examples:
+
+seats used vs available
+
+active users this week / month
+
+module usage by team or user later
+
+watchlist activity
+
+signals generated / viewed
+
+generated scripts or content counts
+
+Do not overbuild org reporting at first, but structure it so it can grow.
+
+13. Data ownership and tenancy
+
+Structure the system so data can clearly belong to:
+
+platform
+
+organisation
+
+team
+
+user
+
+Examples:
+
+Platform-owned
+
+taxonomy
+
+templates
+
+global company / signal graph
+
+feature flags
+
+Organisation-owned
+
+branding
+
+billing
+
+plan
+
+module entitlements
+
+users
+
+seat pool
+
+organisation settings
+
+Team-owned
+
+shared assets later
+
+team configs later
+
+User-owned
+
+personal dashboard
+
+personal market profiles
+
+personal watchlist
+
+personal scripts
+
+personal content history
+
+candidate uploads
+
+This separation is critical for long-term scale and data isolation.
+
+14. Secure route and access model
+
+The app must enforce access based on:
+
+authentication
+
+organisation membership
+
+role
+
+seat assignment
+
+module entitlement
+
+billing status
+
+onboarding completion
+
+A user should not be able to access:
+
+another organisation’s data
+
+modules they do not have access to
+
+admin areas without permission
+
+full product access if the organisation is suspended or unpaid
+
+This should be checked server-side, not just hidden in the frontend.
+
+15. Long-term objective
+
+The final result should be a clean multi-tenant SaaS structure that supports:
+
+solo users
+
+team accounts
+
+multi-seat company accounts
+
+role-based access
+
+admin controls
+
+billing and trials
+
+organisation branding
+
+scalable permissions
+
+future enterprise readiness
+
+The app should remain coherent and manageable as it grows.
+
+Practical build summary
+
+Build:
+
+secure login and signup flows
+
+invite flow
+
+onboarding routing
+
+multi-tenant organisation structure
+
+user roles and permissions
+
+organisation admin page
+
+platform super admin panel
+
+billing and Stripe integration
+
+subscription / seat tracking
+
+trial support
+
+billing status handling
+
+module entitlements
+
+data ownership boundaries
+
+Everything must be structured so that the product will still make sense when there are:
+
+many organisations
+
+many users
+
+many plans
+
+paid and unpaid accounts
+
+trials
+
+different module access levels
+
+For each user, they should also be able to select their preferred colour scheme for the software. Start with the dark as default but they should be a few colour pallets they can choose from that give them the feeling its there personal system. E.g pink, blue, red, green, white, grey e.c.t. All colours and themes need to be clean, aesthetic and highly polished and professional. 
+
+Design the AI-powered parts of the platform so users cannot abuse token-heavy features or generate unnecessary cost.
+
+I need strong usage control across all AI features such as:
+
+Content Studio
+
+BD Scripts
+
+Candidate Matcher summaries
+
+market briefings
+
+signal explanations
+
+e-shot generation
+
+Implement the following principles:
+
+1. Usage limits
+
+Add hard daily and monthly limits by feature.
+These limits should work at:
+
+user level
+
+organisation level
+
+plan level
+
+2. Rate limiting and cooldowns
+
+Add backend-enforced cooldowns for expensive actions such as:
+
+content generation
+
+script generation
+
+refresh actions
+
+candidate parsing
+
+3. Caching
+
+Before calling AI, check whether a valid recent output already exists for the same request.
+Reuse cached outputs wherever possible.
+
+4. Structured generation flows
+
+Do not allow unlimited open-ended generation.
+Use controlled generation inputs such as:
+
+tone
+
+structure
+
+company
+
+signal
+
+candidate profile
+
+market scope
+
+This keeps outputs high quality and reduces waste.
+
+5. Usage tracking
+
+Log AI usage for every request, including:
+
+organisation
+
+user
+
+feature
+
+model
+
+tokens
+
+estimated cost
+
+timestamp
+
+cache hit / miss
+
+6. Budget enforcement
+
+Support warnings and hard stops when usage exceeds allowed limits.
+
+7. Precompute wherever possible
+
+Daily briefings, watchlist summaries, and other repeated outputs should be generated in scheduled background jobs and stored, rather than regenerated on every refresh.
+
+8. Abuse prevention
+
+Add protection against excessive repeated generation and suspicious usage patterns.
+Trial users and low-tier plans must have tighter limits.
+
+The goal is to make the system feel intelligent and smooth while preventing users from burning large amounts of tokens unnecessarily.

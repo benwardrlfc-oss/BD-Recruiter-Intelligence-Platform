@@ -1,33 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import {
-  Search, Bell, ChevronDown, LogOut, Settings, Zap,
+  Bell, ChevronDown, LogOut, Settings, Zap,
   LayoutDashboard, Radar, Target, Building2 as Building2Icon, TrendingUp,
   Users, FileText, Sparkles, BarChart3, Settings as SettingsIcon,
+  Loader2, CheckCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SearchBar } from '@/components/layout/search-bar'
 import { mockSignals, mockOpportunities } from '@/lib/mock-data'
-import { cn } from '@/lib/utils'
-
-function getGreeting() {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
-}
+import { useSettings } from '@/lib/settings-context'
+import { cn, getGreeting } from '@/lib/utils'
 
 export function Header() {
   const { data: session } = useSession()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [isScanning, setIsScanning] = useState(false)
+  const [scanDone, setScanDone] = useState(false)
   const pathname = usePathname()
+  const { settings } = useSettings()
 
   const firstName = session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0] || 'there'
   const activeSignals = mockSignals.length
   const highProbability = mockOpportunities.filter((o) => o.opportunityScore >= 85).length
+
+  const scopeParts = useMemo(() => [
+    settings.sector || 'Biotech',
+    settings.subsector || null,
+    settings.regions.join(', ') || 'USA',
+    settings.stages.length
+      ? `${settings.stages[0]} – ${settings.stages[settings.stages.length - 1]}`
+      : 'All stages',
+  ].filter(Boolean), [settings])
+
+  const handleScan = async () => {
+    setIsScanning(true)
+    try {
+      await fetch('/api/intelligence/run', { method: 'POST', body: JSON.stringify({}) })
+    } catch (e) {}
+    setIsScanning(false)
+    setScanDone(true)
+    setTimeout(() => setScanDone(false), 3000)
+  }
 
   return (
     <header
@@ -38,14 +56,7 @@ export function Header() {
       <div className="flex h-14 items-center justify-between px-6 border-b border-slate-800/40">
         {/* Search */}
         <div className="flex items-center gap-3 flex-1 max-w-sm">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search companies, investors, roles, or signals…"
-              className="w-full pl-9 pr-4 py-1.5 text-sm bg-slate-900/80 border border-slate-800/60 rounded-lg text-slate-300 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
-            />
-          </div>
+          <SearchBar />
         </div>
 
         {/* Right section */}
@@ -53,22 +64,25 @@ export function Header() {
           {/* Scan Market Signals */}
           <Button
             size="sm"
+            disabled={isScanning}
             className="gap-2 text-xs bg-indigo-600 hover:bg-indigo-500 text-white border-0"
-            onClick={async () => {
-              try {
-                await fetch('/api/intelligence/run', { method: 'POST', body: JSON.stringify({}) })
-              } catch (e) {}
-            }}
+            onClick={handleScan}
           >
-            <Zap className="h-3 w-3" />
-            Scan Market Signals
+            {isScanning ? (
+              <><Loader2 className="h-3 w-3 animate-spin" /> Scanning...</>
+            ) : scanDone ? (
+              <><CheckCircle className="h-3 w-3 text-emerald-300" /> Done!</>
+            ) : (
+              <><Zap className="h-3 w-3" /> Scan Market Signals</>
+            )}
           </Button>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative h-8 w-8">
-            <Bell className="h-4 w-4 text-slate-400" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-indigo-500" />
-          </Button>
+          <Link href="/radar">
+            <Button variant="ghost" size="icon" className="relative h-8 w-8" title="View latest signals">
+              <Bell className="h-4 w-4 text-slate-400" />
+            </Button>
+          </Link>
 
           {/* User Menu */}
           <div className="relative">
@@ -88,13 +102,14 @@ export function Header() {
             {showUserMenu && (
               <div className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-slate-700/60 bg-slate-900 shadow-2xl z-50">
                 <div className="p-1">
-                  <a
+                  <Link
                     href="/settings"
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+                    onClick={() => setShowUserMenu(false)}
                   >
                     <Settings className="h-4 w-4" />
                     Settings
-                  </a>
+                  </Link>
                   <button
                     onClick={() => signOut()}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
@@ -118,26 +133,25 @@ export function Header() {
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-slate-500">
-            <span className="text-slate-400 font-medium">Biotech</span>
-            <span>·</span>
-            <span className="text-slate-400 font-medium">Oncology</span>
-            <span>·</span>
-            <span className="text-slate-400 font-medium">USA</span>
-            <span>·</span>
-            <span className="text-slate-400 font-medium">Seed – Series C</span>
+            {scopeParts.map((part, i) => (
+              <span key={i} className="flex items-center gap-1.5">
+                {i > 0 && <span>·</span>}
+                <span className="text-slate-400 font-medium">{part}</span>
+              </span>
+            ))}
           </div>
         </div>
         <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-1.5">
+          <Link href="/radar" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
             <div className="h-1.5 w-1.5 rounded-full bg-teal-400" />
             <span className="text-slate-400">Signals today:</span>
             <span className="font-bold text-white">{activeSignals}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
+          </Link>
+          <Link href="/opportunities" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
             <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
             <span className="text-slate-400">High probability:</span>
             <span className="font-bold text-white">{highProbability}</span>
-          </div>
+          </Link>
         </div>
       </div>
 
@@ -148,7 +162,7 @@ export function Header() {
             { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
             { label: 'Radar', href: '/radar', icon: Radar },
             { label: 'Signals', href: '/opportunities', icon: Target },
-            { label: 'Targets', href: '/targets', icon: Building2Icon },
+            { label: 'Companies', href: '/companies', icon: Building2Icon },
             { label: 'Ventures', href: '/investors', icon: TrendingUp },
             { label: 'Candidates', href: '/candidates', icon: Users },
             { label: 'Scripts', href: '/scripts', icon: FileText },

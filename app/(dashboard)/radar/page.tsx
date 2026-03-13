@@ -2,51 +2,45 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { Filter, ExternalLink, Building2, Clock, ChevronDown, ChevronRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip } from '@/components/ui/tooltip'
 import { mockSignals, mockCompanies } from '@/lib/mock-data'
-import { formatTimeAgo, formatDate, getSignalTypeColor, cn } from '@/lib/utils'
+import { formatTimeAgo, formatDate, getSignalTypeColor, signalTypeIcons, cn } from '@/lib/utils'
+import { useSettings } from '@/lib/settings-context'
+import { useMarketConfig } from '@/lib/market-config'
 
-const signalTypes = ['All', 'funding', 'hiring', 'leadership', 'partnership', 'expansion', 'regulatory', 'clinical']
-const sectors = ['All', 'Biotech', 'MedTech', 'Diagnostics', 'CRO/CDMO']
-
-const signalTypeIcons: Record<string, string> = {
-  funding: '💰',
-  hiring: '👥',
-  leadership: '👤',
-  partnership: '🤝',
-  expansion: '🌍',
-  regulatory: '📋',
-  product: '🧬',
-  clinical: '🔬',
-}
-
-function getGreeting() {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
-}
+const allSignalTypes = ['All', 'funding', 'hiring', 'leadership', 'partnership', 'expansion', 'regulatory', 'clinical']
+const sectors = ['All', 'Biotechnology', 'Biotech', 'MedTech', 'Diagnostics', 'CRO/CDMO', 'CRO / CDMO', 'Gene Therapy', 'Cell Therapy', 'Pharma', 'Digital Health']
 
 export default function RadarPage() {
-  const { data: session } = useSession()
+  const { settings } = useSettings()
+  const marketConfig = useMarketConfig()
+
+  // Build signal type filter list: market-priority types first, then remaining, prefixed with All
+  const signalTypes = [
+    'All',
+    ...marketConfig.prioritySignalTypes,
+    ...allSignalTypes.filter((t) => t !== 'All' && !marketConfig.prioritySignalTypes.includes(t)),
+  ]
   const [selectedType, setSelectedType] = useState('All')
   const [selectedSector, setSelectedSector] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<'all' | '7d' | '30d' | '90d'>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const firstName = session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0] || 'there'
-
   const filtered = useMemo(() => {
     const now = new Date()
+    // When user picks a sector from the dropdown, use it directly.
+    // When set to 'All', fall back to the user's saved settings sector.
+    const effectiveSector = selectedSector !== 'All' ? selectedSector : settings.sector
     return mockSignals.filter((s) => {
       if (selectedType !== 'All' && s.signalType !== selectedType) return false
-      if (selectedSector !== 'All' && s.sector !== selectedSector) return false
+      if (effectiveSector && effectiveSector !== 'All' && s.sector) {
+        if (s.sector.toLowerCase() !== effectiveSector.toLowerCase()) return false
+      }
       if (searchQuery && !s.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
       if (dateRange !== 'all') {
         const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90
@@ -55,17 +49,15 @@ export default function RadarPage() {
       }
       return true
     })
-  }, [selectedType, selectedSector, searchQuery, dateRange])
+  }, [selectedType, selectedSector, searchQuery, dateRange, settings.sector])
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">
-          {getGreeting()}, {firstName}
-        </h1>
+        <h1 className="text-2xl font-bold text-white">Market Radar</h1>
         <p className="text-sm text-slate-400 mt-1">
-          {filtered.length} signals in your market radar · Biotech · USA
+          {filtered.length} signals · {settings.sector} · {settings.regions.join(', ')}
         </p>
       </div>
 
@@ -96,7 +88,7 @@ export default function RadarPage() {
                   : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-600'
               )}
             >
-              {type === 'All' ? 'All Types' : `${signalTypeIcons[type] || ''} ${type}`}
+              {type === 'All' ? 'All Types' : marketConfig.signalTypeLabels[type] || type}
             </button>
           ))}
         </div>

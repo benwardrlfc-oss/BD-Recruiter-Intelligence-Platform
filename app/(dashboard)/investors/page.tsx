@@ -8,6 +8,9 @@ import { Badge } from '@/components/ui/badge'
 import { Tooltip } from '@/components/ui/tooltip'
 import { mockInvestors, mockSignals, mockCompanies } from '@/lib/mock-data'
 import { formatCurrency, cn } from '@/lib/utils'
+import { useWatchlist } from '@/lib/watchlist-context'
+import { WatchButton } from '@/components/ui/watch-button'
+import { useMarketConfig } from '@/lib/market-config'
 
 function EngagementBar({ score }: { score: number }) {
   const color = score >= 90 ? '#10b981' : score >= 75 ? '#14b8a6' : score >= 60 ? '#f59e0b' : '#ef4444'
@@ -30,22 +33,34 @@ function EngagementBar({ score }: { score: number }) {
 export default function InvestorsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(mockInvestors[0]?.id || null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState<'capitalDeployed' | 'recentFundSize' | 'engagementScore'>('capitalDeployed')
-  const [engagementFilter, setEngagementFilter] = useState<'all' | 'very-high' | 'high' | 'medium'>('all')
+  const [sortBy, setSortBy] = useState<'recentFundSize' | 'capitalDeployed' | 'engagementScore' | 'name'>('capitalDeployed')
+  const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc')
+  const { isWatchingVC, toggleVC } = useWatchlist()
+  const marketConfig = useMarketConfig()
+
+  const handleFilterClick = (key: typeof sortBy) => {
+    if (sortBy === key) {
+      setSortDir(sortDir === 'desc' ? 'asc' : 'desc')
+    } else {
+      setSortBy(key)
+      setSortDir(key === 'name' ? 'asc' : 'desc')
+    }
+  }
 
   const filtered = mockInvestors
-    .filter(
-      (inv) => {
-        const nameMatch = inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          inv.sectorFocus.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()))
-        if (!nameMatch) return false
-        if (engagementFilter === 'very-high' && inv.engagementScore < 90) return false
-        if (engagementFilter === 'high' && inv.engagementScore < 75) return false
-        if (engagementFilter === 'medium' && inv.engagementScore < 60) return false
-        return true
-      }
+    .filter((inv) =>
+      inv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inv.sectorFocus.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()))
     )
-    .sort((a, b) => (b[sortBy] ?? 0) - (a[sortBy] ?? 0))
+    .sort((a, b) => {
+      if (sortBy === 'name') {
+        const cmp = a.name.localeCompare(b.name)
+        return sortDir === 'asc' ? cmp : -cmp
+      }
+      const aVal = (a[sortBy] ?? 0) as number
+      const bVal = (b[sortBy] ?? 0) as number
+      return sortDir === 'desc' ? bVal - aVal : aVal - bVal
+    })
 
   const selected = mockInvestors.find((inv) => inv.id === selectedId)
   const selectedSignals = mockSignals.filter((s) => s.investorId === selectedId)
@@ -56,8 +71,8 @@ export default function InvestorsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold text-white">Venture Intelligence</h1>
-        <p className="text-sm text-slate-400 mt-1">Venture firms ranked by capital activity and engagement strength</p>
+        <h1 className="text-2xl font-bold text-white">{marketConfig.capitalTabLabel}</h1>
+        <p className="text-sm text-slate-400 mt-1">{marketConfig.capitalPageDescription}</p>
       </div>
 
       <div className="grid grid-cols-3 gap-6" style={{ height: 'calc(100vh - 210px)' }}>
@@ -69,52 +84,30 @@ export default function InvestorsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <input
                 type="text"
-                placeholder="Search venture firms..."
+                placeholder={`Search ${marketConfig.capitalEntityPluralLabel}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 text-sm bg-slate-900 border border-slate-800 rounded-lg text-slate-300 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
               />
             </div>
-            <div className="flex gap-1 flex-wrap">
-              {([
-                { key: 'all', label: 'All' },
-                { key: 'very-high', label: '⚡ Very High' },
-                { key: 'high', label: '↑ High' },
-                { key: 'medium', label: '~ Medium' },
-              ] as const).map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => setEngagementFilter(opt.key)}
-                  className={cn(
-                    'px-2 py-1 rounded text-xs font-medium border transition-colors',
-                    engagementFilter === opt.key
-                      ? 'bg-teal-600/80 text-white border-teal-500'
-                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600'
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-1.5">
-              {[
-                { key: 'capitalDeployed', label: 'Deployed' },
-                { key: 'recentFundSize', label: 'Fund Size' },
-                { key: 'engagementScore', label: 'Engagement' },
-              ].map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => setSortBy(opt.key as typeof sortBy)}
-                  className={cn(
-                    'flex-1 px-2 py-1 rounded text-xs font-medium border transition-colors',
-                    sortBy === opt.key
-                      ? 'bg-indigo-600 text-white border-indigo-500'
-                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600'
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => handleFilterClick(e.target.value as typeof sortBy)}
+                className="flex-1 px-3 py-2 text-sm bg-slate-900 border border-slate-800 rounded-lg text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+              >
+                <option value="capitalDeployed">Deployed Capital</option>
+                <option value="recentFundSize">Fund Size</option>
+                <option value="engagementScore">Engagement</option>
+                <option value="name">A–Z Name</option>
+              </select>
+              <button
+                onClick={() => setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))}
+                className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-white transition-colors text-sm font-medium flex-shrink-0"
+                title={sortDir === 'desc' ? 'Descending' : 'Ascending'}
+              >
+                {sortDir === 'desc' ? '↓' : '↑'}
+              </button>
             </div>
           </div>
 
@@ -159,6 +152,12 @@ export default function InvestorsPage() {
                         {firmSignals.length} signal{firmSignals.length > 1 ? 's' : ''}
                       </span>
                     )}
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-slate-800/60">
+                    <WatchButton
+                      isWatching={isWatchingVC(investor.id)}
+                      onToggle={() => toggleVC(investor.id)}
+                    />
                   </div>
                 </button>
               )

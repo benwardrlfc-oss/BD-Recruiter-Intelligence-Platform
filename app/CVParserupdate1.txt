@@ -1,0 +1,414 @@
+Clean up and redesign the Candidate Matcher / CV Parser workflow so it feels seamless, premium, and commercially useful.
+
+Right now this section feels too basic. It needs to become a proper recruiter workflow where the user can upload a resume, add extra context, review the parsed profile, and then immediately move into company targeting and e-shot creation.
+
+The goal is to make this page feel like:
+
+upload CV → enrich with recruiter notes → review candidate profile → generate target companies → open a company → build a tailored e-shot
+
+This should all happen in one clean, connected flow.
+
+Core objective
+
+A recruiter should be able to:
+
+upload a PDF or Word document containing a candidate’s resume / CV
+
+optionally paste or type interview notes, recruiter observations, or additional context
+
+see the system parse the CV and build a clean candidate profile on the right-hand side
+
+review and edit that parsed profile if needed
+
+then see a target list of companies the candidate is relevant for
+
+click any company in that target list
+
+open a detailed company fit view
+
+generate a tailored e-shot from that company fit view
+
+This page should feel like a candidate-to-market workflow, not a file upload tool.
+
+1. Left-hand side: CV input area
+
+The left side should become the input and context panel.
+
+It should include:
+
+A. Resume upload area
+
+Allow users to:
+
+drag and drop a file
+
+upload a file manually
+
+Supported formats:
+
+PDF
+
+DOC
+
+DOCX
+
+The upload area should feel clean and premium, with a clear empty state.
+
+Example helper text:
+Upload a CV or resume file for AI analysis
+
+B. Additional information / recruiter notes area
+
+Below the upload area, add a large text box where users can enter:
+
+interview notes
+
+recruiter observations
+
+candidate motivations
+
+location flexibility
+
+compensation notes
+
+commercial strengths
+
+anything not obvious from the CV
+
+This should be optional but clearly useful.
+
+Example label:
+Additional context / interview notes
+
+Example placeholder:
+Add interview notes, recruiter observations, candidate motivations, target geographies, or any context that should influence the profile and outreach.
+
+This is important because the CV alone often misses the nuance needed for a strong e-shot.
+
+2. Right-hand side: Parsed candidate profile
+
+Once the CV is parsed, the right-hand side should automatically build a clean candidate profile summary.
+
+This section should not just be a blob of text. It needs to be structured, easy to scan, and easy to edit.
+
+The recruiter should be able to review it and adjust the output if needed.
+
+The profile should start with the candidate’s career context, because that is what gives the recruiter immediate credibility when using the profile in outreach.
+
+Candidate profile structure
+
+Build the parsed profile in this order:
+
+A. Career snapshot
+
+Show:
+
+candidate name if available
+
+current / most recent title
+
+current / most recent company
+
+location if available
+
+B. Company and title history
+
+This is critical.
+
+Show the key companies they worked for and the job titles they held, in a clean chronological structure.
+
+Example:
+
+Chief Scientific Officer — BioNova Therapeutics
+
+VP Translational Medicine — Arcus Bio
+
+Senior Director, Oncology Research — Tempus
+
+This gives immediate context.
+
+The system should not over-list every minor job. Show the most relevant career progression.
+
+C. Specialty / market fit
+
+Summarise their core specialty clearly.
+
+Examples:
+
+Oncology drug development
+
+Clinical operations in rare disease
+
+Commercial diagnostics leadership
+
+CMC leadership for early-stage biologics
+
+This should be concise and commercially useful.
+
+D. USP
+
+The system should identify and summarise the candidate’s unique selling points.
+
+Examples:
+
+built clinical teams through Phase 2 to Phase 3 transitions
+
+led successful FDA breakthrough designation strategy
+
+scaled diagnostics commercial teams post-funding
+
+combines deep scientific credibility with investor-facing leadership
+
+This should be phrased in a way that is directly useful for outbound marketing.
+
+E. Key achievements
+
+Extract and summarise meaningful achievements from the CV and notes.
+
+Examples:
+
+led Phase 2 programme into registrational planning
+
+built and hired a 20-person clinical operations function
+
+secured strategic partnerships
+
+launched a new commercial territory
+
+helped scale business through Series B and Series C growth
+
+These should be specific and commercial where possible.
+
+F. Additional recruiter notes
+
+If the user adds notes, those should also appear in the profile summary as a clearly separate section.
+
+Example:
+Recruiter Notes
+
+open to Boston and San Diego
+
+motivated by platform science and strong board quality
+
+stronger in execution than investor storytelling
+
+This helps the recruiter refine later outreach.
+
+3. Editable parsed profile
+
+The recruiter must be able to adjust the parsed profile before moving into outreach.
+
+This means:
+
+each section should be editable
+
+the UI should feel like a profile review step, not a locked AI output
+
+edits should update downstream outputs like e-shots
+
+This is important because recruiters need control.
+
+4. Below the parsed profile: target companies list
+
+Once the profile is parsed, generate a target list of companies below the profile workflow.
+
+This list should be simple and clean at first.
+
+Only show:
+
+company name
+
+Do not overload the list visually.
+
+This should feel like a clean target panel.
+
+The company list should be based on:
+
+market fit
+
+industry / subsector relevance
+
+stage relevance
+
+geography relevance
+
+likely hiring need
+
+signal alignment
+
+The list should be ranked in order of best fit.
+
+5. Company detail interaction
+
+When a recruiter clicks a company in the target list, open a company fit panel / detail view.
+
+This should show:
+
+company name
+
+why the company is a fit for this candidate
+
+relevant company context
+
+likely role / need alignment
+
+optional hiring signal if relevant
+
+quick actions
+
+This is where the recruiter should understand:
+why this candidate is relevant to this specific company
+
+“Why they’re a fit” section
+
+This is critical.
+
+The company detail panel should explain the fit in recruiter language.
+
+Examples:
+
+candidate has direct oncology leadership experience aligned to the company’s pipeline
+
+prior Phase 2 / Phase 3 build-out experience is relevant to company stage
+
+diagnostics commercial scale-up background aligns with post-funding growth
+
+prior CMC buildout in biologics fits the likely upcoming manufacturing need
+
+This should feel intelligent and commercially useful, not generic.
+
+6. E-shot builder inside company detail
+
+Once a company is selected, the recruiter should be able to build a tailored e-shot directly from that view.
+
+This should not take them to a completely separate disconnected workflow.
+
+The company fit panel should include an action such as:
+
+Build E-shot
+
+When selected, it should generate an e-shot draft using:
+
+candidate profile
+
+recruiter notes
+
+company fit logic
+
+company context
+
+The e-shot should be structured for executive search outreach.
+
+E-shot structure
+
+Follow a commercially useful format:
+
+Opening
+
+Greeting:
+
+Good morning
+
+Good afternoon
+
+Good evening
+
+Include personalisation where possible:
+
+company name
+
+signal context if relevant
+
+market relevance
+
+Intro / context
+
+Briefly explain why the candidate is relevant to the company.
+
+Core highlights
+
+Pull in the strongest achievements, specialty, and USP relevant to that company.
+
+This should feel tailored, not generic.
+
+Close
+
+A short, relationship-oriented closing that invites discussion.
+
+7. Flow and layout
+
+The full page flow should feel like this:
+
+Step 1
+
+Upload CV / resume
+
+Step 2
+
+Add recruiter notes / interview notes
+
+Step 3
+
+Review parsed candidate profile
+
+Step 4
+
+View ranked target companies
+
+Step 5
+
+Click a company
+
+Step 6
+
+See why the fit makes sense
+
+Step 7
+
+Generate e-shot
+
+This should all happen in one clean, connected workflow.
+
+Do not make the user jump through too many screens.
+
+8. Design expectations
+
+The page should feel:
+
+clean
+
+premium
+
+structured
+
+recruiter-friendly
+
+high-utility
+
+The parsed profile should be easy to scan.
+
+The company list should be simple and not overloaded.
+
+The company detail / e-shot area should feel like the “action panel”.
+
+This page should look like a serious productivity workflow, not a file upload form.
+
+9. Final objective
+
+The final Candidate Matcher / CV Parser experience should let a recruiter:
+
+upload a PDF or Word resume
+
+add extra notes and context
+
+see the candidate profile built out cleanly
+
+verify and edit the parsed summary
+
+see a ranked list of target companies
+
+click a company to understand the fit
+
+immediately generate a tailored e-shot
+
+The experience should feel seamless and commercially useful, and it should make the recruiter feel like the system is helping them turn a candidate into targeted BD outreach quickly and intelligently.

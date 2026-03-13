@@ -13,6 +13,7 @@ import {
   Brain,
   Lightbulb,
   X,
+  Users,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +21,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { mockOpportunities, mockCompanies, mockSignals } from '@/lib/mock-data'
 import { getScoreColor, getSignalTypeColor, cn } from '@/lib/utils'
+import { useSettings, companyMatchesSettings } from '@/lib/settings-context'
 
 const bdActionsMap: Record<string, string[]> = {
   opp_1: [
@@ -91,8 +93,14 @@ export default function HiringSignalsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<'opportunityScore' | 'momentumScore'>('opportunityScore')
   const [marketIntelId, setMarketIntelId] = useState<string | null>(null)
+  const { settings } = useSettings()
 
-  const sorted = [...mockOpportunities].sort((a, b) => b[sortBy] - a[sortBy])
+  const matching = mockOpportunities.filter((o) => {
+    const company = mockCompanies.find((c) => c.id === o.companyId)
+    return company ? companyMatchesSettings(company, settings) : false
+  })
+  const sorted = [...matching].sort((a, b) => b[sortBy] - a[sortBy])
+  const totalCount = mockOpportunities.length
 
   const marketIntelOpp = marketIntelId ? sorted.find(o => o.id === marketIntelId) : null
   const marketIntelCompany = marketIntelOpp ? mockCompanies.find(c => c.id === marketIntelOpp.companyId) : null
@@ -106,7 +114,7 @@ export default function HiringSignalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-white">Hiring Signals</h1>
           <p className="text-sm text-slate-400 mt-1">
-            {sorted.length} active hiring signals detected and ranked by AI
+            {sorted.length} matching your profile · {totalCount} total
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -136,6 +144,18 @@ export default function HiringSignalsPage() {
         </div>
       </div>
 
+      {/* Empty state */}
+      {sorted.length === 0 && (
+        <div className="text-center py-20 text-slate-500">
+          <Building2 className="h-10 w-10 mx-auto mb-3 text-slate-700" />
+          <p className="text-lg font-medium">No matching opportunities</p>
+          <p className="text-sm mt-1">
+            Adjust your market profile in{' '}
+            <a href="/settings" className="text-indigo-400 hover:text-indigo-300">Settings</a> to widen your search.
+          </p>
+        </div>
+      )}
+
       {/* Hiring Signals List */}
       <div className="space-y-3">
         {sorted.map((opp) => {
@@ -160,7 +180,7 @@ export default function HiringSignalsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Link href={`/companies/${opp.companyId}`}>
-                        <p className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors">{company?.name}</p>
+                        <p className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors truncate max-w-[200px]">{company?.name}</p>
                       </Link>
                       <Badge variant="outline" className="text-xs">{company?.sector}</Badge>
                       <Badge variant="secondary" className="text-xs">{company?.stage}</Badge>
@@ -294,7 +314,7 @@ export default function HiringSignalsPage() {
                             <Brain className="h-3 w-3" />
                             View Market Intelligence
                           </button>
-                          <Link href="/scripts">
+                          <Link href={`/scripts?opp=${opp.id}`}>
                             <Button size="sm" className="w-full gap-2 text-xs">
                               <Sparkles className="h-3 w-3" />
                               Generate BD Script
@@ -306,14 +326,20 @@ export default function HiringSignalsPage() {
                               View Company
                             </Button>
                           </Link>
+                          <Link href="/candidates">
+                            <Button variant="outline" size="sm" className="w-full gap-2 text-xs">
+                              <Users className="h-3 w-3" />
+                              Match Candidates
+                            </Button>
+                          </Link>
                         </div>
                       </div>
 
                       <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
                         <div className="flex items-center gap-2 mb-1">
-                          <Activity className="h-3 w-3" style={{ color: '#14b8a6' }} />
+                          <Activity className="h-3 w-3 text-indigo-400" />
                           <p className="text-xs font-medium text-slate-400">
-                            Signal Strength: <span className="font-bold" style={{ color: '#14b8a6' }}>{opp.opportunityScore}</span>
+                            Signal Strength: <span className={`font-bold ${getScoreColor(opp.opportunityScore).split(' ')[0]}`}>{opp.opportunityScore}</span>
                           </p>
                         </div>
                         <p className="text-xs text-slate-500">

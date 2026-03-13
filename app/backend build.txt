@@ -1,0 +1,1734 @@
+I need you to design and build the full backend intelligence system for this product from end to end.
+
+This is not just a data store. It is not just a scraper. It is not just an API. It is a complete intelligence engine that must take raw information from many sources, validate it, enrich it, map it to canonical entities, score it, interpret it, and then power every meaningful output in the product.
+
+The system must be:
+
+robust
+
+scalable
+
+accurate
+
+explainable
+
+cost-efficient
+
+modular
+
+multi-tenant ready
+
+sustainable long term
+
+extensible into new sectors later
+
+clean enough that I do not need to rebuild it from scratch later
+
+The platform will start in Life Sciences, but the backend must be built as a generic intelligence platform with Life Sciences as the first industry template.
+
+The system must also support:
+
+my proprietary company database
+
+live news and signal ingestion
+
+job and hiring signal ingestion
+
+CSV uploads from users to add their own company lists
+
+user and organisation data
+
+watchlists
+
+candidate parsing outputs
+
+script generation outputs
+
+market summaries
+
+map intelligence
+
+scoring systems
+
+admin and billing logic
+
+long-term continuous enrichment and data quality improvement
+
+This instruction must be treated as the master backend specification.
+
+1. Core backend philosophy
+
+Build the backend as a layered intelligence platform with clear separation between:
+
+raw data ingestion
+
+structured extraction
+
+canonical entity matching
+
+enrichment
+
+scoring and interpretation
+
+intelligence outputs
+
+user / organisation / billing layers
+
+AI narrative and generation layer
+
+Do not mix these concerns together.
+
+The backend must be designed so:
+
+raw data can always be reprocessed later
+
+structured data remains clean
+
+canonical company records remain stable
+
+scores are explainable and configurable
+
+outputs across the app are driven by the same underlying intelligence model
+
+adding new industries later does not require a rewrite
+
+2. High-level system architecture
+
+Build the system with these major layers:
+
+Layer A – Source ingestion layer
+
+Collects information from:
+
+my proprietary company database
+
+user-uploaded CSV company lists
+
+news and press releases
+
+company websites
+
+investor / VC / PE / owner websites
+
+portfolio pages
+
+job sources and careers pages
+
+uploaded CVs and documents
+
+future connectors where relevant
+
+This layer stores raw source data and metadata.
+
+Layer B – Extraction layer
+
+Converts raw source data into structured extracted records such as:
+
+company name
+
+website / domain
+
+location
+
+investor / owner name
+
+role title
+
+event type
+
+date
+
+industry hints
+
+subsector hints
+
+source type
+
+source confidence
+
+Layer C – Canonical entity resolution layer
+
+Matches extracted records to canonical entities such as:
+
+companies
+
+investors / owners
+
+roles
+
+geographies
+
+markets
+
+This layer is critical for preventing duplication and fragmentation.
+
+Layer D – Enrichment layer
+
+Adds or updates structured intelligence such as:
+
+industry
+
+subsector
+
+niche
+
+ownership model
+
+stage model
+
+revenue / size band
+
+company type
+
+geography
+
+life-sciences-specific attributes where relevant
+
+other industry extension fields later
+
+Layer E – Scoring and intelligence engine
+
+Computes:
+
+signal strength
+
+movement score
+
+hiring likelihood
+
+engagement / priority score
+
+market heat / geographic activity
+
+role demand
+
+candidate fit
+
+account momentum
+
+watchlist priority
+
+Layer F – Output layer
+
+Provides the data used across the product for:
+
+dashboard
+
+market radar
+
+hiring signals
+
+companies page
+
+watchlist
+
+capital / ownership intelligence
+
+market intelligence
+
+market map
+
+candidate matcher
+
+BD scripts
+
+Content Studio
+
+admin reports
+
+Layer G – AI orchestration layer
+
+Uses structured intelligence to generate:
+
+daily briefings
+
+signal explanations
+
+market summaries
+
+candidate summaries
+
+candidate-company fit explanations
+
+BD scripts
+
+Content Studio outputs
+
+AI should sit on top of structured intelligence, not replace it.
+
+Layer H – Multi-tenant application layer
+
+Supports:
+
+organisations
+
+users
+
+teams
+
+roles
+
+permissions
+
+billing
+
+seat management
+
+trials
+
+module access
+
+dashboard layouts
+
+market profiles
+
+3. Design the system as market-agnostic at the core
+
+Do not hardcode biotech or life sciences logic into the core backend.
+
+The core system should understand generic concepts such as:
+
+industry
+
+subsector
+
+specialty
+
+company
+
+investor / owner
+
+role
+
+signal
+
+geography
+
+market profile
+
+company type
+
+ownership model
+
+stage model
+
+revenue model
+
+Life Sciences should be implemented as:
+
+one industry template
+
+one subsector library
+
+one function library
+
+one signal profile
+
+one set of extension attributes
+
+one weighting / scoring configuration
+
+Later industries should be able to plug into the same architecture.
+
+This is non-negotiable.
+
+4. Canonical company registry
+
+Build a canonical company registry as the central company source of truth.
+
+Every company in the platform must have:
+
+one canonical company ID
+
+one canonical company record
+
+one central place for structured company intelligence
+
+All signals, roles, watchlists, maps, candidate matching, and other outputs must link back to that canonical record.
+
+Core company fields
+
+Each canonical company should support fields such as:
+
+company_id
+
+name
+
+aliases
+
+website
+
+domain
+
+description
+
+industry_id
+
+subsector_id
+
+specialty_tags
+
+country
+
+region
+
+state / province
+
+city / metro
+
+latitude / longitude when available
+
+ownership_type
+
+company_type
+
+stage_model
+
+size_band
+
+revenue_band
+
+employee_band
+
+status
+
+confidence_state
+
+confidence_score
+
+source_priority
+
+first_seen_at
+
+last_seen_at
+
+last_verified_at
+
+created_at
+
+updated_at
+
+Important principle
+
+The canonical company registry must be:
+
+stable
+
+deduplicated
+
+continuously enriched
+
+incrementally updated
+
+explainable in how fields are derived
+
+5. Proprietary company database integration
+
+My existing company database should become the foundational base layer of the company registry.
+
+Design a process to:
+
+import it cleanly
+
+map fields into canonical company structure
+
+standardise names
+
+standardise websites / domains
+
+deduplicate records
+
+assign company IDs
+
+infer missing fields where possible
+
+tag provenance of imported records
+
+retain import history
+
+The import process should not just dump raw CSV data into the main company table.
+
+It should go through:
+
+staging
+
+validation
+
+standardisation
+
+duplicate detection
+
+canonical matching
+
+enrichment
+
+final write to canonical registry
+
+6. User CSV upload architecture
+
+Users must be able to upload CSV company lists to the platform.
+
+This feature should work safely and cleanly.
+
+CSV upload goals
+
+allow users or organisations to import their own target company lists
+
+enrich the platform over time
+
+match uploaded rows to existing canonical companies
+
+create new company candidates where needed
+
+preserve provenance of who uploaded what
+
+improve the central data store without polluting it with junk
+
+CSV upload flow
+Step 1 – upload and staging
+
+Upload CSV into a staging table / staging object, not directly into canonical tables.
+
+Store:
+
+uploader user_id
+
+organisation_id
+
+original file
+
+upload timestamp
+
+row count
+
+raw row contents
+
+Step 2 – schema mapping
+
+Support flexible column mapping such as:
+
+company name
+
+website
+
+city
+
+country
+
+sector
+
+ownership
+
+notes
+
+custom tags
+
+Users should be able to map columns to known system fields where needed.
+
+Step 3 – validation
+
+Validate:
+
+required fields present
+
+formats are acceptable
+
+websites / domains are plausible
+
+duplicate rows inside the upload are flagged
+
+row-level errors are logged
+
+Step 4 – entity resolution
+
+For each row:
+
+try to match to existing canonical company
+
+use exact and fuzzy matching
+
+use website / domain matching
+
+use geography / ownership clues
+
+produce match confidence
+
+Possible states:
+
+matched canonical company
+
+possible duplicate / ambiguous
+
+new company candidate
+
+Step 5 – enrichment
+
+Use uploaded data to enrich existing records where appropriate, but do not blindly overwrite trusted fields.
+
+Use source hierarchy and field confidence.
+
+Step 6 – provenance and ownership
+
+Track:
+
+uploaded_by_user
+
+uploaded_by_org
+
+source_type = user_csv
+
+whether the data created a new company, enriched an existing one, or was rejected
+
+Step 7 – review queue where needed
+
+Low-confidence or conflicting rows should go to a review state rather than corrupt the canonical registry.
+
+Important rule
+
+User CSV uploads should be able to improve the system, but never degrade data quality.
+
+7. Separate raw, structured, and computed data
+
+This must be enforced at the architecture level.
+
+Raw data layer
+
+Store:
+
+raw articles
+
+raw CSV rows
+
+raw website snapshots
+
+raw job posts
+
+raw press releases
+
+raw portfolio pages
+
+raw uploaded files
+
+This data must be preserved so it can be reprocessed later.
+
+Structured extraction layer
+
+Store:
+
+extracted company names
+
+extracted events
+
+extracted roles
+
+extracted ownership names
+
+extracted dates
+
+extracted locations
+
+extracted tags and hints
+
+Computed intelligence layer
+
+Store:
+
+canonical entity links
+
+scores
+
+signal records
+
+role demand summaries
+
+market heat summaries
+
+hiring likelihood
+
+movement summaries
+
+candidate fit outputs
+
+Do not collapse these three layers into one.
+
+8. Source ingestion design
+
+Design separate ingestion pipelines for different source families.
+
+A. Company and owner ingestion
+
+Sources:
+
+proprietary company database
+
+CSV uploads
+
+investor / PE / VC portfolios
+
+official company pages
+
+directories
+
+public registries
+
+B. News / event ingestion
+
+Sources:
+
+press releases
+
+news sources
+
+RSS
+
+public announcements
+
+investor updates
+
+company updates
+
+C. Role ingestion
+
+Sources:
+
+careers pages
+
+job boards
+
+structured role feeds if available
+
+D. Ownership and capital ingestion
+
+Sources:
+
+VC websites
+
+PE websites
+
+sponsor portfolio pages
+
+deal announcements
+
+public filings
+
+Every ingestion pipeline should follow the same pattern:
+
+raw intake
+
+extraction
+
+entity resolution
+
+enrichment
+
+score trigger / update
+
+storage
+
+downstream update
+
+9. Source hierarchy and trust model
+
+When multiple sources disagree, the system needs a clear source-of-truth hierarchy.
+
+Create a ranking system for sources such as:
+
+official company website
+
+trusted internal / proprietary source
+
+public registry / filing source
+
+trusted partner / enrichment provider
+
+investor / owner source
+
+reputable news source
+
+job source
+
+weak scrape or untrusted source
+
+This source priority should affect:
+
+field overwrite logic
+
+confidence scores
+
+verification states
+
+review queue triggers
+
+10. Confidence model and verification states
+
+Not all data should be treated equally.
+
+Every important record and update should have confidence states such as:
+
+unverified
+
+machine-ingested
+
+machine-enriched
+
+high-confidence matched
+
+manually reviewed
+
+stale / needs refresh
+
+conflicting / needs attention
+
+This confidence model should apply to:
+
+companies
+
+signals
+
+ownership records
+
+role records
+
+enrichment fields
+
+CSV uploads
+
+match results
+
+This allows the platform to scale without pretending the data is perfect.
+
+11. Industry-specific extension fields
+
+Do not pollute core tables with life-sciences-only fields.
+
+Instead, design a flexible extension attribute system.
+
+Core idea
+
+The base company schema stays generic.
+
+Industry-specific details live in extension tables / attribute models.
+
+Life Sciences examples
+
+therapeutic area
+
+modality
+
+indication
+
+clinical stage
+
+regulatory context
+
+pipeline stage
+
+Future legal examples
+
+practice area
+
+office count
+
+partner count
+
+Future construction examples
+
+project type
+
+contract type
+
+operating region
+
+The architecture must support:
+
+core universal fields
+
+industry-specific extension fields
+
+field-level confidence
+
+future extensibility without schema chaos
+
+12. Signal engine design
+
+Build a generic signal engine.
+
+Do not design signals as a short static list.
+
+Signal families
+
+Support broad categories such as:
+
+capital / ownership
+
+hiring / talent
+
+growth / commercial
+
+product / milestone
+
+partnership / market development
+
+organisational change
+
+Signal object
+
+Each signal should support:
+
+signal_id
+
+company_id
+
+related_owner_id if relevant
+
+signal_family
+
+signal_type
+
+detected_at
+
+source_id
+
+source_confidence
+
+signal_confidence
+
+summary
+
+structured metadata
+
+related_geography
+
+related_function if applicable
+
+market relevance
+
+score components
+
+Life sciences signal examples
+
+Series A / B / C funding
+
+clinical trial start
+
+FDA / EMA milestone
+
+licensing deal
+
+CSO hire
+
+new role posted
+
+company launch
+
+This same system must later support:
+
+legal signals
+
+construction signals
+
+tech signals
+
+revenue-led signals
+
+PE-backed signals
+
+13. Full scoring architecture
+
+The platform must support multiple scoring systems.
+
+These scores should be deterministic, configurable, explainable, and tied to market templates.
+
+Do not create one vague “score.”
+
+Support at least the following:
+
+A. Signal Strength Score
+
+Measures how important an individual signal is.
+
+Inputs may include:
+
+signal family
+
+signal type
+
+source quality
+
+source confidence
+
+company relevance to market
+
+recency
+
+ownership relevance
+
+related role / hiring context
+
+market-specific weighting
+
+Example
+
+A Series B in oncology biotech may score highly in a life sciences VC-backed market.
+A partner move may score highly in legal.
+A contract award may score highly in construction.
+
+Store:
+
+final score
+
+component weights
+
+explanation
+
+B. Movement Score
+
+Measures how much momentum a company or owner has over time.
+
+Inputs may include:
+
+number of signals in last X days
+
+diversity of signal families
+
+change in activity over time
+
+watchlist status
+
+recency weighting
+
+ownership-related movement
+
+hiring-related movement
+
+This should show whether a company is “heating up.”
+
+C. Hiring Likelihood Score
+
+Measures how likely it is a company is to hire in relevant functions.
+
+Inputs may include:
+
+open roles
+
+recent growth signals
+
+capital / ownership events
+
+leadership changes
+
+stage / revenue model
+
+company type
+
+market-specific hiring logic
+
+role-family relevance to user market
+
+This score should be market-aware, not universal.
+
+D. Engagement / Priority Score
+
+Measures how worthwhile it is for the recruiter to spend time on the account.
+
+Inputs may include:
+
+signal strength
+
+movement score
+
+hiring likelihood
+
+fit to user market
+
+watchlist status
+
+ownership relevance
+
+target function alignment
+
+account quality indicators
+
+This should drive prioritisation in the app.
+
+E. Candidate Fit Score
+
+Measures how well a candidate aligns to a company or account set.
+
+Inputs may include:
+
+company history match
+
+title match
+
+function match
+
+sector match
+
+geography match
+
+stage / ownership match
+
+specialty match
+
+recruiter notes
+
+likely account need
+
+F. Market Heat Score
+
+Measures how active a geography, subsector, or cluster is.
+
+Inputs may include:
+
+volume of signals
+
+weighted signal strength
+
+movement acceleration
+
+relevant company counts
+
+hiring activity
+
+ownership activity
+
+G. Role Demand Score
+
+Measures how in-demand a role family or function is in a market.
+
+Inputs may include:
+
+role volume
+
+signal context
+
+geography
+
+sector
+
+ownership type
+
+time trend
+
+company growth patterns
+
+14. Score explainability
+
+Every important score must be explainable.
+
+Store score components and reasons.
+
+Examples:
+
+why a company has a high engagement score
+
+why a signal strength is 92
+
+why a candidate fits a company
+
+why a region is hot
+
+The system must never become a black box.
+
+15. Market profile system
+
+The backend must support one canonical market profile object per saved market.
+
+This should include:
+
+industry
+
+subsector
+
+niche / specialty
+
+functions
+
+seniority
+
+geography
+
+ownership model
+
+company types
+
+stage model
+
+revenue / commercial model where relevant
+
+signal preferences
+
+dashboard preferences later
+
+This market profile must drive:
+
+signal relevance
+
+scoring weights
+
+dashboard composition
+
+company ranking
+
+candidate fit
+
+content framing
+
+map outputs
+
+watchlist updates
+
+The market profile should not create separate datasets. It should control interpretation of the shared dataset.
+
+16. Market intelligence engine
+
+The system must aggregate structured data into broader intelligence outputs.
+
+It should be able to power:
+
+dashboard summaries
+
+market radar groupings
+
+top signals
+
+top companies
+
+hottest geographies
+
+top ownership activity
+
+fastest-growing signal clusters
+
+in-demand roles
+
+movement by subsector
+
+watchlist summaries
+
+These outputs should be generated from structured and scored data, not by ad hoc LLM calls on every request.
+
+Use background jobs and materialised summaries where possible.
+
+17. Market map backend logic
+
+The map should be backed by computed geographic summaries, not raw points alone.
+
+The backend should support:
+
+region-level activity counts
+
+city-level activity counts
+
+clustered signal density
+
+movement by geography over time
+
+company-level map points only at deep zoom
+
+filters by signal type, time window, geography, ownership, etc.
+
+The backend must compute and cache geographic summaries so the map performs well at scale.
+
+18. In-demand roles engine
+
+The backend should aggregate and interpret role activity.
+
+It must support:
+
+counting roles by function
+
+counting roles by industry, subsector, geography
+
+counting roles by ownership model
+
+trend detection over time
+
+likely role-family demand
+
+ranking rising role categories
+
+This should feed:
+
+market intelligence
+
+dashboard modules
+
+candidate matcher
+
+content studio
+
+watchlist updates
+
+This should mostly be deterministic, not LLM-driven.
+
+19. Candidate matcher backend logic
+
+The candidate parser must become a structured candidate intelligence pipeline.
+
+Inputs
+
+uploaded PDF
+
+uploaded DOC / DOCX
+
+recruiter notes / interview notes
+
+manual additional context
+
+Extraction and structuring
+
+Build a candidate profile object containing:
+
+company history
+
+titles
+
+career chronology
+
+core function
+
+sector / subsector fit
+
+leadership level
+
+specialty
+
+USP
+
+achievements
+
+location relevance
+
+recruiter notes
+
+fit hints
+
+Matching
+
+Compare that profile against:
+
+canonical company records
+
+company signals
+
+ownership type
+
+stage / growth model
+
+geography
+
+likely hiring need
+
+market profile
+
+Outputs
+
+ranked company list
+
+company fit explanations
+
+candidate fit scores
+
+BD-ready profile summary
+
+e-shot generation inputs
+
+Use AI only for:
+
+phrasing candidate summary
+
+articulating USP
+
+narrative fit explanation
+
+drafting e-shots
+
+Do not use AI for the whole parsing chain if extraction and rules can do the job.
+
+20. Scripts and Content Studio backend logic
+
+These should be built using structured scaffolding plus AI refinement.
+
+Inputs
+
+company
+
+signal context
+
+market profile
+
+candidate profile if relevant
+
+selected tone
+
+selected structure
+
+selected CTA style
+
+Process
+
+build structured content frame
+
+insert factual context
+
+use AI to refine phrasing and tone
+
+store generated output
+
+cache for reuse
+
+This keeps:
+
+quality high
+
+output structured
+
+tone controllable
+
+token cost lower
+
+Support generation for:
+
+e-shots
+
+cold emails
+
+LinkedIn messages
+
+phone openers
+
+LinkedIn posts
+
+market commentary
+
+daily briefings
+
+21. AI orchestration and cost control
+
+AI must be treated as a language layer, not the core engine.
+
+Use deterministic logic for:
+
+filtering
+
+ranking
+
+scoring
+
+signal detection
+
+entity matching
+
+map aggregation
+
+role demand
+
+watchlist movement
+
+market relevance
+
+permissions
+
+billing
+
+Use AI for:
+
+summarisation
+
+explanation
+
+candidate narratives
+
+scripts
+
+content
+
+market commentary
+
+Cost controls
+
+Build:
+
+caching
+
+precomputation
+
+cooldowns
+
+rate limits
+
+per-feature usage tracking
+
+per-user and per-organisation quotas
+
+AI usage logs
+
+prompt standardisation
+
+provider abstraction
+
+Store:
+
+organisation_id
+
+user_id
+
+feature
+
+model
+
+token counts
+
+estimated cost
+
+cache hit / miss
+
+timestamp
+
+The platform must not be vulnerable to users burning huge numbers of tokens unnecessarily.
+
+22. Background jobs and precompute strategy
+
+Do not calculate everything in real time.
+
+Use background jobs for:
+
+ingestion
+
+extraction
+
+enrichment
+
+entity matching
+
+scoring
+
+map aggregation
+
+role demand aggregation
+
+daily briefings
+
+market summaries
+
+watchlist updates
+
+signal groupings
+
+ownership / capital refreshes
+
+Use on-demand generation only where necessary:
+
+script generation
+
+content generation
+
+candidate parsing
+
+manual refreshes when appropriate
+
+23. Multi-tenant architecture and data ownership
+
+The backend must also support:
+
+platform-owned data
+
+organisation-owned data
+
+team-owned data
+
+user-owned data
+
+Examples:
+
+Platform-owned
+
+canonical company registry
+
+global signals
+
+taxonomy
+
+templates
+
+global scoring configs
+
+Organisation-owned
+
+seats
+
+branding
+
+module entitlements
+
+uploaded CSV lists
+
+organisation settings
+
+org-level reports
+
+User-owned
+
+watchlists
+
+dashboard layouts
+
+market profiles
+
+scripts
+
+content history
+
+candidate uploads
+
+This separation must be enforced cleanly.
+
+24. Data cleanliness and long-term sustainability
+
+The system must be designed so the dataset becomes cleaner and more powerful over time, not messier.
+
+This means:
+
+canonical entities stay stable
+
+new sources enrich rather than duplicate
+
+low-confidence data is quarantined or reviewed
+
+user CSV uploads improve the graph without corrupting it
+
+scores can be recalculated as logic improves
+
+raw data remains available for reprocessing
+
+all major logic is modular and configurable
+
+The long-term effect should be:
+more sources + more usage = better data quality and better intelligence
+
+not:
+more sources + more usage = more chaos
+
+25. Sense-check and failure prevention
+
+I need you to do more than build it. I need you to sense-check it.
+
+Actively review and tell me:
+
+where the architecture is too life-sciences specific
+
+where the company model is too rigid
+
+where scoring might break across markets
+
+where user CSVs could pollute the registry
+
+where entity resolution may become unreliable
+
+where modules depend on assumptions that are too narrow
+
+what needs to be made generic now
+
+what can safely remain industry-specific at launch
+
+The system must be designed to avoid future rewrites.
+
+26. Deliverables I need from you
+
+I need you to produce and/or build:
+
+A. Full backend architecture
+
+The complete architecture from raw data to intelligence outputs.
+
+B. Canonical company registry design
+
+Including import, matching, enrichment, confidence, and update strategy.
+
+C. User CSV ingestion and validation design
+
+Including staging, mapping, validation, matching, provenance, and review flows.
+
+D. Signal engine design
+
+Including generic signal families and life sciences implementation first.
+
+E. Full scoring architecture
+
+Including:
+
+signal strength
+
+movement
+
+hiring likelihood
+
+engagement priority
+
+candidate fit
+
+market heat
+
+role demand
+
+with explanation of how each score is computed and stored.
+
+F. Intelligence output design
+
+How scored data powers:
+
+dashboard
+
+market radar
+
+hiring signals
+
+map
+
+watchlist
+
+market intelligence
+
+candidate matcher
+
+scripts
+
+content studio
+
+G. AI usage and cost-control architecture
+
+What uses AI, what does not, how caching works, how precompute works, how usage is tracked.
+
+H. Sense-check report
+
+What future problems this design avoids and what still needs watching.
+
+I. Build order
+
+What should be built first, second, and third.
+
+Final objective
+
+The backend must become a foolproof, scalable, clean intelligence engine that starts in Life Sciences but is fundamentally designed to support many industries later.
+
+It must be systematic enough that:
+
+the data remains clean
+
+the scoring remains explainable
+
+the outputs remain accurate
+
+the intelligence grows more powerful over time
+
+the system does not need to be rebuilt when scaling
+
+That is the standard this backend needs to meet. 
+
+I will be using supabase for this but check this and if there are better options tell me 
+
+Puublihsable Key - [REDACTED - store in .env]
+Secret key - [REDACTED - store in .env]
+JTW Key - [REDACTED - store in .env]

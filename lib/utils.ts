@@ -74,3 +74,21 @@ export function formatCurrency(amount: number) {
   if (amount >= 1e3) return `$${(amount / 1e3).toFixed(0)}K`
   return `$${amount}`
 }
+
+export function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
+export const signalTypeIcons: Record<string, string> = {
+  funding: '💰',
+  hiring: '👥',
+  leadership: '👤',
+  partnership: '🤝',
+  expansion: '🌍',
+  regulatory: '📋',
+  product: '🧬',
+  clinical: '🔬',
+}

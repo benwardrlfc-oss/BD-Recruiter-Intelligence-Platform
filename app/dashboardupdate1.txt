@@ -1,0 +1,103 @@
+Build the BD Command Centre as a guided modular dashboard, not a fixed page and not a fully open canvas.
+
+The dashboard should have three layers:
+
+1. Fixed top layer
+
+This should remain standard and not be editable.
+It should include:
+
+market scope summary
+
+daily briefing
+
+key headline metrics
+
+This keeps the dashboard structured and premium.
+
+2. Dynamic default workspace
+
+The main dashboard layout should be generated automatically based on the user’s market settings.
+
+Different industries should get different default modules.
+
+For example:
+
+life sciences users should see modules such as funding, regulatory / clinical movement, investor activity
+
+legal users should see modules such as partner moves, practice expansion, mandates, revenue indicators
+
+construction users should see modules such as contract awards, project launches, regional expansion, senior hiring
+
+This means the dashboard must be industry-aware from the start.
+
+3. Personalised module workspace
+
+Below the fixed top layer, users should be able to customise the dashboard using an edit mode.
+
+In edit mode, users should be able to:
+
+drag and reorder modules
+
+hide modules
+
+add modules from a module library
+
+resize modules where appropriate
+
+save their preferred layout
+
+reset to the recommended default layout
+
+Do not make this a freeform dashboard builder.
+Use a clean grid-based layout so the dashboard stays aligned and premium.
+
+Add Module experience
+
+When the user clicks “Add Module”, open a clean side drawer with available modules grouped by category, such as:
+
+Signals
+
+Accounts
+
+Capital / Ownership
+
+Geography
+
+Intelligence
+
+Execution
+
+The available modules in this drawer should also adapt to the user’s industry and market profile.
+
+Personalisation behaviour
+
+Users should feel like the system gives them a strong starting template for their market, but also enough flexibility to make it feel like their own dashboard.
+
+Allow users to customise:
+
+module order
+
+module visibility
+
+module size
+
+certain module preferences such as time window or signal type
+
+Do not allow users to break the visual structure or remove all standardisation.
+
+UX expectations
+
+The dashboard should remain clean, premium, and easy to use.
+Edit mode should feel simple and polished.
+Use subtle drag handles, clean outlines, and smooth transitions when modules are moved.
+
+The final result should feel like:
+
+an industry-aware dashboard by default
+
+a personalised command centre in daily use
+
+structured enough to stay premium
+
+flexible enough to feel tailored to the individual recruiter

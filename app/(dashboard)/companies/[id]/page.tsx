@@ -18,18 +18,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockCompanies, mockSignals, mockOpportunities, mockInvestors, mockOpportunities as mockOpps } from '@/lib/mock-data'
-import { formatDate, formatCurrency, getScoreColor, getSignalTypeColor, getTimingBadgeColor, formatTimeAgo } from '@/lib/utils'
-
-const signalTypeIcons: Record<string, string> = {
-  funding: '💰',
-  hiring: '👥',
-  leadership: '👤',
-  partnership: '🤝',
-  expansion: '🌍',
-  regulatory: '📋',
-  clinical: '🔬',
-}
+import { mockCompanies, mockSignals, mockOpportunities, mockInvestors } from '@/lib/mock-data'
+import { formatDate, formatCurrency, getScoreColor, getSignalTypeColor, getTimingBadgeColor, formatTimeAgo, signalTypeIcons } from '@/lib/utils'
 
 export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -42,8 +32,8 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="text-center py-16">
         <p className="text-slate-400">Company not found</p>
-        <Link href="/targets">
-          <Button variant="ghost" className="mt-4">Back to Targets</Button>
+        <Link href="/companies">
+          <Button variant="ghost" className="mt-4">Back to Companies</Button>
         </Link>
       </div>
     )
@@ -52,10 +42,10 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   return (
     <div className="space-y-6">
       {/* Back */}
-      <Link href="/targets">
+      <Link href="/companies">
         <Button variant="ghost" size="sm" className="gap-2 text-slate-400">
           <ArrowLeft className="h-4 w-4" />
-          Back to Targets
+          Back to Companies
         </Button>
       </Link>
 
@@ -87,7 +77,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               </Button>
             </a>
           )}
-          <Link href="/scripts">
+          <Link href={opportunity ? `/scripts?opp=${opportunity.id}` : '/scripts'}>
             <Button size="sm" className="gap-2">
               <Sparkles className="h-4 w-4" />
               Generate Script
@@ -249,7 +239,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               <CardContent className="space-y-4">
                 {/* Score */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">Opportunity Score</span>
+                  <span className="text-sm text-slate-400">Signal Strength</span>
                   <span className={`text-xl font-bold px-3 py-1 rounded-lg ${getScoreColor(opportunity.opportunityScore)}`}>
                     {opportunity.opportunityScore}
                   </span>
@@ -290,7 +280,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                 </div>
 
-                <Link href="/scripts">
+                <Link href={`/scripts?opp=${opportunity.id}`}>
                   <Button size="sm" className="w-full gap-2">
                     <Sparkles className="h-4 w-4" />
                     Generate BD Script

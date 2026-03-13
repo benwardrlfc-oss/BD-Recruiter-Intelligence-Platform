@@ -8,7 +8,7 @@ import { mockCompanies } from '@/lib/mock-data'
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    const { rawText, fileName } = await request.json()
+    const { rawText, fileName, recruiterNotes } = await request.json()
 
     if (!rawText) {
       return NextResponse.json({ error: 'Candidate text required' }, { status: 400 })
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       // Use mock
     }
 
-    const matchResult = await matchCandidateToCompanies(rawText, companies)
+    const matchResult = await matchCandidateToCompanies(rawText, companies, recruiterNotes)
 
     // Save to DB if possible
     try {

@@ -1,0 +1,498 @@
+Build a universal Market Taxonomy + AI Market Builder so the platform can work for any recruitment firm, not just life sciences.
+
+The system must support both:
+
+standard recruiter markets through structured settings
+
+niche recruiter markets through natural-language input
+
+Core objective
+
+A recruiter should be able to describe their market in plain English, and the platform should automatically configure itself around that market across the entire site.
+
+For example:
+
+“I recruit C-suite leaders for venture-backed biotech companies in the US.”
+
+“I work on GTM hires for cybersecurity start-ups in Europe.”
+
+“I recruit CFOs for PE-backed industrial firms across the UK.”
+
+“I focus on commercial hires in diagnostics and tools businesses on the East Coast.”
+
+The system should interpret that input and convert it into a structured market profile.
+
+1. Build a structured market taxonomy
+
+Create a taxonomy layer with the following structure:
+
+Industry
+
+Support major industries such as:
+
+Life Sciences
+
+Technology
+
+Financial Services
+
+Healthcare
+
+Manufacturing & Engineering
+
+Energy & Infrastructure
+
+Legal
+
+Consulting & Professional Services
+
+Retail & Consumer
+
+Logistics & Supply Chain
+
+Real Estate & Construction
+
+Education
+
+Government & Public Sector
+
+Media & Creative
+
+Subsector
+
+Each industry should have dynamic subsectors.
+
+Examples:
+Life Sciences:
+
+Biotech
+
+Pharma
+
+MedTech
+
+Diagnostics
+
+CRO
+
+CDMO
+
+Cell & Gene Therapy
+
+Synthetic Biology
+
+Bioindustrial
+
+Digital Health
+
+Technology:
+
+AI / Machine Learning
+
+SaaS
+
+Cybersecurity
+
+FinTech
+
+Cloud Infrastructure
+
+Semiconductors
+
+Robotics
+
+DevTools
+
+Data Infrastructure
+
+Consumer Tech
+
+Financial Services:
+
+Private Equity
+
+Venture Capital
+
+Investment Banking
+
+Asset Management
+
+Hedge Funds
+
+Insurance
+
+Wealth Management
+
+FinTech
+
+The subsector list should change based on the chosen industry.
+
+Niche / Specialty
+
+Support more specific niches inside subsectors, for example:
+
+Oncology biotech
+
+Radiopharma
+
+Liquid biopsy
+
+AI drug discovery
+
+Biologics CDMO
+
+Cybersecurity GTM
+
+PE-backed SaaS finance
+
+Semiconductor manufacturing leadership
+
+This layer must support:
+
+known niche values from platform taxonomy
+
+user-defined niche labels created from natural language input
+
+Function
+
+Support multi-select functional areas such as:
+
+Executive Leadership
+
+R&D
+
+Clinical
+
+Commercial
+
+Sales
+
+Marketing
+
+Product
+
+Engineering
+
+Finance
+
+Operations
+
+Legal
+
+HR
+
+Manufacturing
+
+Regulatory
+
+Quality
+
+Seniority
+
+Support:
+
+Individual Contributor
+
+Manager
+
+Director
+
+VP
+
+C-Suite
+
+Board
+
+Company Type
+
+Support:
+
+Startup
+
+Scaleup
+
+VC-backed
+
+PE-backed
+
+Public company
+
+Private company
+
+Family-owned
+
+Government
+
+Non-profit
+
+Consultancy
+
+Agency
+
+Company Stage
+
+Support:
+
+Pre-seed
+
+Seed
+
+Series A
+
+Series B
+
+Growth
+
+Late stage
+
+Enterprise
+
+Public
+
+Geography
+
+Build hierarchical geography:
+
+Region
+
+Country
+
+State / Province
+
+City / Metro
+
+Signal Preferences
+
+Support market-relevant signal types such as:
+
+Funding rounds
+
+Leadership changes
+
+Job postings
+
+Partnerships
+
+Product / pipeline updates
+
+Geographic expansion
+
+M&A
+
+Restructuring
+
+New company launches
+
+Investor / portfolio activity
+
+2. Add an AI Market Builder chat box
+
+At the top of onboarding and settings, add a natural-language market builder input.
+
+Prompt:
+“Describe the market you recruit in.”
+
+The user should be able to type a sentence or paragraph describing their market.
+
+The system should parse that input and extract:
+
+industry
+
+subsector
+
+niche
+
+function
+
+seniority
+
+geography
+
+company type
+
+stage
+
+optional keywords
+
+Example:
+
+Input:
+“I recruit CTOs and VP Engineering talent for Series A AI infrastructure startups in San Francisco.”
+
+Structured output:
+
+Industry: Technology
+
+Subsector: AI / Machine Learning
+
+Niche: AI infrastructure
+
+Function: Engineering
+
+Seniority: VP / C-Suite
+
+Geography: USA → California → San Francisco
+
+Company Type: Startup / VC-backed
+
+Stage: Series A
+
+3. Confirmation flow after parsing
+
+After parsing, do not auto-save silently.
+
+Show a confirmation panel:
+“Here’s how I’ve understood your market”
+
+Then list the extracted values and allow the user to:
+
+confirm
+
+edit
+
+add another specialty
+
+Store:
+
+raw text input
+
+parsed structured output
+
+confidence by field
+
+any unresolved fields
+
+4. Fallback logic for niche markets
+
+The parser must handle unusual recruiter niches without breaking the system.
+
+If it encounters a meaningful niche not already in the taxonomy:
+
+keep the parent industry and subsector if identifiable
+
+store the unknown niche as a custom specialty label
+
+use that specialty label in filtering, ranking, summarisation, search, and content generation
+
+This ensures the system works for specialist recruiters in unusual niches.
+
+5. Market templates
+
+Add onboarding templates such as:
+
+Life Sciences Recruiter
+
+Tech Recruiter
+
+Executive Search
+
+Finance Recruiter
+
+Healthcare Recruiter
+
+Industrial / Engineering Recruiter
+
+Generalist Recruiter
+
+These templates should preload sensible defaults for:
+
+industry
+
+common subsectors
+
+common functions
+
+likely signal types
+
+Then the AI market builder should refine that profile.
+
+6. Support multiple market profiles
+
+Allow users to save multiple market profiles such as:
+
+Primary Market
+
+Secondary Market
+
+Additional Markets
+
+Examples:
+
+US Oncology Biotech
+
+EU Diagnostics
+
+PE-backed SaaS Finance Leaders
+
+The user should be able to switch market profiles, and the whole platform should update accordingly.
+
+7. Make the market profile drive the entire site
+
+Once the market profile is saved, it must shape all site behaviour.
+
+This includes:
+
+dashboard
+
+daily briefing
+
+top signals
+
+watchlist suggestions
+
+top target companies
+
+live roles
+
+venture / investor pages
+
+BD scripts
+
+content studio
+
+trends
+
+The platform should feel like it understands the recruiter’s exact market.
+
+8. Build the backend structure to support this cleanly
+
+Support:
+
+global taxonomy tables / config for industries, subsectors, functions, etc.
+
+user market profiles
+
+user-defined niche labels
+
+raw input text from AI builder
+
+parsed field output
+
+field confidence
+
+multiple saved profiles
+
+The architecture should make it easy to add more industries and subsectors later.
+
+9. UX requirement
+
+The setup must feel easy and intelligent.
+
+The user should be able to either:
+
+choose from structured fields
+or
+
+describe their market in plain English
+
+The system should then do the hard work of structuring the market and applying it across the site.
+
+The result should be a platform that works for:
+
+broad recruiters
+
+specialist recruiters
+
+very niche recruiters
+
+without making setup feel rigid or complicated.

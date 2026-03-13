@@ -1,0 +1,245 @@
+Filters across the platform need to feel clean, simple, and premium. The current sorting options on the Venture Intelligence page look cluttered. Replace these with a single dropdown-style filter menu so the interface feels organised and high-end. Users should be able to click the dropdown and select sorting options such as AUM, recent investments, sector focus, or activity level without multiple visible buttons on the page. Filters and drop owns need to be consistent across the build so the flow and aesthetic feels premium and high quality. 
+
+On the Dashboard, the interaction patterns should be consistent. The Top Hiring Signals section already has a “View All” option, but the Recent Funding Signals section does not. Add a View All button to the Recent Funding Signals panel so users can open the full list of funding events in their market.
+
+For the Candidate Matcher, once a CV has been parsed the system should provide additional controls and actions. After the summary and analysis are generated, the user should be able to choose how many companies they want to send the profile to, with a configurable range from 1 up to a maximum of 30 companies. The platform should then generate a list of companies ranked by estimated relevance and hiring likelihood, based on factors such as sector match, geography, stage, and potential leadership gaps.
+
+On the same page, add an E-shot Template Builder that follows executive search outreach best practices. The template should include:
+
+A greeting (e.g., Good morning / Good afternoon / Good evening)
+
+Personalisation fields (company name, contact name, role context)
+
+A concise section highlighting the candidate’s core strengths and achievements relevant to the target company
+
+Bullet-point highlights summarising the candidate’s background and impact
+
+A short closing section that invites conversation rather than pushing a hard call to action
+
+The goal is that once a CV has been parsed, the user can select target companies, generate a ranked outreach list, and instantly produce a tailored e-shot ready to send, all from the same interface.
+
+Update the Global Market Activity Map so that it visually shows where relevant activity is happening in the recruiter’s market and allows them to quickly understand where to focus business development efforts.
+
+This map should not be a generic global map. It must be driven entirely by the user’s configured market settings and only show intelligence relevant to that market.
+
+The user’s market settings will include:
+
+industry
+
+subsector
+
+niche specialisations
+
+geography scope
+
+company stage focus
+
+company types
+
+signal preferences
+
+The map must use these settings to filter and display activity signals from the database.
+
+Examples of signals that should appear on the map include:
+
+funding events
+
+hiring signals
+
+newly opened roles
+
+leadership changes
+
+partnerships
+
+expansion announcements
+
+regulatory or clinical milestones (where relevant)
+
+other configured market signals
+
+The map should visualise signals detected within a defined time window, with 90 days as the default, but users should be able to filter by shorter time periods such as 7 days or 30 days.
+
+The purpose of the map is to help recruiters quickly answer questions such as:
+
+Where is the most activity happening in my market?
+
+Which regions are becoming more active?
+
+Where are hiring signals clustering?
+
+Which locations should I focus BD efforts on?
+
+Geographic Intelligence Structure
+
+The map must support three levels of geographic detail.
+
+Level 1 – Market Overview
+
+When the map loads, it should show aggregated activity clusters rather than individual companies.
+
+Clusters should represent regions or countries depending on the user’s geographic scope.
+
+Each cluster should display:
+
+total number of signals
+
+signal density
+
+optional signal mix indicator
+
+Use cluster markers or a heatmap layer so areas with high signal density are visually prominent.
+
+The goal at this level is strategic awareness, not individual company detail.
+
+Level 2 – Regional Drill Down
+
+When the user zooms in or clicks a region, clusters should break down into states, provinces, or metropolitan areas.
+
+This level should highlight regional market hotspots and help the recruiter identify areas where signals are increasing.
+
+Clusters should dynamically update as the user zooms or moves across the map.
+
+Level 3 – Company Level Detail
+
+Only when the user zooms into city-level view should individual companies appear.
+
+Each company marker should represent one or more signals detected within the selected time window.
+
+Clicking a company marker should open the right-hand intelligence panel showing company-level information.
+
+Performance and Data Handling
+
+The map must support marker clustering to avoid rendering thousands of individual companies simultaneously.
+
+Clusters should expand dynamically as the user zooms.
+
+Use lazy loading so the map loads:
+
+regional clusters first
+
+city clusters second
+
+individual company markers only at deeper zoom levels
+
+This ensures the map remains smooth even with large datasets.
+
+Personalised Default View
+
+The map’s default view should adapt to the user’s configured market.
+
+Examples:
+
+If a recruiter focuses on US biotech, the map should open centred on the United States.
+
+If the user works across multiple regions, the map may open in a broader global view.
+
+This ensures the map always feels relevant and personalised.
+
+Filtering Controls
+
+Add clean filtering controls above the map.
+
+These should include:
+
+Signal type filter
+Funding / Hiring / Leadership / Partnerships / Expansion / etc.
+
+Time range filter
+7 days / 30 days / 90 days
+
+Search input
+Search company, city, or investor
+
+Geography quick filters
+Global / North America / Europe / Asia
+
+These controls should appear in a clean horizontal toolbar above the map and should use minimal dropdown menus rather than many visible buttons to maintain a premium feel.
+
+Right-Hand Intelligence Panel
+
+The right-hand panel should update dynamically.
+
+When no company is selected, it should summarise regional intelligence including:
+
+total signals detected
+
+breakdown by signal type
+
+most active companies
+
+emerging hiring hotspots
+
+key market observations
+
+When a company marker is clicked, the panel should switch to company intelligence view showing:
+
+company name
+
+location
+
+recent signals
+
+open roles
+
+funding or activity context
+
+links to the company website and company page within the platform
+
+Map Background and Visual Style
+
+Replace the current background with a real geographic map layer using a mapping library such as Mapbox or MapLibre.
+
+The current background contains abstract shapes which look like placeholder graphics and reduce the perceived quality of the product.
+
+The map should use a dark minimal style consistent with the platform’s premium design language.
+
+Avoid unnecessary detail such as roads or terrain.
+
+Only show:
+
+coastlines
+
+landmass shapes
+
+subtle country borders
+
+Recommended visual styling:
+
+Ocean background
+Very dark navy
+
+Landmass
+Slightly lighter dark tone
+
+Country borders
+Low contrast subtle lines
+
+Labels
+Minimal or hidden
+
+Remove all decorative shapes currently behind the markers.
+
+Premium UI Enhancements
+
+To ensure the map feels high-end and polished, implement the following design details:
+
+Cluster markers should use soft glow effects to highlight activity density.
+
+Signal markers should use distinct colour coding for different signal types.
+
+Markers should have subtle hover animations so the interface feels interactive and responsive.
+
+New signals can optionally use gentle pulsing animations to draw attention.
+
+Zoom transitions and cluster expansions should be smooth and fluid, avoiding abrupt visual jumps.
+
+Add a very subtle grid overlay with low opacity to reinforce the intelligence-platform aesthetic without cluttering the interface.
+
+The map should prioritise clarity and focus. Signals and clusters must visually stand out from the background.
+
+Final Objective
+
+The final result should be a personalised market intelligence map that clearly highlights where relevant news, hiring activity, and company movement are occurring within the recruiter’s defined market scope.
+
+The map should help the recruiter instantly understand where activity is increasing and where to focus their efforts, while maintaining a clean, premium, and high-quality visual experience consistent with a modern intelligence platform.

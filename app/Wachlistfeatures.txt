@@ -1,0 +1,563 @@
+Build a personalised Watchlist feature that becomes a core part of the product and works like a recruiter’s live territory intelligence layer.
+
+This feature should allow users to save and track the companies and venture firms they care about most, then see what has changed across those watched accounts directly on the Watchlist page and the Dashboard.
+
+The goal is to make the platform feel personal, habit-forming, and action-oriented.
+
+This should not behave like a simple saved-items list. It should behave like a live monitored account list.
+
+Core objective
+
+A recruiter should be able to:
+
+add a company to their watchlist
+
+add a venture firm to their watchlist
+
+see all watched accounts in one place
+
+see what changed recently across those accounts
+
+understand why those changes matter
+
+take action directly from those updates
+
+This feature should work across the platform and integrate with:
+
+Companies
+
+Venture Intelligence
+
+Hiring Signals
+
+Market Radar
+
+Dashboard
+
+1. Add a new Watchlist page to the sidebar
+
+Add a new sidebar tab:
+
+Watchlist
+
+Place it near:
+
+Companies
+
+Venture Intelligence
+
+Hiring Signals
+
+This page should become the user’s personal workspace for tracked companies and venture firms.
+
+2. Add watch actions across the platform
+
+Wherever a company or venture firm appears, users should be able to add it to their watchlist.
+
+Add this to company-related views:
+
+company cards
+
+company rows
+
+company profile pages
+
+hiring signals rows
+
+market radar cards
+
+top priority accounts cards
+
+company detail panels
+
+Add this to venture-related views:
+
+venture firm cards
+
+venture firm rows
+
+venture profile pages
+
+venture detail panels
+
+The action should be a clean button or icon such as:
+
+Add to Watchlist
+
+Watch
+
+Watching once active
+
+Once clicked, the state should update immediately so the user knows the item has been saved.
+
+This should feel clean and premium, not heavy or intrusive.
+
+3. Data structure and entity support
+
+The Watchlist must support two entity types:
+
+A. Watched Companies
+
+Each watched company should store:
+
+company id
+
+user id
+
+date added
+
+optional notes later
+
+watched state
+
+B. Watched Venture Firms
+
+Each watched venture firm should store:
+
+venture firm id
+
+user id
+
+date added
+
+watched state
+
+The backend / state model should be designed so more watched entity types can be added later if needed.
+
+4. Build a dedicated Watchlist page
+
+The Watchlist page should not just be a table of saved items. It should be an intelligence page showing movement across watched accounts.
+
+The page should be split into clear sections.
+
+Section A – Watchlist Overview / Summary
+
+At the top of the page show a summary such as:
+
+total watched companies
+
+total watched venture firms
+
+number of watched accounts with new movement in last 7 days
+
+number of watched accounts with high-priority movement
+
+This gives the user an immediate overview.
+
+Section B – Recent Watchlist Movement
+
+This should be the most important section.
+
+Show a live feed or grouped card list of recent activity from watched accounts.
+
+Examples of movement:
+
+funding event
+
+hiring signal
+
+newly opened role
+
+leadership change
+
+partnership
+
+expansion announcement
+
+regulatory / clinical milestone
+
+VC made a new investment
+
+portfolio company had new signal activity
+
+Each movement item should show:
+
+watched entity name
+
+entity type (company or VC)
+
+update type
+
+short summary
+
+timestamp / recency
+
+why it matters
+
+quick actions
+
+Quick actions should include:
+
+open company / VC
+
+generate BD script
+
+view related signal
+
+remove from watchlist
+
+This section should make the user feel:
+“These are the accounts I care about, and this is what changed.”
+
+Section C – Watched Companies
+
+Show all watched companies in a structured list or cards.
+
+Each watched company should display:
+
+company name
+
+location
+
+stage
+
+signal strength / momentum if available
+
+latest movement
+
+last activity date
+
+short “why this matters” line
+
+quick actions
+
+Quick actions:
+
+open company
+
+generate BD script
+
+view signals
+
+remove from watchlist
+
+Example display:
+
+BioNova Therapeutics
+Boston, MA
+Series C
+Latest movement: Funding round + positive Phase 2 data
+Why it matters: Likely C-suite and regulatory build-out over next 12 months
+
+Section D – Watched Venture Firms
+
+Show all watched VCs / investors.
+
+Each watched VC should display:
+
+venture firm name
+
+geography
+
+stage focus
+
+sector focus
+
+latest movement
+
+relevant portfolio activity
+
+recent signal count
+
+quick actions
+
+Quick actions:
+
+open VC page
+
+open portfolio companies
+
+view related signals
+
+remove from watchlist
+
+Example:
+
+HealthVentures Capital
+Boston, MA
+Latest movement: led Series A round in GenVec Bio
+Portfolio movement: 2 portfolio companies with active hiring signals
+
+5. Add Watchlist updates to the Dashboard
+
+Add a new Dashboard section:
+
+Watchlist Updates
+or
+Your Watchlist Movement
+
+This should show recent movement for watched accounts directly on the BD Command Centre.
+
+This section should be highly visible on the dashboard because it is one of the biggest drivers of daily engagement.
+
+Each item should include:
+
+entity name
+
+what changed
+
+why it matters
+
+recency
+
+action buttons
+
+Examples:
+
+BioNova Therapeutics
+Series C funding announced yesterday
+Likely leadership hiring across clinical and regulatory
+
+GenVec Bio
+Posted Head of Manufacturing role
+Indicates near-term process development build-out
+
+HealthVentures Capital
+Led new investment in gene therapy company
+Potential new portco hiring opportunity
+
+Quick actions:
+
+open company / VC
+
+generate BD script
+
+view signal
+
+The dashboard should make the user feel like they can log in and instantly see what changed in their own territory.
+
+6. Watchlist movement logic
+
+The Watchlist should actively surface movement, not just show static saved items.
+
+For watched companies, track things like:
+
+funding events
+
+new job postings
+
+hiring signals
+
+leadership appointments or exits
+
+partnerships
+
+product or pipeline updates
+
+expansion announcements
+
+regulatory / clinical milestones
+
+signal score increases
+
+momentum changes
+
+For watched venture firms, track things like:
+
+new investments
+
+fund activity
+
+portfolio company funding events
+
+portfolio company hiring activity
+
+portfolio company leadership changes
+
+increased signal activity across portfolio
+
+The system should be able to tell the user:
+
+what changed
+
+when it changed
+
+why it matters
+
+what they should do next
+
+7. Filtering on the Watchlist page
+
+Add clean filtering controls to the Watchlist page.
+
+These should include:
+
+All watched items
+
+Companies only
+
+Venture firms only
+
+New movement only
+
+High-priority only
+
+Last 7 days / 30 days / 90 days
+
+Use dropdowns or clean segmented controls.
+
+Do not clutter the page with too many chips or controls.
+
+The page should feel premium and easy to scan.
+
+8. Make watched-state visible across the site
+
+Once an entity is being watched, that should be visible elsewhere in the platform.
+
+Examples:
+
+watch icon filled in on company cards
+
+“Watching” state on venture pages
+
+watched badge on signals tied to watched companies
+
+future ability to filter for watched companies only
+
+This helps the user feel continuity across the system.
+
+9. Interaction design and UX behaviour
+
+The Watchlist feature should be seamless.
+
+When a user clicks Add to Watchlist:
+
+the state should update immediately
+
+the button should switch to watched state
+
+there should be subtle visual confirmation
+
+no clunky modal unless needed
+
+When the user opens the Watchlist page:
+
+recent movement should appear first
+
+static saved account lists should appear below
+
+the page should feel like a monitored territory, not a bookmark archive
+
+When the user opens the dashboard:
+
+Watchlist Updates should show only relevant recent changes
+
+newest and most important changes should be prioritised
+
+10. Visual design direction
+
+The Watchlist feature must match the premium dark theme of the platform.
+
+Design principles:
+
+clean dark UI
+
+calm but high-value look
+
+strong hierarchy
+
+movement and recency should stand out more than static data
+
+newly changed watched accounts should feel more prominent
+
+quick actions should be obvious but not visually heavy
+
+For each watched item, visual hierarchy should be:
+
+entity name
+
+what changed
+
+why it matters
+
+quick actions
+
+This page should feel like:
+“my active accounts and what changed today.”
+
+Not:
+“my saved list.”
+
+11. Cross-platform linking
+
+Watchlist items must connect properly with the rest of the platform.
+
+A user should be able to move from:
+
+watchlist item → company page
+
+watchlist item → linked signals
+
+watchlist item → VC page
+
+watchlist item → generate BD script
+
+This needs to feel fluid and connected.
+
+12. Future-ready structure
+
+Build this so it can support later additions such as:
+
+notifications
+
+email alerts
+
+team watchlists
+
+watchlist notes
+
+CRM overlays
+
+ownership / assignment
+
+watchlist hotness score
+
+These do not all need to be built now, but the architecture should not block them.
+
+13. Final user experience goal
+
+The Watchlist should become one of the most habit-forming parts of the product.
+
+A recruiter should be able to:
+
+track the companies and VCs they care about
+
+log in each morning
+
+see what changed
+
+understand why it matters
+
+act immediately
+
+This should make the platform feel like a live territory intelligence system, not just a dashboard.
+
+Short build summary
+
+Build a Watchlist feature that includes:
+
+a new Watchlist page in the sidebar
+
+ability to add companies and venture firms to watchlist from across the platform
+
+a dedicated Watchlist page showing:
+
+recent movement
+
+watched companies
+
+watched venture firms
+
+why updates matter
+
+quick actions
+
+a Watchlist Updates section on the Dashboard
+
+watched-state visible across the platform
+
+movement tracking for watched companies and watched VCs
+
+premium UI consistent with the rest of the platform
+
+The feature should behave like a personal market territory tracker and should become one of the main reasons users return to the product daily.

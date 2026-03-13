@@ -1,0 +1,228 @@
+I need you to run a full end-to-end audit of everything we have built so far.
+
+You already have access to the codebase, pages, flows, components, and current product logic because this has all been built in this environment. I want you to review it like a serious product team before backend work starts.
+
+Your job is to sense check the app from multiple specialist perspectives, identify anything missing, anything weak, anything overlapping, anything that will break later, and anything that needs to be fixed now before we build the backend and production infrastructure.
+
+I do not want generic praise. I want a critical, structured review.
+
+Use separate specialist review passes / “agents” / perspectives for each of the following areas and then combine the findings into one final report.
+
+AGENT 1 — PRODUCT ARCHITECT
+Review the overall product structure and logic.
+Check:
+- whether each page has a clear and distinct purpose
+- whether any pages overlap too much
+- whether the workflows make sense end to end
+- whether the app feels like one coherent product
+- whether the user journey is logical
+- whether the product can scale as a real SaaS
+- whether the current architecture is too life-sciences specific
+- whether the market-profile logic is strong enough to drive the entire app
+- whether the app is being built as a generic intelligence engine with industry templates rather than a biotech-only system
+
+Specifically review:
+- BD Command Centre
+- Market Radar
+- Hiring Signals
+- Companies
+- Capital / Ownership Intelligence
+- Watchlist
+- Candidate Matcher
+- BD Scripts
+- Content Studio
+- Market Intelligence
+- Settings / Market Profiles
+- login / onboarding / permissions / admin / billing flows if present
+
+For each, tell me:
+- what its purpose currently is
+- whether that purpose is clear
+- whether it overlaps with another page
+- whether it is structurally sound
+- what needs tightening
+
+AGENT 2 — UX / USER FLOW REVIEWER
+Review the app as if you are a senior B2B SaaS UX lead.
+Check:
+- whether the app is intuitive
+- whether a first-time user would understand it
+- whether the next action is always obvious
+- whether there are dead ends
+- whether users will understand why to come back daily
+- whether the dashboard is actually useful as a daily control centre
+- whether the market settings flow is intuitive and dynamic enough
+- whether the candidate matcher flow is clean and commercially useful
+- whether the watchlist is strong enough to become habit-forming
+- whether the product feels premium, clean, and coherent
+
+Look for:
+- friction
+- confusion
+- too many clicks
+- incomplete workflows
+- pages that are good-looking but not useful enough
+- missing controls or missing confirmation states
+- places where the app still feels like a prototype rather than a serious product
+
+AGENT 3 — FRONTEND / CODE ARCHITECT
+Review the codebase and component structure.
+Check:
+- component reuse
+- duplication
+- state handling
+- prop flow
+- hardcoded assumptions
+- brittle logic
+- inconsistent naming
+- page-level coupling
+- whether components are generic enough for multiple industries
+- whether the dashboard can realistically become modular and personalised
+- whether the market settings flow is architected well enough to become truly dynamic
+- whether the candidate matcher / watchlist / admin / billing / onboarding flows are structured in a way that will support backend integration cleanly
+- whether anything should be refactored before backend work
+
+I want you to identify:
+- what is clean
+- what is fragile
+- what needs refactoring now
+- what can wait
+- what will become painful once real data and permissions are introduced
+
+AGENT 4 — DATA / BACKEND READINESS REVIEWER
+Review whether the frontend and product logic are ready for the backend and intelligence engine we plan to build.
+
+Sense check whether the app is ready for:
+- canonical company registry
+- signal engine
+- movement scoring
+- hiring likelihood scoring
+- watchlist updates
+- CSV uploads
+- candidate parsing
+- organisation / user / role structure
+- multi-tenant data separation
+- billing and trials
+- market-profile-driven app behaviour
+- VC and PE / ownership intelligence
+- revenue-led vs funding-led market logic
+- geographic activity mapping
+- AI generation layer on top of deterministic intelligence
+
+Flag anywhere the frontend is making assumptions that are too narrow or will break when dynamic real data arrives.
+
+AGENT 5 — SaaS / COMMERCIAL PRODUCT REVIEWER
+Review the product like a senior B2B SaaS operator.
+Check whether the app includes or is prepared for:
+- login / signup / onboarding
+- organisation setup
+- user roles
+- team support
+- admin controls
+- billing
+- licences / seats
+- plans
+- trials
+- reporting
+- permissions
+- module entitlements
+- settings hierarchy
+- product stickiness
+- retention drivers
+- trust and explainability
+- supportability
+
+Tell me what mature SaaS products would expect here that is currently missing or underdeveloped.
+
+AGENT 6 — SCALE / FUTURE-RISK REVIEWER
+Think ahead and tell me what is likely to break later if I do not fix it now.
+
+Specifically review risk around:
+- scaling into multiple industries
+- supporting many organisations
+- supporting many users
+- dashboard personalisation
+- market-profile complexity
+- duplicate or overlapping pages
+- candidate matcher becoming too shallow
+- watchlist not being central enough
+- billing / admin / permissions being retrofitted
+- data and output explainability
+- ownership / capital intelligence remaining too VC-specific
+- AI usage becoming too expensive or too loosely controlled
+- code structure becoming too brittle
+
+For each risk, explain:
+- what the risk is
+- why it matters
+- what to change now to prevent it later
+
+IMPORTANT REVIEW INSTRUCTIONS
+- Be direct and critical
+- Do not give me shallow reassurance
+- Do not just describe the UI
+- Use logic and product reasoning
+- Compare the product against what strong B2B SaaS products need
+- Focus on preventing future mistakes
+- Focus on product coherence, backend readiness, scale readiness, and user value
+- Assume I want this to become a serious multi-tenant SaaS platform
+- Assume I want to start with Life Sciences but scale into other sectors later
+- Assume I want the app to be premium, clean, dynamic, and commercially useful
+- Assume I want to avoid rework and rewrites later
+
+OUTPUT FORMAT
+Give me the final review in these sections:
+
+1. Executive Summary
+A concise summary of whether the product currently makes sense, whether it is backend-ready, and the biggest strengths / weaknesses.
+
+2. What Is Already Strong
+What is solid and should be kept.
+
+3. What Is Weak / Missing / Risky
+What is currently weak, unclear, incomplete, overlapping, or likely to cause future issues.
+
+4. Critical Fixes Before Backend
+The things that should be fixed now before backend work continues.
+
+5. Important Fixes That Can Wait Slightly Longer
+Things that matter, but do not need to block backend if sequencing requires.
+
+6. Module-by-Module Review
+For each core page/module, provide:
+- purpose
+- current quality
+- missing pieces
+- overlap issues
+- recommended changes
+Also give each module a RED / AMBER / GREEN status.
+
+7. Code / Architecture Review
+Summarise the key code and component architecture issues.
+
+8. Backend / Data Readiness Review
+Summarise what frontend assumptions are safe and what will break when real data is introduced.
+
+9. SaaS / Commercial Readiness Review
+Summarise what is missing or underdeveloped from a proper SaaS product perspective.
+
+10. Scale Risks
+List the biggest future scale risks and how to prevent them.
+
+11. Recommended Action Plan
+Give me a practical sequence:
+- what to fix first
+- what to fix second
+- what to fix third
+- what can wait
+
+12. Final Verdict
+Tell me clearly:
+- whether the product foundation is good enough to proceed
+- what must be tightened before backend
+- whether the overall concept and structure hold up
+
+EXTRA INSTRUCTION
+Where possible, be specific and point to actual code patterns, components, or page behaviours rather than staying high level.
+
+I want this review to function as a pre-backend product and architecture audit so I can build the backend on the right foundation and avoid future problems.

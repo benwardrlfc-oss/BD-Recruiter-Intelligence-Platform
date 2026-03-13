@@ -1,0 +1,411 @@
+I need you to do a full product, UX, architecture, and code audit of this app before backend work continues.
+
+The goal is not just to spot surface bugs. The goal is to make sure this product is structurally sound, scalable, coherent, and ready for a real backend and real users.
+
+You need to review the entire website, all current code, all page flows, component structure, navigation logic, state handling, data assumptions, and future scalability risks.
+
+Your job is to identify anything that could cause problems later when I:
+
+build the backend
+
+connect real data
+
+introduce multiple users
+
+add dynamic market logic
+
+personalise the dashboard
+
+support multiple industries
+
+scale the product
+
+I need you to think like a senior product architect, frontend engineer, systems designer, and UX reviewer, not just a coder.
+
+Core objective
+
+Audit the app and determine whether:
+
+the product structure is logical
+
+the page architecture is coherent
+
+the workflows make sense end to end
+
+components are reusable and scalable
+
+data assumptions are stable enough for backend integration
+
+the current frontend will hold up when dynamic, personalised data is introduced
+
+the navigation and page purposes are distinct enough
+
+the whole app can scale without becoming messy or breaking
+
+I want you to proactively find and fix or flag anything that could become a future problem.
+
+What I want you to review
+1. Full product structure review
+
+Review the app at a product level.
+
+Check whether:
+
+each page has a clear and distinct job
+
+the navigation makes sense
+
+the workflows from page to page are logical
+
+the app feels like one coherent product rather than disconnected screens
+
+users can move through the platform naturally
+
+Pay particular attention to whether these pages are clearly differentiated:
+
+BD Command Centre
+
+Market Radar
+
+Hiring Signals
+
+Companies
+
+Venture / Capital Intelligence
+
+Watchlist
+
+Candidate Matcher
+
+BD Scripts
+
+Content Studio
+
+Market Intelligence
+
+Settings / Market Profiles
+
+If any pages overlap too much in purpose, flag it and suggest how to clarify them.
+
+2. Workflow and linking audit
+
+Check every important user flow and link between pages.
+
+I want to know whether the workflows are logically complete and whether the UI supports the next natural action.
+
+Review flows such as:
+
+dashboard → signal → company → script
+
+dashboard → watchlist item → company / VC
+
+signal → company → venture / capital owner
+
+company → watchlist → dashboard updates
+
+candidate matcher → parsed profile → company fit → e-shot
+
+settings / market profile → app-wide behaviour
+
+market radar → signal detail → BD actions
+
+hiring signals → company → watchlist / script
+
+venture / capital intelligence → portfolio company → company page
+
+Check that:
+
+all links make sense
+
+pages connect properly
+
+buttons lead to the right place
+
+important actions are not dead ends
+
+the app feels fluid and intentional
+
+Where flows are incomplete or weak, explain what is missing.
+
+3. Code and component architecture audit
+
+Review the codebase and determine whether the frontend architecture is strong enough to support long-term scale.
+
+Check:
+
+component structure
+
+page composition
+
+prop flow
+
+state handling
+
+reuse of common patterns
+
+duplication
+
+hardcoded assumptions
+
+brittle page-specific logic
+
+inconsistent naming
+
+layout consistency
+
+scalability of modules
+
+Flag anything that will become a problem when:
+
+more industries are added
+
+more signal types are added
+
+more dynamic modules are added
+
+the dashboard becomes configurable
+
+real backend data replaces sample data
+
+I want a clear view of:
+
+what is architecturally sound
+
+what is fragile
+
+what should be refactored now before backend
+
+4. Dynamic market profile / personalisation readiness audit
+
+This is one of the most important areas.
+
+I need the app to become dynamic based on the user’s market profile.
+
+Check whether the current frontend is actually ready for that.
+
+Review whether the code and page logic can properly support:
+
+industry-specific behaviour
+
+dynamic subsectors
+
+dynamic function libraries
+
+different signal models by industry
+
+VC-backed vs PE-backed vs revenue-led markets
+
+market-specific terminology
+
+dynamic dashboard modules
+
+personalised watchlist updates
+
+market-specific candidate matching
+
+market-specific BD scripts and content
+
+Flag anywhere the current frontend is still too life-sciences specific or where the logic is too hardcoded to scale well across industries.
+
+I want to know whether the product is truly becoming a universal recruitment intelligence platform, or whether there are hidden assumptions that will break that.
+
+5. Dashboard architecture audit
+
+I am about to make the dashboard dynamic and personalised.
+
+Before I do that, review whether the current dashboard structure is strong enough to become:
+
+industry-aware
+
+user-personalised
+
+modular
+
+editable
+
+still premium and coherent
+
+Check whether the current dashboard could support:
+
+fixed top layer
+
+dynamic default workspace
+
+editable modules
+
+add / remove modules
+
+drag / reorder
+
+saved user layouts
+
+market-specific default templates
+
+If the current dashboard code or layout patterns are not ready for that, explain exactly what needs to be restructured.
+
+6. Market settings / market profile system audit
+
+I am also updating the market settings and market flow.
+
+Review whether the current settings page and related code can support a true structured market configuration system.
+
+Check whether the architecture can properly support:
+
+AI market builder
+
+template-based setup
+
+step-based guided flow
+
+dynamic industry → subsector → functions logic
+
+dynamic company types / stages / signal preferences
+
+multiple market profiles
+
+one canonical market profile object used across the app
+
+Flag anything that will make this difficult or unstable.
+
+The Settings page is not just a form. It is the configuration engine for the whole app, so I need this to be structurally correct.
+
+7. Output logic audit
+
+Even though this is still sample-data based, I want you to review whether the intended outputs actually match the app logic.
+
+Examples:
+
+does the candidate matcher flow logically produce the right company-fit and e-shot outputs?
+
+does the signal detail structure support real signal explanations?
+
+do company rankings make sense for the intended product?
+
+does the venture / capital page structure support VC and PE logic properly?
+
+does the watchlist concept integrate correctly with the dashboard and company pages?
+
+I want you to assess whether the app structure will produce the right outputs once real data exists.
+
+8. Scalability and future-risk audit
+
+Think ahead and identify anything likely to become a serious issue later.
+
+Examples:
+
+page overlap causing product confusion
+
+hardcoded life sciences assumptions
+
+brittle component structure
+
+state complexity
+
+inconsistent filters
+
+weak data model assumptions
+
+dashboard personalisation becoming messy
+
+settings not driving the app properly
+
+modules not being generic enough
+
+VC logic being too narrow
+
+candidate matcher not structured for real workflow depth
+
+I want you to actively think:
+“What will break later if this is not fixed now?”
+
+Then explain:
+
+the risk
+
+why it matters
+
+how to fix it now
+
+How I want the review delivered
+
+Give me the audit in these sections:
+
+Section 1 – What is already strong
+
+What parts of the app are structurally good and should be kept.
+
+Section 2 – What is weak or risky
+
+What parts of the app, code, or workflows are currently weak, confusing, brittle, or likely to cause future issues.
+
+Section 3 – Critical fixes before backend
+
+The things that must be fixed now before backend work continues.
+
+Section 4 – Important fixes that can wait slightly longer
+
+Things that matter, but do not have to block backend if necessary.
+
+Section 5 – Architecture / refactor recommendations
+
+Specific code or structural improvements that would make the product cleaner and more scalable.
+
+Section 6 – Future scale risks
+
+What will likely go wrong later if the app continues as-is.
+
+Section 7 – Recommended action plan
+
+A practical sequence of what should be fixed first, second, and third.
+
+Additional instructions
+
+Do not give me a shallow answer.
+
+I do not want:
+
+generic praise
+
+vague comments
+
+only UI observations
+
+I want a serious audit that checks:
+
+the actual website
+
+the current code
+
+page logic
+
+cross-page relationships
+
+structural readiness for backend and scale
+
+If you find issues, be direct and specific.
+
+If something is fine, say so clearly.
+
+If something is risky, explain why.
+
+If you think something should be redesigned before backend, say that explicitly.
+
+Your role here is to help me prevent future problems, not just react to them later.
+
+The goal is to make sure this product:
+
+holds together
+
+makes sense
+
+scales properly
+
+stays coherent
+
+is buildable long-term
+
+Final objective
+
+I want you to act as if you are reviewing this product before a serious build phase and your job is to stop me from making avoidable mistakes.
+
+Audit the entire app and codebase accordingly, then give me a clear, critical, structured review with recommended fixes.

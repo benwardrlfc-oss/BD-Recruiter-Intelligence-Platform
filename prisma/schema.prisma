@@ -6,27 +6,177 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id              String    @id @default(cuid())
-  name            String?
-  email           String    @unique
-  emailVerified   DateTime?
-  image           String?
-  password        String?
-  company         String?
-  accountType     String?   @default("recruiter")
-  activeProfileId String?
+// ── Platform layer ─────────────────────────────────────────────────────────────
 
-  accounts         Account[]
-  sessions         Session[]
-  marketProfiles   MarketProfile[]
-  opportunities    Opportunity[]
-  candidateUploads CandidateUpload[]
-  contentItems     ContentItem[]
+model Organisation {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  logoUrl  String?
+
+  // Billing
+  billingStatus        String   @default("trialing") // trialing | active | past_due | unpaid | cancelled | suspended
+  planId               String   @default("trial")    // trial | core | pro | team | enterprise
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+
+  // Seat management
+  seatCount    Int @default(1)
+  seatsUsed    Int @default(0)
+
+  // Trial
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+
+  // Plan lifecycle
+  planStartedAt DateTime?
+  planRenewsAt  DateTime?
+
+  // Module entitlements — array of enabled module IDs
+  enabledModules String[]
+
+  // Org-level settings (defaults, branding preferences)
+  settings Json?
+
+  members      OrgMembership[]
+  teams        Team[]
+  invites      OrgInvite[]
+  subscription Subscription?
+  aiUsageLogs  AiUsageLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ── Team layer ─────────────────────────────────────────────────────────────────
+
+model Team {
+  id    String @id @default(cuid())
+  orgId String
+  name  String
+
+  org     Organisation    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  members OrgMembership[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── User layer ─────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+
+  // Onboarding state
+  hasCompletedOnboarding Boolean @default(false)
+  onboardingStep         Int     @default(0)
+  activeProfileId        String?
+
+  // Personal preferences
+  colorPalette  String  @default("dark")
+  dashboardLayout Json?
+
+  // Platform super admin flag (separate from org roles)
+  isSuperAdmin  Boolean @default(false)
+
+  accounts         Account[]
+  sessions         Session[]
+  memberships      OrgMembership[]
+  marketProfiles   MarketProfile[]
+  opportunities    Opportunity[]
+  candidateUploads CandidateUpload[]
+  contentItems     ContentItem[]
+  aiUsageLogs      AiUsageLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── Org membership (User ↔ Organisation join) ─────────────────────────────────
+
+model OrgMembership {
+  id     String @id @default(cuid())
+  userId String
+  orgId  String
+
+  // Role: org_admin | team_manager | member | read_only
+  role         String @default("member")
+  seatAssigned Boolean @default(true)
+  teamId       String?
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  team Team?        @relation(fields: [teamId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, orgId])
+}
+
+// ── Invitations ────────────────────────────────────────────────────────────────
+
+model OrgInvite {
+  id        String   @id @default(cuid())
+  orgId     String
+  email     String
+  role      String   @default("member")
+  token     String   @unique @default(cuid())
+  expiresAt DateTime
+  accepted  Boolean  @default(false)
+  invitedBy String?
+
+  org Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// ── Subscription ──────────────────────────────────────────────────────────────
+
+model Subscription {
+  id     String @id @default(cuid())
+  orgId  String @unique
+
+  stripeSubId        String   @unique
+  stripePriceId      String
+  status             String   // trialing | active | past_due | unpaid | cancelled
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean  @default(false)
+  trialEnd           DateTime?
+
+  org Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ── AI usage log ──────────────────────────────────────────────────────────────
+
+model AiUsageLog {
+  id     String @id @default(cuid())
+  orgId  String
+  userId String
+
+  feature       String  // content_studio | bd_scripts | candidate_matcher | market_briefing | signal_explain | eshot
+  model         String
+  inputTokens   Int     @default(0)
+  outputTokens  Int     @default(0)
+  estimatedCost Float   @default(0)
+  cacheHit      Boolean @default(false)
+
+  org  Organisation @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// ── NextAuth standard models ──────────────────────────────────────────────────
 
 model Account {
   id                String  @id @default(cuid())
@@ -63,9 +213,12 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ── Feature-level models ──────────────────────────────────────────────────────
+
 model MarketProfile {
-  id            String   @id @default(cuid())
-  userId        String
+  id     String @id @default(cuid())
+  userId String
+
   name          String
   geography     String[]
   sector        String

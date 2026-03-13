@@ -404,6 +404,8 @@ CMC
 
 This ensures signals and predictions are relevant to the user’s recruiting niche.
 
+15 - campaigns 
+
 Final Goal
 
 After these changes the platform should feel like:

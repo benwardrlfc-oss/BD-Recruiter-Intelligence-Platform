@@ -11,6 +11,8 @@ import {
   BarChart3,
   Save,
   RotateCcw,
+  Search,
+  AlertCircle,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -42,10 +44,24 @@ const contentTypes = [
 export default function ContentPage() {
   const [selectedType, setSelectedType] = useState('linkedin_post')
   const [selectedSignals, setSelectedSignals] = useState<string[]>([])
+  const [selectedTone, setSelectedTone] = useState('')
+  const [selectedLength, setSelectedLength] = useState('')
+  const [signalTypeFilter, setSignalTypeFilter] = useState('all')
+  const [signalSearch, setSignalSearch] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [generatedContent, setGeneratedContent] = useState('')
   const [copied, setCopied] = useState(false)
   const [savedItems, setSavedItems] = useState<Array<{ type: string; content: string; date: Date }>>([])
+  const [lengthWarning, setLengthWarning] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const filteredSignals = mockSignals.filter((s) => {
+    const typeMatch = signalTypeFilter === 'all' || s.signalType === signalTypeFilter
+    const searchMatch = !signalSearch || s.title.toLowerCase().includes(signalSearch.toLowerCase())
+    return typeMatch && searchMatch
+  })
+
+  const signalTypes = ['all', ...Array.from(new Set(mockSignals.map((s) => s.signalType)))]
 
   const toggleSignal = (id: string) => {
     setSelectedSignals((prev) =>
@@ -54,7 +70,13 @@ export default function ContentPage() {
   }
 
   const handleGenerate = async () => {
+    if (!selectedLength) {
+      setLengthWarning(true)
+      setTimeout(() => setLengthWarning(false), 3000)
+      return
+    }
     setIsLoading(true)
+    setError(null)
     try {
       const response = await fetch('/api/content/generate', {
         method: 'POST',
@@ -62,12 +84,16 @@ export default function ContentPage() {
         body: JSON.stringify({
           contentType: selectedType,
           signalIds: selectedSignals.length > 0 ? selectedSignals : undefined,
+          tone: selectedTone || 'professional',
+          length: selectedLength,
         }),
       })
+      if (!response.ok) throw new Error(`API error ${response.status}`)
       const data = await response.json()
       setGeneratedContent(data.draftText || '')
-    } catch (error) {
-      console.error('Error generating content:', error)
+    } catch (err) {
+      setError('Failed to generate content. Check your API key in Settings.')
+      console.error('Error generating content:', err)
     } finally {
       setIsLoading(false)
     }
@@ -131,21 +157,120 @@ export default function ContentPage() {
             </CardContent>
           </Card>
 
+          {/* Tone of Voice */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Tone of Voice</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { key: 'professional', label: 'Professional' },
+                  { key: 'conversational', label: 'Conversational' },
+                  { key: 'analytical', label: 'Analytical' },
+                  { key: 'bold', label: 'Bold / Thought Leader' },
+                ].map((tone) => (
+                  <button
+                    key={tone.key}
+                    onClick={() => setSelectedTone(tone.key)}
+                    className={cn(
+                      'px-2.5 py-2 rounded-lg text-xs border text-left transition-colors',
+                      selectedTone === tone.key
+                        ? 'bg-indigo-600 text-white border-indigo-500'
+                        : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-600'
+                    )}
+                  >
+                    {tone.label}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Post Length */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm flex items-center gap-2">
+                Post Length
+                {lengthWarning && (
+                  <span className="flex items-center gap-1 text-rose-400 font-normal">
+                    <AlertCircle className="h-3 w-3" />
+                    Required
+                  </span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-1.5">
+                {[
+                  { key: 'short', label: 'Short', desc: '~150w' },
+                  { key: 'medium', label: 'Medium', desc: '~300w' },
+                  { key: 'long', label: 'Long', desc: '~500w' },
+                ].map((opt) => (
+                  <button
+                    key={opt.key}
+                    onClick={() => setSelectedLength(opt.key)}
+                    className={cn(
+                      'flex-1 flex flex-col items-center gap-0.5 py-2 rounded-lg text-xs border transition-colors',
+                      selectedLength === opt.key
+                        ? 'bg-indigo-600 text-white border-indigo-500'
+                        : lengthWarning
+                        ? 'bg-slate-900 text-slate-400 border-rose-600/50 hover:border-slate-600'
+                        : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-slate-600'
+                    )}
+                  >
+                    <span className="font-medium">{opt.label}</span>
+                    <span className="opacity-70">{opt.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Signal Selector */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">Base on Signals</CardTitle>
+                <CardTitle className="text-sm">Select Signal</CardTitle>
                 <span className="text-xs text-slate-500">{selectedSignals.length} selected</span>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {mockSignals.slice(0, 8).map((signal) => (
+            <CardContent className="space-y-2">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search signals..."
+                  value={signalSearch}
+                  onChange={(e) => setSignalSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg text-slate-300 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              {/* Type filter */}
+              <div className="flex gap-1 flex-wrap">
+                {signalTypes.slice(0, 5).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setSignalTypeFilter(type)}
+                    className={cn(
+                      'px-2 py-0.5 rounded text-xs border transition-colors capitalize',
+                      signalTypeFilter === type
+                        ? 'bg-indigo-600 text-white border-indigo-500'
+                        : 'bg-slate-900 text-slate-500 border-slate-800 hover:border-slate-600'
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                {filteredSignals.slice(0, 10).map((signal) => (
                   <label
                     key={signal.id}
                     className={cn(
-                      'flex items-start gap-2 rounded-lg border p-2 cursor-pointer transition-colors',
+                      'flex items-start gap-2 rounded-lg border p-2 transition-colors',
+                      isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
                       selectedSignals.includes(signal.id)
                         ? 'border-indigo-500/50 bg-indigo-900/10'
                         : 'border-slate-800 hover:border-slate-700'
@@ -154,7 +279,8 @@ export default function ContentPage() {
                     <input
                       type="checkbox"
                       checked={selectedSignals.includes(signal.id)}
-                      onChange={() => toggleSignal(signal.id)}
+                      onChange={() => !isLoading && toggleSignal(signal.id)}
+                      disabled={isLoading}
                       className="mt-0.5 accent-indigo-500"
                     />
                     <div>
@@ -180,6 +306,11 @@ export default function ContentPage() {
 
         {/* Right: Generated Content */}
         <div className="col-span-2 space-y-4">
+          {error && (
+            <div className="rounded-lg border border-rose-700/40 bg-rose-900/10 px-4 py-3 text-sm text-rose-400">
+              {error}
+            </div>
+          )}
           <Card className="flex-1">
             <CardHeader>
               <div className="flex items-center justify-between">

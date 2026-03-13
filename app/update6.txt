@@ -1,0 +1,638 @@
+Update the product so the entire app is personalised and dynamically tailored to the user’s market, not just filtered by it.
+
+Right now the platform needs to move from being a strong life sciences-focused intelligence product to being a universal recruitment intelligence platform that adapts its language, signal logic, modules, and outputs depending on the user’s chosen industry, market structure, and commercial model.
+
+The system must not feel like a life sciences tool with generic filters layered on top. It must feel like the product understands the recruiter’s market and reshapes itself accordingly across the entire app.
+
+1. Core product behaviour
+
+Everything in the app must be driven by the user’s configured market settings.
+
+This includes:
+
+industry
+
+subsector
+
+niche / specialty
+
+geography
+
+company type
+
+company stage
+
+commercial model
+
+signal preferences
+
+The product should use those settings to shape:
+
+dashboard content
+
+market radar
+
+hiring signals
+
+companies
+
+watchlist
+
+venture / investor intelligence
+
+market intelligence
+
+candidate matcher
+
+BD scripts
+
+content studio
+
+map / geographic intelligence
+
+terminology and labels where needed
+
+This means the platform is not only filtering results. It is also changing which signals matter, how modules are framed, what language is used, and what entities are shown.
+
+2. Industry-specific signal logic across the app
+
+Different industries care about different signals.
+
+The platform must dynamically adjust the signal types shown and prioritised depending on the market the recruiter works in.
+
+Example: Life Sciences
+
+Relevant signals may include:
+
+funding
+
+hiring
+
+leadership movement
+
+partnerships
+
+clinical milestones
+
+regulatory milestones
+
+pipeline progression
+
+licensing / collaboration deals
+
+new company launches
+
+investor activity
+
+Example: Legal
+
+Relevant signals may include:
+
+partner moves
+
+law firm office launches
+
+mergers between firms
+
+major mandates / case wins
+
+team buildouts
+
+lateral hiring
+
+practice group expansion
+
+revenue growth
+
+new client wins
+
+Example: Construction / Built Environment
+
+Relevant signals may include:
+
+contract wins
+
+project launches
+
+geographic expansion
+
+major hires
+
+new site openings
+
+M&A
+
+revenue growth
+
+public sector awards
+
+framework wins
+
+Example: Technology
+
+Relevant signals may include:
+
+funding
+
+hiring
+
+product launches
+
+executive changes
+
+new market entries
+
+revenue milestones
+
+PE investment
+
+M&A
+
+customer growth
+
+partnerships
+
+The Market Radar and all other relevant modules must reflect the signal model that makes sense for that industry.
+
+Do not hard-code life sciences logic into a universal product.
+
+3. Commercial model awareness: funding vs revenue vs ownership structure
+
+The platform must support different business realities depending on the market.
+
+Some industries are highly funding-driven. Others are revenue-driven. Some are VC-backed. Some are PE-backed. Some are neither.
+
+The product must recognise this and reflect it properly.
+
+Funding-driven markets
+
+Example:
+
+biotech
+
+venture-backed SaaS
+
+deep tech startups
+
+Relevant indicators:
+
+funding rounds
+
+investor syndicates
+
+company stage
+
+capital raised
+
+runway implications
+
+expected leadership buildout
+
+Revenue-driven markets
+
+Example:
+
+legal
+
+construction
+
+many services businesses
+
+mature industrial firms
+
+Relevant indicators:
+
+revenue growth
+
+contract wins
+
+office expansion
+
+major new clients
+
+market share growth
+
+team growth
+
+PE-backed markets
+
+Example:
+
+professional services
+
+industrials
+
+healthcare services
+
+B2B SaaS roll-ups
+
+Relevant indicators:
+
+PE ownership
+
+platform / add-on acquisitions
+
+leadership changes post-investment
+
+growth mandates
+
+scale-up hiring
+
+transformation or integration signals
+
+The platform must allow the underlying commercial logic to shift depending on the market profile so it feels natively relevant.
+
+4. Venture / investor tab must evolve into broader capital / ownership intelligence
+
+The current Venture Intelligence tab cannot remain venture-only if the app is to work across markets.
+
+It needs to support both:
+
+Venture Capital
+
+Private Equity
+
+And potentially broader ownership / capital intelligence over time.
+
+Rename and/or structure this section so it can support:
+
+venture firms
+
+PE firms
+
+portfolio companies
+
+platform companies
+
+investment activity
+
+ownership-related movement
+
+If the user’s market is VC-heavy, the module should feel venture-oriented.
+
+If the user’s market is PE-heavy, it should reflect PE ownership, platforms, add-ons, portfolio growth, and leadership changes.
+
+If the user’s market does not rely heavily on investors at all, this module should either:
+
+adapt to broader ownership / company backing intelligence
+or
+
+reduce emphasis in the navigation / dashboard
+
+This part of the product must be context-aware.
+
+5. Dynamic labels and terminology
+
+The app should use terminology that fits the user’s market where appropriate.
+
+Examples:
+
+“Venture Intelligence” may not make sense in PE-heavy or non-investor-led markets
+
+“Pipeline milestone” is relevant in biotech but not in legal
+
+“Practice expansion” may matter in law
+
+“Contract award” may matter in construction
+
+“Platform acquisition” may matter in PE-backed sectors
+
+The product should be able to adapt section language, signal labels, and detail descriptions depending on the market profile.
+
+This should not feel jarring or overdone, but it should be contextually smart.
+
+6. Settings must drive every module consistently
+
+Once the user defines their market in Settings / Market Builder, that logic must cascade across the site.
+
+Examples:
+
+If user selects:
+
+Life Sciences → Oncology Biotech → US → VC-backed → C-suite
+
+The system should prioritise:
+
+funding
+
+pipeline / clinical milestones
+
+leadership movement
+
+new portcos
+
+likely CSO / CMO / COO hires
+
+If user selects:
+
+Legal → Corporate Law → UK → Revenue-driven → Partner / Senior Associate hiring
+
+The system should prioritise:
+
+partner moves
+
+practice launches
+
+office openings
+
+new mandates
+
+revenue growth
+
+expansion signals
+
+If user selects:
+
+Construction → Commercial Contractors → Middle East → Project-led / Revenue-led
+
+The system should prioritise:
+
+project awards
+
+contract wins
+
+regional expansion
+
+major site openings
+
+senior commercial or project leadership hires
+
+Every major module must reflect this logic.
+
+The system should feel like:
+this platform is built for my market
+not
+this platform is a biotech tool pretending to be generic
+
+7. Specific module behaviour updates
+A. Dashboard / Command Centre
+
+The dashboard should surface the most relevant signal types and summaries for the user’s market.
+
+The overview cards, top signals, and recommended actions should all be based on the configured industry and commercial model.
+
+B. Market Radar
+
+This must become a truly dynamic signal feed.
+It should only show and prioritise the signal categories that matter to the market the recruiter has defined.
+
+C. Hiring Signals
+
+The ranking logic should reflect the types of events that usually precede hiring in that market.
+
+For some markets that may be funding.
+For others, it may be revenue growth, contract wins, M&A, or office expansion.
+
+D. Companies
+
+The way companies are scored and prioritised should reflect the market logic.
+A company in a revenue-led sector should not be ranked using venture-style assumptions.
+
+E. Capital / Ownership Intelligence
+
+This must show VC or PE appropriately depending on the market.
+
+F. Market Intelligence
+
+The macro trends, growth areas, and demand forecasts should reflect the specific market.
+
+G. Watchlist
+
+Movement on watched accounts must reflect relevant signal types for the user’s market.
+
+H. Map / geographic intelligence
+
+What is plotted geographically should also reflect the correct signal categories for the market.
+
+8. Candidate Matcher / CV Parser update
+
+The Candidate Matcher and CV Parser need to be cleaned up and made more flexible and controllable.
+
+The overall layout should be:
+
+Parser / upload and notes on the left
+
+Parsed profile building live on the right
+
+Below that: company target list and e-shot builder
+
+The whole page must feel clean, structured, and seamless.
+
+9. Candidate Matcher workflow and layout
+Left side: Parser input panel
+
+Allow the user to:
+
+upload a PDF CV
+
+upload a Word document CV / resume
+
+add interview notes or recruiter notes
+
+type additional information into a text box
+
+This side should be the input / context area.
+
+Right side: Live profile builder
+
+As the CV and notes are parsed, build the candidate profile on the right-hand side.
+
+This profile should be structured and editable.
+
+It should include:
+
+company history
+
+job titles
+
+specialty
+
+USP
+
+achievements
+
+recruiter notes / additional context
+
+any market-specific fit factors
+
+The profile should be clear and commercially useful, not a blob of AI text.
+
+10. CV parsing logic and output structure
+
+The parsed profile should start with context:
+
+companies worked for
+
+job titles held
+
+current / most recent role
+
+relevant career progression
+
+Then derive:
+
+specialty
+
+market focus
+
+leadership level
+
+USP
+
+key achievements
+
+likely target company fit
+
+This needs to feel accurate and recruiter-grade because it will feed directly into the e-shot builder.
+
+11. Company list below parsed profile
+
+Below the profile, show a target company list.
+
+This list should be clean and simple.
+
+Initially show:
+
+company names only or very minimal company rows
+
+Then when the user clicks a company, open a detailed fit view.
+
+The list should be ranked by:
+
+fit to candidate
+
+fit to recruiter’s market
+
+likely need
+
+relevant signal alignment
+
+12. Company fit detail and e-shot builder
+
+When a company is selected, show:
+
+company name
+
+why the company is a fit
+
+relevant company context
+
+likely role alignment
+
+relevant signal or growth context
+
+e-shot builder
+
+This should feel like the action panel.
+
+13. Add control over e-shot generation
+
+The CV Parser / Candidate Matcher should work much more like the Content Studio in terms of control and flexibility.
+
+The recruiter should be able to shape the output rather than just accept one rigid draft.
+
+Add controls for:
+
+Tone
+
+Examples:
+
+formal
+
+conversational
+
+commercial
+
+consultative
+
+direct
+
+warm
+
+high-level executive
+
+Structure
+
+Examples:
+
+concise
+
+standard executive search
+
+candidate-led
+
+signal-led
+
+relationship-led
+
+bullet-heavy
+
+narrative-led
+
+Personalisation
+
+Allow fields or settings for:
+
+greeting style
+
+company context
+
+candidate highlight emphasis
+
+achievement emphasis
+
+soft close vs stronger CTA
+
+This should make the user feel they have control over how the e-shot is built.
+
+14. End-to-end Candidate Matcher flow
+
+The final flow should be:
+
+Upload CV / resume
+
+Add notes / context
+
+Review parsed profile on the right
+
+Edit / refine profile if needed
+
+Review ranked target companies below
+
+Click company
+
+See why the fit makes sense
+
+Build tailored e-shot with tone / structure controls
+
+This needs to feel smooth, premium, and connected.
+
+Do not make it feel like separate tools stitched together.
+
+15. Final objective
+
+The whole app should become a market-adaptive recruitment intelligence platform where:
+
+each industry sees the signals that matter to them
+
+each commercial model is represented properly
+
+every module reflects the user’s market settings
+
+the Venture tab evolves into broader capital / ownership intelligence where needed
+
+the Candidate Matcher becomes a polished candidate-to-market workflow
+
+the e-shot builder gives the user meaningful control over output tone and structure
+
+The result should be a platform that feels:
+
+highly personalised
+
+commercially intelligent
+
+clean and premium
+
+relevant across many recruitment sectors
+
+seamless in flow from intelligence to action

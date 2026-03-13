@@ -15,64 +15,44 @@ import {
   Settings,
   Zap,
   Brain,
+  Bookmark,
+  DollarSign,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useMarketConfig } from '@/lib/market-config'
 
-const navItems = [
-  {
-    label: 'BD Command Centre',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    label: 'Market Radar',
-    href: '/radar',
-    icon: Radar,
-  },
-  {
-    label: 'Hiring Signals',
-    href: '/opportunities',
-    icon: Target,
-  },
-  {
-    label: 'Target Accounts',
-    href: '/targets',
-    icon: Building2,
-  },
-  {
-    label: 'Venture Intelligence',
-    href: '/investors',
-    icon: TrendingUp,
-  },
-  {
-    label: 'Candidate Matcher',
-    href: '/candidates',
-    icon: Users,
-  },
-  {
-    label: 'BD Scripts',
-    href: '/scripts',
-    icon: FileText,
-  },
-  {
-    label: 'Content Studio',
-    href: '/content',
-    icon: Sparkles,
-  },
-  {
-    label: 'Market Intelligence',
-    href: '/trends',
-    icon: BarChart3,
-  },
-  {
-    label: 'Settings',
-    href: '/settings',
-    icon: Settings,
-  },
+const staticNavItems = [
+  { label: 'BD Command Centre', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Market Radar', href: '/radar', icon: Radar },
+  { label: 'Hiring Signals', href: '/opportunities', icon: Target },
+  { label: 'Companies', href: '/companies', icon: Building2 },
+]
+
+const bottomNavItems = [
+  { label: 'Watchlist', href: '/watchlist', icon: Bookmark },
+  { label: 'Candidate Matcher', href: '/candidates', icon: Users },
+  { label: 'BD Scripts', href: '/scripts', icon: FileText },
+  { label: 'Content Studio', href: '/content', icon: Sparkles },
+  { label: 'Market Intelligence', href: '/trends', icon: BarChart3 },
+  { label: 'Settings', href: '/settings', icon: Settings },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const marketConfig = useMarketConfig()
+
+  const capitalIcon =
+    marketConfig.commercialModel === 'vc'
+      ? TrendingUp
+      : marketConfig.commercialModel === 'pe'
+      ? DollarSign
+      : BarChart3
+
+  const allNavItems = [
+    ...staticNavItems,
+    { label: marketConfig.capitalTabLabel, href: '/investors', icon: capitalIcon },
+    ...bottomNavItems,
+  ]
 
   return (
     <div
@@ -100,7 +80,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-        {navItems.map((item) => {
+        {allNavItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <Link

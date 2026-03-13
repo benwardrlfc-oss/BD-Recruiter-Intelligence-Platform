@@ -1,0 +1,158 @@
+The Market Settings flow and broader product architecture need to be redesigned so the platform can scale across industries without breaking.
+
+Do not treat Market Settings as just a filter form. Treat it as the core market configuration engine that produces one structured market profile used across the entire platform.
+
+Implement the following structural principles:
+
+1. One central market profile
+
+The setup flow must generate a canonical market profile object that defines:
+
+industry
+
+subsector
+
+niche
+
+functional focus
+
+seniority
+
+company types
+
+company stage model
+
+geography
+
+ownership / capital model
+
+signal preferences
+
+commercial model
+
+Every other module must read from this same market profile.
+
+2. Dynamic taxonomy by industry
+
+Industry selection must dynamically control:
+
+subsectors
+
+niche options
+
+function libraries
+
+relevant signal types
+
+terminology
+
+stage models where applicable
+
+Different industries must not share the same static options.
+
+3. Configurable signal model
+
+Build a signal taxonomy that supports multiple signal families such as:
+
+capital / ownership
+
+growth / commercial
+
+talent / hiring
+
+market / product
+
+regulatory / milestone
+
+Each market profile should determine which signal families matter most and how they should be weighted.
+
+4. Dynamic function libraries
+
+Functional focus options must change based on industry.
+Life sciences, legal, construction, tech, finance, and other industries must all surface relevant functions.
+
+5. Ownership / capital flexibility
+
+Do not assume every market is VC-backed.
+Support:
+
+VC-backed
+
+PE-backed
+
+public company
+
+private company
+
+family-owned
+
+government
+
+non-profit
+
+consultancy
+
+agency
+
+The current Venture Intelligence concept must evolve into a broader ownership / capital model where relevant.
+
+6. Dynamic scoring model
+
+Signal scoring and hiring inference must not be universal.
+Different industries and commercial models must have different weighting logic.
+
+7. Guided setup flow
+
+Redesign the settings experience as a step-based, guided flow:
+
+define market with AI builder or template
+
+name profile
+
+select industry
+
+dynamically choose subsector
+
+dynamically choose functions
+
+choose seniority
+
+choose company type / ownership
+
+choose stage model
+
+choose geography
+
+choose signal preferences
+
+Each step should influence the next.
+
+8. Summary / confirmation panel
+
+Show a clear market profile summary as the user builds it so they can confirm the platform has understood their market.
+
+9. Versionable templates
+
+Templates such as Life Sciences Recruiter, Tech Recruiter, Finance Recruiter, etc. should behave like structured configurations, not just visual shortcuts. They should set defaults for:
+
+taxonomy
+
+signals
+
+scoring
+
+modules
+
+ownership model
+
+10. Niche market fallback
+
+If a user enters a niche that is not in the taxonomy, store it as a custom specialty while still mapping the broader market to the structured framework.
+
+11. Universal vs industry-specific separation
+
+Keep universal platform logic separate from industry-specific logic so the product can scale.
+
+12. Long-term objective
+
+The result should be a stable, scalable market configuration engine that allows every other part of the platform to stay accurate, dynamic, and personalised without becoming brittle.
